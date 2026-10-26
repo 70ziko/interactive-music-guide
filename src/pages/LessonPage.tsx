@@ -1,18 +1,19 @@
-import { lazy, Suspense, useEffect, useMemo } from 'react';
+import { Suspense, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { MDXProvider } from '@mdx-js/react';
 import { useLang } from '../i18n/LangContext';
-import { lessonIndex, lessonLoader, lessons } from '../lessons';
+import { lessonComponent, lessonIndex, lessons } from '../lessons';
 import { mdxComponents } from '../components/mdxComponents';
 
 export default function LessonPage() {
   const { slug = '' } = useParams();
   const { lang, t } = useLang();
   const idx = lessonIndex(slug);
-  const loader = lessonLoader(lang, slug);
-  const Body = useMemo(() => (loader ? lazy(loader) : null), [loader]);
+  const Body = lessonComponent(lang, slug);
 
-  useEffect(() => window.scrollTo(0, 0), [slug, lang]);
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [slug, lang]);
 
   if (idx < 0 || !Body) return <p>{t.notFound}</p>;
   const meta = lessons[idx];

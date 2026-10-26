@@ -1,4 +1,4 @@
-import type { ComponentType } from 'react';
+import { lazy, type ComponentType, type LazyExoticComponent } from 'react';
 import type { Lang } from '../i18n/LangContext';
 
 export type Part = 'sound' | 'rhythm' | 'harmony' | 'synth' | 'structure';
@@ -97,8 +97,16 @@ export const lessons: LessonMeta[] = [
 
 const modules = import.meta.glob<{ default: ComponentType }>('./*/*.mdx');
 
-export function lessonLoader(lang: Lang, slug: string) {
-  return modules[`./${lang}/${slug}.mdx`];
+// One lazy component per lesson file, created once. Creating lazy() during render
+// makes React suspend forever when navigation runs as a transition.
+const cache = new Map<string, LazyExoticComponent<ComponentType>>();
+
+export function lessonComponent(lang: Lang, slug: string) {
+  const key = `./${lang}/${slug}.mdx`;
+  const loader = modules[key];
+  if (!loader) return null;
+  if (!cache.has(key)) cache.set(key, lazy(loader));
+  return cache.get(key)!;
 }
 
 export const lessonIndex = (slug: string) => lessons.findIndex((l) => l.slug === slug);

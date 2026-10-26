@@ -17,7 +17,9 @@ export default function Layout({ children }: { children: ReactNode }) {
     saveLang(lang);
   }, [lang, t]);
 
-  useEffect(() => setOpen(false), [loc.pathname]);
+  useEffect(() => {
+    setOpen(false);
+  }, [loc.pathname]);
 
   const switchTo = (l: Lang) => nav(loc.pathname.replace(/^\/(en|pl)/, `/${l}`));
 

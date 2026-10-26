@@ -1,0 +1,75 @@
+Każde pojęcie z kursu, z angielską nazwą i funkcją Strudla, która to robi. Posortowane według terminu polskiego.
+
+| Polski | English | Znaczenie | Strudel |
+|---|---|---|---|
+| akord | chord | 3+ nuty grane razem | `chord()` / `n("[0,2,4]")` |
+| amplituda | amplitude | jak daleko porusza się powietrze; słyszysz jako głośność | `gain()` |
+| aranżacja | arrangement | które warstwy grają kiedy w całym utworze | `arrange()` |
+| arpeggio | arpeggio | nuty akordu grane jedna po drugiej | `arp()` |
+| backbeat | backbeat | klap albo werbel na uderzeniach 2 i 4 | `s("~ cp ~ cp")` |
+| BPM | BPM | uderzenia na minutę | `setcpm()` |
+| breakdown | breakdown | sekcja bez stopy; mała energia, rosnące napięcie | — |
+| centy | cents | 1/100 półtonu; 1200 · log2(stosunek) | — |
+| cykl | cycle | jednostka czasu w Strudlu; wszystko w `"…"` mieści się w jednym | `setcpm()` |
+| częstotliwość | frequency | cykle na sekundę (Hz); słyszysz jako wysokość | `freq()` |
+| częstotliwość odcięcia | cutoff | gdzie filtr zaczyna wycinać częstotliwości | `lpf(hz)` |
+| delay (opóźnienie) | delay | echa dźwięku w czasie | `delay()` `delaysync()` |
+| donk | donk | puste uderzenie basu na offbicie w bounce | `penv()` `decay()` |
+| drop | drop | sekcja-nagroda po narastaniu | — |
+| ducking / sidechain | ducking / sidechain | jeden dźwięk przycisza drugi | `duckorbit()` |
+| dur / moll | major / minor | jasna / ciemna skala albo akord | `scale("C:major")` |
+| dźwięk akordu | chord tone | nuta należąca do akordu, który właśnie gra | — |
+| filtr | filter | usuwa część pasma częstotliwości | `lpf()` `hpf()` `bpf()` |
+| filtr dolnoprzepustowy | low-pass filter | przepuszcza dół, wycina górę | `lpf()` |
+| filtr górnoprzepustowy | high-pass filter | przepuszcza górę, wycina dół | `hpf()` |
+| four on the floor | four on the floor | stopa na każdym uderzeniu | `s("bd*4")` |
+| fraza | phrase | blok 4 / 8 / 16 taktów | — |
+| ghost note | ghost note | bardzo ciche uderzenie pomiędzy | `gain()` |
+| groove | groove | odczucie rytmu: timing, akcenty, swing | — |
+| harmoniczne (alikwoty) | harmonics | sinusy na 2f, 3f, 4f… w środku dźwięku | — |
+| hook | hook | krótka, zapadająca w pamięć melodia | — |
+| hoover | hoover | rave'owy syntezator: oktawy, PWM, chorus | `supersaw` + `phaser()` |
+| interwał | interval | odległość między dwiema nutami; stosunek częstotliwości | — |
+| koło kwintowe | circle of fifths | 12 tonacji ułożonych co kwintę | — |
+| krok | step | 1/16 taktu | — |
+| kształt fali | waveform | kształt jednego cyklu; słyszysz jako barwę | `s("sine")` … |
+| kwinta | fifth | 7 półtonów, stosunek ≈ 3 : 2 | `add(note(7))` |
+| LFO | LFO | wolna fala, która porusza parametrem | `sine.range().slow()` |
+| mini-notacja | mini-notation | język rytmu Strudla w `"…"` | `"bd*4, ~ cp"` |
+| motyw | motif | malutki pomysł na 2–4 nuty | — |
+| napięcie / rozładowanie | tension / release | ciągnięcie w stronę czegoś, potem dotarcie | — |
+| narastanie | build-up | sekcja, która podnosi napięcie przed dropem | — |
+| obwiednia ADSR | ADSR envelope | jak zmienia się głośność nuty: attack, decay, sustain, release | `attack()` `decay()` `sustain()` `release()` |
+| offbit | offbeat | „&” między uderzeniami | `"[~ x]*4"` |
+| oktawa | octave | podwojona częstotliwość; 12 półtonów | `add(note(12))` |
+| orbit | orbit | szyna efektów ze wspólnym pogłosem/delayem | `orbit()` |
+| oscylator | oscillator | źródło fali w syntezatorze | `s("sawtooth")` |
+| pad | pad | długi, miękki, trzymany akord | `attack()` `release()` |
+| panorama | panning | pozycja lewo–prawo | `pan()` |
+| pluck | pluck | krótki dźwięk: szybki atak, bez podtrzymania | `decay()` `sustain(0)` |
+| pogłos | reverb | brzmienie przestrzeni | `room()` `roomsize()` |
+| półton | semitone | najmniejszy krok na klawiaturze | `add(note(1))` |
+| progresja | progression | sekwencja akordów | `"<0 5 2 6>"` |
+| pryma (podstawa) | root | nuta, od której akord bierze nazwę | `n(0)` |
+| przejście (fill) | fill | zmiana w ostatnim takcie frazy | `lastOf()` |
+| przester | distortion | wyginanie fali → więcej harmonicznych | `distort()` `shape()` |
+| pytanie i odpowiedź | call and response | fraza, która pyta, i fraza, która odpowiada | `<…>` |
+| reese | reese | dwa rozstrojone basy z piły przesuwające się w fazie | `add(note("0,0.12"))` |
+| rezonans | resonance | podbicie tuż przy częstotliwości odcięcia | `lpq()` |
+| riser | riser | rosnący szum/ton przed dropem | `hpf(saw.range())` |
+| rozstrojenie | detune | głosy lekko rozstrojone → szerokość, dudnienie | `detune()` |
+| rytm euklidesowy | Euclidean rhythm | k uderzeń rozłożonych równo na n krokach | `"x(3,8)"` |
+| skala | scale | zestaw używanych nut (7 albo 5 z 12) | `scale()` |
+| stab | stab | krótkie, punktowe uderzenie akordu albo basu | `decay()` `struct()` |
+| strój równomiernie temperowany | equal temperament | 12 równych półtonów: każdy ×2^(1/12) | — |
+| supersaw | supersaw | kilka rozstrojonych pił w jednym głosie | `s("supersaw")` |
+| swing / shuffle | swing / shuffle | opóźnianie co drugiej szesnastki | `swingBy()` |
+| synkopa | syncopation | akcenty poza głównymi uderzeniami | — |
+| takt | bar (measure) | 4 uderzenia w 4/4; w tym kursie jeden cykl | `setcpm(BPM/4)` |
+| tercja | third | 3 albo 4 półtony; decyduje o mollu lub durze | — |
+| tonacja | key | tonika + skala używana w całym utworze | `scale("A:minor")` |
+| tonika | tonic | nuta „domowa” tonacji | `n(0)` |
+| trójdźwięk | triad | akord z 3 nut (pryma, tercja, kwinta) | `n("[0,2,4]")` |
+| uderzenie (beat) | beat | jeden puls; jedna stopa w house | — |
+| voicing (układ akordu) | voicing | w której oktawie jest każda nuta akordu | `voicing()` |
+| wysokość dźwięku | pitch | jak wysoko albo nisko brzmi nuta | `note()` |

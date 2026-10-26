@@ -1,0 +1,103 @@
+Wszystko, czego potrzebujesz przy pisaniu, na jednej stronie. Liczby w nawiasach wskazują lekcję, która to wyjaśnia.
+
+## Czas (3)
+
+<Formula>setcpm(BPM / 4)   →   1 cykl = 1 takt = 4 uderzenia = 16 kroków</Formula>
+
+| Wartość | Wzór | Przy 128 BPM |
+|---|---|---|
+| 1 uderzenie | 60 000 / BPM ms | 468,8 ms |
+| 1 takt | 4 × uderzenie | 1,875 s |
+| 1/16 (krok) | uderzenie / 4 | 117,2 ms |
+| 8 taktów | 32 × uderzenie | 15 s |
+| `late(x)` | x × takt | `late(0.01)` = 18,75 ms |
+
+## Mini-notacja (3)
+
+| Piszesz | Znaczy |
+|---|---|
+| `a b c d` | 4 równe kroki w jednym cyklu |
+| `~` | pauza |
+| `[a b]` | ściśnij w jeden krok |
+| `a*4` / `a!4` | powtórz w kroku / skopiuj jako 4 kroki |
+| `<a b>` | jedno na cykl |
+| `a, b` | razem (warstwy) |
+| `a(3,8)` | Euklides: 3 uderzenia na 8 |
+| `a?` | 50 % szans |
+| `a@3` | długie na 3 kroki |
+| `sd*<4 8 16>` | liczba powtórzeń jako wzór |
+
+## Wysokość (1, 2)
+
+<Formula>f = 440 · 2^((m − 69) / 12)      centy = 1200 · log2(stosunek)</Formula>
+
+| Interwał | Półtony | Stosunek | Stopnie skali (7-dźwiękowej) |
+|---|---|---|---|
+| Oktawa | 12 | 2 : 1 | 7 |
+| Kwinta | 7 | 3 : 2 | 4 |
+| Kwarta | 5 | 4 : 3 | 3 |
+| Tercja wielka / mała | 4 / 3 | 5 : 4 / 6 : 5 | 2 |
+
+**Kolejność ma znaczenie:** `n(…).add(n(…)).scale(key)` — arytmetykę na `n` rób **przed** `.scale()`. Po `.scale()` jest po cichu ignorowana.
+
+## Mapa pasm (1, 15)
+
+| Zakres | Kto tam mieszka |
+|---|---|
+| 20–60 Hz | sub, ciało stopy |
+| 60–250 Hz | bas, donk, uderzenie stopy |
+| 250 Hz–2 kHz | akordy, stabsy, ciało leadu, wokal |
+| 2–6 kHz | trzask klapa/werbla, ostrość leadu |
+| 6–20 kHz | haty, powietrze, risery |
+
+## Tonacja i akordy w A-moll (6, 7)
+
+| Stopień `n` | 0 | 1 | 2 | 3 | 4 | 5 | 6 |
+|---|---|---|---|---|---|---|---|
+| Nuta | A | B (H) | C | D | E | F | G |
+| Trójdźwięk | Am (i) | B° (ii°) | C (III) | Dm (iv) | Em (v) | F (VI) | G (VII) |
+
+| Progresja | Wzór `n` | Klimat |
+|---|---|---|
+| i – VI – III – VII | `"<0 5 2 6>"` | hymniczny |
+| i – i – VI – v | `"<0 0 5 4>"` | klasyka house |
+| i – VI – iv – v | `"<0 5 3 4>"` | bounce |
+| i – iv | `"<0 3>"` | hipnotyczny vamp |
+
+## Funkcje według zadania
+
+| Zadanie | Funkcje |
+|---|---|
+| Brzmienie | `s()` `note()` `n().scale()` `chord().voicing()` `bank()` |
+| Rytm | `struct()` `mask()` `fast()` `slow()` `swingBy()` `late()` |
+| Wariacja | `<…>` `lastOf()` `firstOf()` `sometimesBy()` `degradeBy()` `off()` `rev()` `ply()` |
+| Obwiednia | `attack()` `decay()` `sustain()` `release()` `penv()` `pdecay()` |
+| Filtr | `lpf()` `lpq()` `hpf()` `bpf()` `lpenv()` `lpattack()` `ftype()` `djf()` |
+| Efekty | `room()` `roomsize()` `delay()` `delaysync()` `delayfeedback()` `distort()` `shape()` `crush()` `phaser()` |
+| Miks | `gain()` `pan()` `orbit()` `duckorbit()` `duckdepth()` `duckattack()` `compressor()` |
+| Ruch | `sine` `saw` `perlin` + `.range(a,b)` `.slow(n)` |
+| Struktura | etykiety `kick:` · wyciszenie `_kick:` · `stack()` · `arrange([takty, wzór], …)` |
+
+## Gatunki (16–18)
+
+| | House | Bounce / donk | Hard house |
+|---|---|---|---|
+| BPM | 115–130 (głównie 120–128) | ~140–150 | 135–165 (~150) |
+| Offbit | hat otwarty | donk | stabsy basu |
+| Stopa | czysta | punktowa, przesterowana | twarda, przesterowana |
+| Podpis | stabsy m7, pianino, acid | hook do śpiewania | hoover, długi smyczek, drop po rolce |
+
+## Na start
+
+<Strudel title="starter na pustą stronę" code={`
+  setcpm(128/4)
+  const key  = 'A:minor'
+  const prog = "<0 0 5 4>"
+  kick: s("bd*4").bank("RolandTR909")
+  hats: s("[~ oh]*4, hh*16").bank("RolandTR909").gain(0.35)
+  clap: s("~ cp ~ cp").bank("RolandTR909").gain(0.7)
+  bass: n(prog).scale("A1:minor").struct("[~ x]*4")
+    .s("sawtooth").lpf(450).decay(0.15).sustain(0.3)
+  _chords: n("[0,2,4,6]").add(n(prog)).scale(key)
+    .struct("[~ x ~ ~]*4").s("gm_drawbar_organ").decay(0.2).sustain(0).hpf(200)
+`} />

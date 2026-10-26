@@ -1,0 +1,103 @@
+Everything you need while writing, on one page. Numbers in brackets point to the lesson that explains it.
+
+## Time (3)
+
+<Formula>setcpm(BPM / 4)   →   1 cycle = 1 bar = 4 beats = 16 steps</Formula>
+
+| Value | Formula | At 128 BPM |
+|---|---|---|
+| 1 beat | 60 000 / BPM ms | 468.8 ms |
+| 1 bar | 4 × beat | 1.875 s |
+| 1/16 step | beat / 4 | 117.2 ms |
+| 8 bars | 32 × beat | 15 s |
+| `late(x)` | x × bar | `late(0.01)` = 18.75 ms |
+
+## Mini-notation (3)
+
+| Write | Means |
+|---|---|
+| `a b c d` | 4 equal steps in one cycle |
+| `~` | rest |
+| `[a b]` | squeeze into one step |
+| `a*4` / `a!4` | repeat inside the step / copy as 4 steps |
+| `<a b>` | one per cycle |
+| `a, b` | together (layers) |
+| `a(3,8)` | Euclid: 3 hits over 8 |
+| `a?` | 50 % chance |
+| `a@3` | 3 steps long |
+| `sd*<4 8 16>` | patterned repeat count |
+
+## Pitch (1, 2)
+
+<Formula>f = 440 · 2^((m − 69) / 12)      cents = 1200 · log2(ratio)</Formula>
+
+| Interval | Semitones | Ratio | Scale steps (7-note) |
+|---|---|---|---|
+| Octave | 12 | 2 : 1 | 7 |
+| Fifth | 7 | 3 : 2 | 4 |
+| Fourth | 5 | 4 : 3 | 3 |
+| Major / minor 3rd | 4 / 3 | 5 : 4 / 6 : 5 | 2 |
+
+**Order matters:** `n(…).add(n(…)).scale(key)` — do arithmetic on `n` **before** `.scale()`. After `.scale()` it is silently ignored.
+
+## Frequency map (1, 15)
+
+| Range | Who lives there |
+|---|---|
+| 20–60 Hz | sub, kick body |
+| 60–250 Hz | bass, donk, kick punch |
+| 250 Hz–2 kHz | chords, stabs, lead body, vocals |
+| 2–6 kHz | clap/snare snap, lead bite |
+| 6–20 kHz | hats, air, risers |
+
+## Keys and chords in A minor (6, 7)
+
+| Degree `n` | 0 | 1 | 2 | 3 | 4 | 5 | 6 |
+|---|---|---|---|---|---|---|---|
+| Note | A | B | C | D | E | F | G |
+| Triad | Am (i) | B° (ii°) | C (III) | Dm (iv) | Em (v) | F (VI) | G (VII) |
+
+| Progression | `n` pattern | Feel |
+|---|---|---|
+| i – VI – III – VII | `"<0 5 2 6>"` | anthemic |
+| i – i – VI – v | `"<0 0 5 4>"` | house classic |
+| i – VI – iv – v | `"<0 5 3 4>"` | bounce |
+| i – iv | `"<0 3>"` | hypnotic vamp |
+
+## Functions by job
+
+| Job | Functions |
+|---|---|
+| Sound | `s()` `note()` `n().scale()` `chord().voicing()` `bank()` |
+| Rhythm | `struct()` `mask()` `fast()` `slow()` `swingBy()` `late()` |
+| Variation | `<…>` `lastOf()` `firstOf()` `sometimesBy()` `degradeBy()` `off()` `rev()` `ply()` |
+| Envelope | `attack()` `decay()` `sustain()` `release()` `penv()` `pdecay()` |
+| Filter | `lpf()` `lpq()` `hpf()` `bpf()` `lpenv()` `lpattack()` `ftype()` `djf()` |
+| Effects | `room()` `roomsize()` `delay()` `delaysync()` `delayfeedback()` `distort()` `shape()` `crush()` `phaser()` |
+| Mix | `gain()` `pan()` `orbit()` `duckorbit()` `duckdepth()` `duckattack()` `compressor()` |
+| Movement | `sine` `saw` `perlin` + `.range(a,b)` `.slow(n)` |
+| Structure | labels `kick:` · mute `_kick:` · `stack()` · `arrange([bars, pat], …)` |
+
+## Genres (16–18)
+
+| | House | Bounce / donk | Hard house |
+|---|---|---|---|
+| BPM | 115–130 (mostly 120–128) | ~140–150 | 135–165 (~150) |
+| Offbeat | open hat | donk | bass stabs |
+| Kick | clean | punchy, driven | hard, distorted |
+| Signature | m7 stabs, piano, acid | sing-along hook | hoover, long string, drum-roll drop |
+
+## Starter
+
+<Strudel title="blank-page starter" code={`
+  setcpm(128/4)
+  const key  = 'A:minor'
+  const prog = "<0 0 5 4>"
+  kick: s("bd*4").bank("RolandTR909")
+  hats: s("[~ oh]*4, hh*16").bank("RolandTR909").gain(0.35)
+  clap: s("~ cp ~ cp").bank("RolandTR909").gain(0.7)
+  bass: n(prog).scale("A1:minor").struct("[~ x]*4")
+    .s("sawtooth").lpf(450).decay(0.15).sustain(0.3)
+  _chords: n("[0,2,4,6]").add(n(prog)).scale(key)
+    .struct("[~ x ~ ~]*4").s("gm_drawbar_organ").decay(0.2).sustain(0).hpf(200)
+`} />

@@ -1,0 +1,75 @@
+Every term from the course, with its Polish name and the Strudel function that does it. Sorted by the English term.
+
+| English | Polski | Meaning | Strudel |
+|---|---|---|---|
+| ADSR envelope | obwiednia ADSR | how loudness moves over a note: attack, decay, sustain, release | `attack()` `decay()` `sustain()` `release()` |
+| Amplitude | amplituda | how far the air moves; heard as loudness | `gain()` |
+| Arpeggio | arpeggio | chord notes played one after another | `arp()` |
+| Arrangement | aranżacja | which layers play when, over the whole track | `arrange()` |
+| Backbeat | backbeat | clap or snare on beats 2 and 4 | `s("~ cp ~ cp")` |
+| Bar (measure) | takt | 4 beats in 4/4; one cycle in this course | `setcpm(BPM/4)` |
+| Beat | uderzenie (beat) | one pulse; one kick in house | — |
+| BPM | BPM | beats per minute | `setcpm()` |
+| Breakdown | breakdown | section with the kick removed; low energy, rising tension | — |
+| Build-up | narastanie | section that raises tension before a drop | — |
+| Call and response | pytanie i odpowiedź | a phrase that asks, then one that answers | `<…>` |
+| Cents | centy | 1/100 of a semitone; 1200 · log2(ratio) | — |
+| Chord | akord | 3+ notes played together | `chord()` / `n("[0,2,4]")` |
+| Chord tone | dźwięk akordu | a note that belongs to the chord playing now | — |
+| Circle of fifths | koło kwintowe | the 12 keys arranged a fifth apart | — |
+| Cutoff | częstotliwość odcięcia | where a filter starts removing frequencies | `lpf(hz)` |
+| Cycle | cykl | Strudel's time unit; everything in `"…"` fits in one | `setcpm()` |
+| Delay | delay (opóźnienie) | echoes of a sound in time | `delay()` `delaysync()` |
+| Detune | rozstrojenie | voices slightly out of tune → width, beating | `detune()` |
+| Distortion | przester | bending the wave → more harmonics | `distort()` `shape()` |
+| Donk | donk | hollow offbeat bass hit of bounce | `penv()` `decay()` |
+| Drop | drop | the payoff section after a build-up | — |
+| Ducking / sidechain | ducking / sidechain | one sound turns another down | `duckorbit()` |
+| Equal temperament | strój równomiernie temperowany | 12 equal semitones: ×2^(1/12) each | — |
+| Euclidean rhythm | rytm euklidesowy | k hits spread evenly over n steps | `"x(3,8)"` |
+| Fifth | kwinta | 7 semitones, ratio ≈ 3 : 2 | `add(note(7))` |
+| Fill | przejście (fill) | a change in the last bar of a phrase | `lastOf()` |
+| Filter | filtr | removes part of the frequency range | `lpf()` `hpf()` `bpf()` |
+| Four on the floor | four on the floor | kick on every beat | `s("bd*4")` |
+| Frequency | częstotliwość | cycles per second (Hz); heard as pitch | `freq()` |
+| Ghost note | ghost note | very quiet in-between hit | `gain()` |
+| Groove | groove | the feel of a rhythm: timing, accents, swing | — |
+| Harmonics | harmoniczne (alikwoty) | sine waves at 2f, 3f, 4f… inside a sound | — |
+| High-pass filter | filtr górnoprzepustowy | lets highs through, removes lows | `hpf()` |
+| Hook | hook | the short, memorable melody | — |
+| Hoover | hoover | rave synth: octave-stacked, PWM, chorus | `supersaw` + `phaser()` |
+| Interval | interwał | distance between two notes; a frequency ratio | — |
+| Key | tonacja | tonic + scale used for the whole track | `scale("A:minor")` |
+| LFO | LFO | slow wave that moves a parameter | `sine.range().slow()` |
+| Low-pass filter | filtr dolnoprzepustowy | lets lows through, removes highs | `lpf()` |
+| Major / minor | dur / moll | bright / dark scale or chord | `scale("C:major")` |
+| Mini-notation | mini-notacja | Strudel's rhythm language inside `"…"` | `"bd*4, ~ cp"` |
+| Motif | motyw | a tiny 2–4 note idea | — |
+| Octave | oktawa | double the frequency; 12 semitones | `add(note(12))` |
+| Offbeat | offbit | the "&" between beats | `"[~ x]*4"` |
+| Orbit | orbit | an effects bus with shared reverb/delay | `orbit()` |
+| Oscillator | oscylator | the source of a synth's wave | `s("sawtooth")` |
+| Pad | pad | long, soft sustained chord sound | `attack()` `release()` |
+| Panning | panorama | left–right position | `pan()` |
+| Phrase | fraza | a block of 4 / 8 / 16 bars | — |
+| Pitch | wysokość dźwięku | how high or low a note sounds | `note()` |
+| Pluck | pluck | short sound: fast attack, no sustain | `decay()` `sustain(0)` |
+| Progression | progresja | a sequence of chords | `"<0 5 2 6>"` |
+| Reese | reese | two detuned saw basses phasing | `add(note("0,0.12"))` |
+| Resonance | rezonans | boost right at the filter cutoff | `lpq()` |
+| Reverb | pogłos | the sound of a space | `room()` `roomsize()` |
+| Riser | riser | rising noise/tone before a drop | `hpf(saw.range())` |
+| Root | pryma (podstawa) | the note a chord is named after | `n(0)` |
+| Scale | skala | the set of notes used (7 or 5 of 12) | `scale()` |
+| Semitone | półton | the smallest step on a keyboard | `add(note(1))` |
+| Stab | stab | short, punchy chord or bass hit | `decay()` `struct()` |
+| Step | krok | 1/16 of a bar | — |
+| Supersaw | supersaw | several detuned saws in one voice | `s("supersaw")` |
+| Swing / shuffle | swing / shuffle | delaying every second 16th | `swingBy()` |
+| Syncopation | synkopa | accents off the main beats | — |
+| Tension / release | napięcie / rozładowanie | pulling towards something, then arriving | — |
+| Third | tercja | 3 or 4 semitones; decides minor or major | — |
+| Tonic | tonika | the home note of the key | `n(0)` |
+| Triad | trójdźwięk | 3-note chord (root, third, fifth) | `n("[0,2,4]")` |
+| Voicing | voicing (układ akordu) | which octave each chord note is in | `voicing()` |
+| Waveform | kształt fali | the shape of one cycle; heard as tone colour | `s("sine")` … |

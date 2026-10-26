@@ -1,0 +1,100 @@
+You know the pieces. This last lesson is the **order to put them together in**, so a blank editor turns into a finished track instead of an endless 8-bar loop.
+
+## The 8 steps
+
+<Chain steps={[
+  { name: '1. Decide', desc: 'genre, tempo, key', code: "setcpm(128/4); const key='A:minor'" },
+  { name: '2. Drums', desc: 'the 4 rules, then groove', code: 'kick: hats: clap:' },
+  { name: '3. Bass', desc: 'locked to the kick, on chord roots', code: 'bass:' },
+  { name: '4. Harmony + hook', desc: '1–4 chords, one short hook', code: 'chords: hook:' },
+  { name: '5. Sound pass', desc: 'make each part sound right', code: '.s() .lpf() .distort()' },
+  { name: '6. Arrange', desc: '8-bar blocks, tension, drops', code: 'arrange(…)' },
+  { name: '7. Mix', desc: 'levels, slots, pan, ducking', code: '.gain() .hpf() .pan()' },
+  { name: '8. Finish', desc: 'checklist, then stop', code: '✓' },
+]} />
+
+**The rule that saves tracks:** do the steps **in order** and give each one a time limit. A good loop in 30 minutes, an arrangement in the next hour. Polishing a loop for hours is the #1 reason tracks never get finished.
+
+## Step 1–4: the loop (≈ 30 min)
+
+Start from this skeleton. Every part is a labelled line, so you can mute (`_`) and unmute while you work. The `slider()` calls draw real knobs in the editor — drag them while it plays.
+
+<Strudel title="starting skeleton with live knobs" code={`
+  setcpm(128/4)
+  const key  = 'A:minor'
+  const prog = "<0 0 5 4>"
+
+  kick: s("bd*4").bank("RolandTR909").gain(0.95)
+  hats: s("[~ oh]*4, hh*16").bank("RolandTR909").gain(0.35)
+  clap: s("~ cp ~ cp").bank("RolandTR909").gain(0.7)
+  bass: n(prog).scale("A1:minor").struct("[~ x]*4")
+    .s("sawtooth").lpf(slider(450, 150, 1500))
+    .decay(0.15).sustain(0.3).gain(0.8)
+  _chords: n("[0,2,4,6]").add(n(prog)).scale(key).struct("[~ x ~ ~]*4")
+    .s("gm_drawbar_organ").decay(0.2).sustain(0).hpf(200).gain(0.55)
+  _hook: n("0 ~ ~ 2 ~ ~ 4 ~ ~ ~ 3 ~ 2 ~ ~ ~").scale("A4:minor")
+    .s("square").lpf(slider(2200, 500, 6000)).decay(0.15).sustain(0.2).gain(0.45)
+`} />
+
+<TryThis>
+Press Play. Drag the bass filter knob. Remove `_` from `chords`, then from `hook`. Change the progression to `"<0 3 5 4>"`. You now have a loop you made decisions in — that is step 4 done.
+</TryThis>
+
+## Step 5: the sound pass (≈ 20 min)
+
+Go part by part, solo it (mute the rest with `_`), and ask one question: **does it sound like the genre?** Use lessons 10–12. Do not touch the arrangement yet.
+
+## Step 6: arrange (≈ 45 min)
+
+Turn the labels into `const` layers and list sections with `arrange()` (lessons 13–14). Start from the genre template (lessons 16–18) and only change what you need.
+
+<Callout kind="tip">
+Shortcut: write the sections first with only `kick` in each — `[16, kick], [16, kick], …` — and check the total length feels right. Then fill in the layers.
+</Callout>
+
+## Step 7: mix (≈ 20 min)
+
+Run the mix checklist from lesson 15. Fix the biggest problem first (usually: kick vs bass, or something too loud).
+
+## Step 8: finish
+
+A track is finished when the checklist passes, not when it is perfect.
+
+| ✓ | Check |
+|---|---|
+| ☐ | Tempo and key decided and consistent |
+| ☐ | Intro and outro are DJ-friendly (drums first) |
+| ☐ | Every change lands on an 8-bar boundary |
+| ☐ | At least one breakdown and one real drop |
+| ☐ | Something changes every 8 bars; small variation inside bars |
+| ☐ | Kick loudest, nothing clips, low end mono |
+| ☐ | You listened at low volume and on a second system |
+| ☐ | You took a break and listened once more with fresh ears |
+
+## The 10 rules of this course
+
+1. `setcpm(BPM/4)`: one cycle = one bar.
+2. One key per track, everything through `.scale(key)`.
+3. Kick on every beat, clap on 2 and 4, open hat on the offbeat.
+4. Bass between the kicks, on chord roots.
+5. Octaves and fifths in the low end, thirds only in the mids.
+6. Start sounds from a saw and shape them with the filter.
+7. Change something every 8 bars; fill in the last bar.
+8. Tension before release: roll + riser + a silent beat.
+9. Kick loudest; high-pass everything else; low end mono.
+10. Finish, then start the next track.
+
+<DoDont
+  do={[
+    'Time-box each step; move on when the time is up.',
+    'Start from a template and change it, rather than from a blank page.',
+    'Save versions (copy the code somewhere) before big changes.',
+    'Finish many small tracks — that is how you get good.',
+  ]}
+  dont={[
+    'Loop 8 bars for hours "until it is ready".',
+    'Mix before arranging.',
+    'Restart a track because a new idea came up — write the new idea in a new file.',
+    'Compare your first tracks to professional releases. Compare them to your last track.',
+  ]}
+/>

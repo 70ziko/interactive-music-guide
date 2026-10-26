@@ -1,0 +1,100 @@
+Znasz już elementy. Ta ostatnia lekcja to **kolejność ich składania**, żeby pusty edytor zamienił się w skończony utwór, a nie w niekończącą się 8-taktową pętlę.
+
+## 8 kroków
+
+<Chain steps={[
+  { name: '1. Zdecyduj', desc: 'gatunek, tempo, tonacja', code: "setcpm(128/4); const key='A:minor'" },
+  { name: '2. Bębny', desc: '4 zasady, potem groove', code: 'kick: hats: clap:' },
+  { name: '3. Bas', desc: 'zazębiony ze stopą, na prymach akordów', code: 'bass:' },
+  { name: '4. Harmonia + hook', desc: '1–4 akordy, jeden krótki hook', code: 'chords: hook:' },
+  { name: '5. Brzmienie', desc: 'niech każda partia brzmi jak trzeba', code: '.s() .lpf() .distort()' },
+  { name: '6. Aranżacja', desc: 'bloki po 8 taktów, napięcie, dropy', code: 'arrange(…)' },
+  { name: '7. Miks', desc: 'poziomy, pasma, panorama, ducking', code: '.gain() .hpf() .pan()' },
+  { name: '8. Koniec', desc: 'lista kontrolna, potem stop', code: '✓' },
+]} />
+
+**Zasada, która ratuje utwory:** rób kroki **po kolei** i daj każdemu limit czasu. Dobra pętla w 30 minut, aranżacja w kolejną godzinę. Szlifowanie pętli godzinami to powód nr 1, dla którego utwory nigdy nie są kończone.
+
+## Kroki 1–4: pętla (≈ 30 min)
+
+Zacznij od tego szkieletu. Każda partia to linia z etykietą, więc w trakcie pracy możesz wyciszać (`_`) i włączać. Wywołania `slider()` rysują w edytorze prawdziwe gałki — przeciągaj je, gdy gra.
+
+<Strudel title="szkielet startowy z gałkami na żywo" code={`
+  setcpm(128/4)
+  const key  = 'A:minor'
+  const prog = "<0 0 5 4>"
+
+  kick: s("bd*4").bank("RolandTR909").gain(0.95)
+  hats: s("[~ oh]*4, hh*16").bank("RolandTR909").gain(0.35)
+  clap: s("~ cp ~ cp").bank("RolandTR909").gain(0.7)
+  bass: n(prog).scale("A1:minor").struct("[~ x]*4")
+    .s("sawtooth").lpf(slider(450, 150, 1500))
+    .decay(0.15).sustain(0.3).gain(0.8)
+  _chords: n("[0,2,4,6]").add(n(prog)).scale(key).struct("[~ x ~ ~]*4")
+    .s("gm_drawbar_organ").decay(0.2).sustain(0).hpf(200).gain(0.55)
+  _hook: n("0 ~ ~ 2 ~ ~ 4 ~ ~ ~ 3 ~ 2 ~ ~ ~").scale("A4:minor")
+    .s("square").lpf(slider(2200, 500, 6000)).decay(0.15).sustain(0.2).gain(0.45)
+`} />
+
+<TryThis>
+Wciśnij Graj. Przeciągnij gałkę filtra basu. Usuń `_` sprzed `chords`, potem sprzed `hook`. Zmień progresję na `"<0 3 5 4>"`. Masz teraz pętlę, w której podjąłeś decyzje — krok 4 zrobiony.
+</TryThis>
+
+## Krok 5: przejście po brzmieniach (≈ 20 min)
+
+Idź partia po partii, zostaw ją samą (resztę wycisz `_`) i zadaj jedno pytanie: **czy to brzmi jak ten gatunek?** Korzystaj z lekcji 10–12. Nie ruszaj jeszcze aranżacji.
+
+## Krok 6: aranżacja (≈ 45 min)
+
+Zamień etykiety na warstwy `const` i wypisz sekcje w `arrange()` (lekcje 13–14). Zacznij od szablonu gatunku (lekcje 16–18) i zmieniaj tylko to, co trzeba.
+
+<Callout kind="tip">
+Skrót: najpierw wypisz sekcje z samą stopą w każdej — `[16, kick], [16, kick], …` — i sprawdź, czy całkowita długość jest w porządku. Potem wypełnij warstwy.
+</Callout>
+
+## Krok 7: miks (≈ 20 min)
+
+Przejdź listę kontrolną miksu z lekcji 15. Najpierw napraw największy problem (zwykle: stopa vs bas albo coś za głośno).
+
+## Krok 8: koniec
+
+Utwór jest skończony, gdy lista kontrolna przechodzi, a nie wtedy, gdy jest idealny.
+
+| ✓ | Sprawdź |
+|---|---|
+| ☐ | Tempo i tonacja ustalone i spójne |
+| ☐ | Intro i outro przyjazne DJ-om (najpierw bębny) |
+| ☐ | Każda zmiana wypada na granicy 8 taktów |
+| ☐ | Przynajmniej jeden breakdown i jeden prawdziwy drop |
+| ☐ | Coś się zmienia co 8 taktów; drobne wariacje wewnątrz taktów |
+| ☐ | Stopa najgłośniejsza, nic się nie przesterowuje, dół w mono |
+| ☐ | Posłuchałeś na małej głośności i na drugim sprzęcie |
+| ☐ | Zrobiłeś przerwę i posłuchałeś jeszcze raz świeżymi uszami |
+
+## 10 zasad tego kursu
+
+1. `setcpm(BPM/4)`: jeden cykl = jeden takt.
+2. Jedna tonacja na utwór, wszystko przez `.scale(key)`.
+3. Stopa na każdym uderzeniu, klap na 2 i 4, hat otwarty na offbicie.
+4. Bas między stopami, na prymach akordów.
+5. Oktawy i kwinty w dole, tercje tylko w środku.
+6. Brzmienia zaczynaj od piły i kształtuj filtrem.
+7. Zmieniaj coś co 8 taktów; fill w ostatnim takcie.
+8. Napięcie przed rozładowaniem: rolka + riser + ciche uderzenie.
+9. Stopa najgłośniejsza; filtr górnoprzepustowy na resztę; dół w mono.
+10. Skończ, potem zacznij następny utwór.
+
+<DoDont
+  do={[
+    'Dawaj każdemu krokowi limit czasu; idź dalej, gdy czas minie.',
+    'Zaczynaj od szablonu i go zmieniaj, zamiast od pustej strony.',
+    'Zapisuj wersje (skopiuj kod gdzieś) przed dużymi zmianami.',
+    'Kończ wiele małych utworów — tak się staje dobrym.',
+  ]}
+  dont={[
+    'Kręcić 8 taktów w pętli godzinami, „aż będzie gotowe”.',
+    'Miksować przed aranżacją.',
+    'Zaczynać utworu od nowa, bo wpadł nowy pomysł — zapisz nowy pomysł w nowym pliku.',
+    'Porównywać pierwszych utworów z profesjonalnymi wydawnictwami. Porównuj je ze swoim poprzednim utworem.',
+  ]}
+/>

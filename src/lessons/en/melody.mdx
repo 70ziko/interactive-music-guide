@@ -1,0 +1,118 @@
+The **hook** is the part people hum on the way home. In dance music it is usually short (1–2 bars), repeated many times, and simple enough to recognise after one listen. The good news: hooks are built from a few repeatable tricks, not genius.
+
+## Rhythm first, pitch second
+
+Clap a hook before you give it notes. Most memorable dance hooks have:
+
+- **few notes** — 3 to 7 per bar,
+- **space** — rests are part of the rhythm,
+- **syncopation** — notes on the "e", "&", "a" of a beat, not only on the beat,
+- **repetition** — the same rhythm comes back, even when the notes change.
+
+If the rhythm is catchy with one note, it will be catchy with five.
+
+<Strudel title="the same rhythm, one note vs a melody" code={`
+  setcpm(128/4)
+  n("<[0 ~ ~ 0 ~ ~ 0 ~ ~ ~ 0 ~ 0 ~ ~ ~] [0 ~ ~ 2 ~ ~ 4 ~ ~ ~ 3 ~ 2 ~ ~ ~]>")
+    .scale("A4:minor").s("square").lpf(2200)
+    .decay(0.15).sustain(0.2).gain(0.5)
+    ._pianoroll()
+`} />
+
+## Contour: the shape of a line
+
+**Steps** (moving to the neighbouring scale note) sound smooth and singable. **Leaps** (jumping 3+ scale steps) sound dramatic and draw attention. A good line mixes both: a leap, then steps back towards it. Keep most hooks inside one octave.
+
+<MelodyGrid preset="hook" />
+
+<TryThis>
+1. Press **Play**, then load **Simple hook**, **Arpeggio**, **Offbeat riff**, **Bounce hook**.
+2. Make your own: start from **Empty**, put 4 notes in bar positions 1, 4, 7 and 11. Then try moving only one of them up or down.
+3. Switch the scale to **Major**: same clicks, brighter mood.
+</TryThis>
+
+## Motif and variation
+
+A **motif** is a tiny idea (2–4 notes). You build a hook by repeating it with small changes:
+
+| Trick | What happens | Strudel |
+|---|---|---|
+| Repeat | identical — builds familiarity | `<…>` with the same value |
+| Sequence | same shape, moved up/down the scale | `.add(n("<0 0 2 -1>"))` |
+| Rhythmic shift | same notes, starting later | `.late(1/8)` |
+| Reverse | notes backwards | `.rev()` |
+| Answer | change only the ending | `lastOf(2, …)` |
+
+<Strudel title="one motif, moved through the scale" code={`
+  setcpm(128/4)
+  n("0 2 ~ 4 ~ ~ 2 ~")
+    .add(n("<0 0 3 2>"))         // bar 3 and 4: same shape, higher
+    .scale("A4:minor").s("square").lpf(2000)
+    .decay(0.15).sustain(0.2).gain(0.5)
+    ._pianoroll()
+`} />
+
+## Call and response
+
+The most reliable structure for a 4-bar hook: **bar 1 asks, bar 2 answers, bar 3 asks again, bar 4 answers differently**. The question ends on a tension note (degree 1 or 6, lesson 6). The final answer lands on the tonic (0).
+
+<Strudel title="call and response (4 bars)" code={`
+  setcpm(128/4)
+  n(\`<
+    [0 ~ 2 ~ 4 ~ ~ 5]
+    [4 ~ 2 ~ ~ ~ ~ ~]
+    [0 ~ 2 ~ 4 ~ ~ 5]
+    [6 ~ 4 ~ 1 ~ 0 ~]
+  >\`).scale("A4:minor").s("square").lpf(2200)
+   .decay(0.18).sustain(0.2).gain(0.5)._pianoroll()
+`} />
+
+## Hooks that fit the chords
+
+A hook sounds strongest when its long or accented notes are **chord tones** — notes that are also in the chord playing underneath. Over Am (A C E) the safe landing notes are degrees 0, 2, 4. Over F (F A C) they are 5, 7, 9. Passing notes between them can be anything in the scale.
+
+<Strudel title="hook landing on chord tones" code={`
+  setcpm(128/4)
+  chords: n("<[0,2,4] [5,7,9] [2,4,6] [6,8,10]>")
+    .scale("A3:minor").s("sawtooth").lpf(900).sustain(1).gain(0.2)
+  hook: n("<[4 ~ 2 4 ~ ~ 2 ~] [7 ~ 5 7 ~ ~ 5 ~] [6 ~ 4 6 ~ ~ 4 ~] [8 ~ 6 8 ~ 7 6 ~]>")
+    .scale("A4:minor").s("square").lpf(2400)
+    .decay(0.15).sustain(0.25).gain(0.45)
+  kick: s("bd*4").bank("RolandTR909")
+`} />
+
+## Arpeggios: melody from chords
+
+An **arpeggio** plays the notes of a chord one after another. It is the fastest way to get a moving line that always fits. `arp` picks notes from the chord by index.
+
+<Strudel title="arp over a progression" code={`
+  setcpm(128/4)
+  n("<[0,2,4,7] [5,7,9,12] [2,4,6,9] [6,8,10,13]>")
+    .arp("0 1 2 3 2 1 0 1 2 3 2 1 0 1 2 3")
+    .scale("A3:minor").s("sawtooth")
+    .lpf(1600).lpq(4).decay(0.12).sustain(0).gain(0.5)
+    ._pianoroll()
+`} />
+
+## Genre flavours
+
+| Genre | Typical hook |
+|---|---|
+| House | piano or organ chord riffs, vocal phrases, syncopated stabs |
+| Bounce | very catchy, often major-ish, sing-along lead on top of the donk |
+| Hard house | short repeated stabs on the offbeat, hoover riffs, long sustained string notes in breakdowns |
+
+<DoDont
+  do={[
+    'Write the rhythm first, then add pitch.',
+    'Keep hooks within about one octave and mostly in steps.',
+    'Repeat the motif at least 2–3 times before changing it.',
+    'Land long notes on chord tones; end the phrase on the tonic.',
+  ]}
+  dont={[
+    'Fill every 16th — a hook needs rests to be heard.',
+    'Use more than ~7 notes per bar for a main hook.',
+    'Write a new idea every bar. Variation, not invention.',
+    'Put the hook in the same register as the chords — move it up an octave so it stands out.',
+  ]}
+/>

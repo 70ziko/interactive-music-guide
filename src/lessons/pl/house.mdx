@@ -1,0 +1,88 @@
+Wszystko w tym kursie do tej pory miało kształt house'u. Ten podręcznik zbiera to w **jedną stronę, z której napiszesz utwór**: odcisk palca gatunku, jego odmiany, pełny szablon i listę kontrolną.
+
+## Odcisk palca
+
+House narodził się w **Chicago na początku lat 80.** i zwykle ma około **115–130 BPM** (większość utworów 120–128). Jego rdzeń to wzór bębnów, który zbudowałeś w lekcji 4:
+
+| Element | Zasada |
+|---|---|
+| Stopa | na każdym uderzeniu (four on the floor), zwykle z automatu perkusyjnego (TR-909, TR-808) |
+| Haty | hat otwarty na offbicie, zamknięte na ósemkach albo szesnastkach |
+| Klap / werbel | na uderzeniach 2 i 4 |
+| Bas | na offbicie albo synkopowany, zazębiony ze stopą |
+| Harmonia | 1–4 akordy, często m7 / m9, pętle po 1, 2 albo 4 takty |
+| Forma | frazy po 8 taktów, intro i outro przyjazne DJ-om |
+
+## Odmiany (z grubsza)
+
+| Styl | Klimat | Po co sięgnąć |
+|---|---|---|
+| Deep house | ciepły, soulowy, niespieszny | akordy m7/m9, e-piano albo pady, okrągły bas, swing, dużo przestrzeni |
+| Chicago / jackin' | surowy, punktowy, automat na pierwszym planie | głośne bębny 909/808, prosty bas, acid albo stabsy organowe |
+| Piano house | podnoszący na duchu, euforyczny | riffy akordowe na pianinie, dur albo jasny moll, wielkie breakdowny |
+| Acid house | hipnotyczny, mlaszczący | jedna linia acid w stylu 303 niesie utwór (lekcja 10) |
+| Tech house | ciasny, groovy, minimalny | sucha perkusja, krótkie nuty basu, małe wariacje (lekcja 5) |
+
+## Szablon
+
+Pełny, grający utwór house na 112 taktów (≈ 3,6 min przy 124 BPM). Zbudowany z nazwanych warstw, zaaranżowany przez `arrange()` (lekcja 13). Zmień tonację, akordy i brzmienie stabów — i masz swój utwór.
+
+<Strudel title="szablon utworu house" code={`
+  setcpm(124/4)
+  const key  = 'A:minor'
+  const prog = "<0 0 5 4>"                     // i i VI v
+
+  const kick  = s("bd*4").bank("RolandTR909").gain(0.95)
+    .duckorbit(2).duckdepth(0.6).duckattack(0.2)
+  const clap  = s("~ cp ~ cp").bank("RolandTR909").gain(0.7).room(0.15)
+  const hats  = s("[~ oh]*4").bank("RolandTR909").gain(0.4)
+  const shuf  = s("hh*16").bank("RolandTR909").gain("[0.2 0.32]*8")
+    .degradeBy(0.1).swingBy(1/6, 8)
+  const perc  = s("rim(3,8)").bank("RolandTR909").gain(0.35).pan(0.7)
+  const bass  = n(prog).scale("A1:minor").struct("[~ x ~ x] [~ x ~ ~] [~ x ~ x] [~ x ~ ~]")
+    .s("sawtooth").lpf(perlin.range(350, 600).slow(8)).decay(0.15).sustain(0.3).gain(0.8)
+  const stabs = n("[0,2,4,6]").add(n(prog)).scale(key)
+    .struct("[~ x ~ ~] [x ~ ~ x] [~ ~ x ~] [~ x ~ ~]")
+    .s("gm_drawbar_organ").decay(0.18).sustain(0).hpf(200).gain(0.6)
+    .room(0.3).orbit(2)
+  const pad   = n("[0,2,4,8]").add(n(prog)).scale(key)
+    .s("supersaw").attack(0.6).release(1.5).sustain(0.8)
+    .hpf(250).lpf(1600).gain(0.18).room(0.6).orbit(2)
+  const roll  = s("cp*<4 4 8 8 16 16 32 32>").bank("RolandTR909")
+    .gain(saw.range(0.3, 0.8).slow(8))
+
+  arrange(
+    [16, stack(kick, hats, shuf)],                              // intro
+    [16, stack(kick, hats, shuf, clap, bass, perc)],            // groove
+    [16, stack(kick, hats, shuf, clap, bass, perc, stabs)],     // główna
+    [16, stack(stabs, pad)],                                    // breakdown
+    [8,  stack(stabs.hpf(saw.range(200, 1500).slow(8)), roll)], // narastanie
+    [24, stack(kick, hats, shuf, clap, bass, perc, stabs, pad)],// drop
+    [16, stack(kick, hats, shuf, perc)]                         // outro
+  )
+`} />
+
+<ArrangementTimeline template="house" />
+
+## Zrób go swoim: 5 zmian, które najwięcej znaczą
+
+1. **Tonacja i progresja** — spróbuj `'F:minor'` i `"<0 3 5 4>"`.
+2. **Brzmienie stabów** — zamień `gm_drawbar_organ` na `piano` albo `gm_epiano1` (deep), albo `sawtooth` z `lpq(6)` (rave).
+3. **Rytm basu** — zmień `struct` (lekcja 9).
+4. **Swing** — `swingBy(1/6, 8)` subtelnie → `1/3` pełny shuffle.
+5. **Jedno charakterystyczne brzmienie** — linia acid, lead „wokalny” przez `vowel("a e")` albo przefiltrowana pętla, która staje się hookiem.
+
+<DoDont
+  do={[
+    'Trzymaj się 120–128 BPM, chyba że masz powód.',
+    'Niech groove robi robotę: bębny + bas + jeden hook + jedno brzmienie akordów wystarczą.',
+    'm7/m9 i swing na deep; stabsy organowe albo piano na klasykę; acid na hipnozę.',
+    'Zostaw 16-taktowe intro i outro przyjazne DJ-om.',
+  ]}
+  dont={[
+    'Dodawać nowego instrumentu co 8 taktów, aż będzie ich 12 — house to powściągliwość.',
+    'Robić stopy przesterowanej i twardej — to już terytorium hard house.',
+    'Zmieniać akordów na każde uderzenie.',
+    'Pomijać breakdownu: house potrzebuje jednego momentu, w którym stopa znika.',
+  ]}
+/>

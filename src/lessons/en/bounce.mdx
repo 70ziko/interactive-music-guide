@@ -1,0 +1,101 @@
+Bounce is house turned up: faster, harder, and built around one unmistakable sound — **the donk**, a hollow offbeat bass hit. It is fun, loud and unashamedly catchy.
+
+## Where it comes from
+
+The style grew in **North West England** (Liverpool) and was first called **scouse house** or **bounce**. As it spread it became known as **donk**, also "hard bounce". Its defining feature is a "pipe"-like sample used as an **offbeat bassline**. Related scenes elsewhere have their own names (e.g. hardbass in Russia).
+
+## The fingerprint
+
+| Element | Rule |
+|---|---|
+| Tempo | fast — roughly 140–150 BPM (varies by scene and era) |
+| Kick | four on the floor, hard and punchy, often distorted |
+| **Donk** | on **every offbeat** — it *is* the groove, not decoration |
+| Hats | open hat also on the offbeat, 16th closed hats |
+| Hook | very catchy lead melody on top, short and repeated |
+| Chords | simple, often bright; stabs in the drop |
+| Build-ups | snare rolls and risers into big drops |
+
+The kick and the donk together make the **boom-donk boom-donk** pulse. Everything else sits on top.
+
+## The donk, properly
+
+The donk follows the harmony: it plays the **root of the current chord** on each offbeat, sometimes jumping an octave for bounce.
+
+<Strudel title="donk following the chords" code={`
+  setcpm(145/4)
+  const prog = "<0 5 3 4>"               // i VI iv v
+  donk: n(prog).struct("[~ x]*4")
+    .add(n("0 0 0 7"))                     // every 4th offbeat: octave up
+    .scale("A2:minor")
+    .s("triangle").penv(14).pdecay(0.03)
+    .decay(0.13).sustain(0).lpf(1800).distort(0.6).gain(0.85)
+  kick: s("bd*4").bank("RolandTR909").distort(1.2).gain(0.9)
+`} />
+
+<Callout kind="tip">
+`.add(n("0 0 0 7"))` has one slot per donk (4 per bar), so the 4th donk gets +7 scale steps (= one octave in a 7-note scale). Try `"0 0 4 0"` (a fifth on the 3rd donk) or `"0 7 0 7"` (octave on every second donk).
+</Callout>
+
+## The hook
+
+Bounce hooks are short, bright and sing-along. Write the rhythm first (lesson 8), keep it in one octave, repeat it.
+
+<MelodyGrid preset="bounce" />
+
+## The template
+
+A full 112-bar bounce track (≈ 3.1 min at 145 BPM).
+
+<Strudel title="bounce track template" code={`
+  setcpm(145/4)
+  const key  = 'A:minor'
+  const prog = "<0 5 3 4>"
+
+  const kick  = s("bd*4").bank("RolandTR909").distort(1.2).gain(0.9)
+  const clap  = s("~ cp ~ cp").bank("RolandTR909").gain(0.7)
+  const hats  = s("[~ oh]*4, hh*16").bank("RolandTR909").gain("0.35")
+  const donk  = n(prog).struct("[~ x]*4").add(n("0 0 0 7")).scale("A2:minor")
+    .s("triangle").penv(14).pdecay(0.03).decay(0.13).sustain(0)
+    .lpf(1800).distort(0.6).gain(0.85)
+  const hook  = n(\`<[4 ~ 4 ~ 5 ~ 4 ~ 2 ~ 2 ~ 1 ~ 0 ~]
+                   [4 ~ 4 ~ 5 ~ 7 ~ 5 ~ 4 ~ 2 ~ ~ ~]>\`)
+    .scale("A4:minor").s("supersaw").unison(5).detune(0.3)
+    .lpf(4000).decay(0.2).sustain(0.5).gain(0.35).room(0.3).orbit(2)
+  const stabs = n("[0,2,4]").add(n(prog)).scale(key).struct("[~ x]*4")
+    .s("sawtooth").lpf(2500).decay(0.1).sustain(0).hpf(200).gain(0.35)
+  const pad   = n("[0,2,4,7]").add(n(prog)).scale(key)
+    .s("supersaw").attack(0.4).release(1.5).sustain(0.8)
+    .hpf(250).lpf(2000).gain(0.2).room(0.7).orbit(2)
+  const roll  = s("sd*<4 4 8 8 16 16 32 32>").bank("RolandTR909")
+    .gain(saw.range(0.3, 1).slow(8)).speed(saw.range(1, 1.5).slow(8))
+  const riser = s("white*16").decay(0.07).sustain(0)
+    .hpf(saw.range(300, 10000).slow(8)).gain(saw.range(0.05, 0.35).slow(8))
+
+  arrange(
+    [16, stack(kick, hats)],                                         // intro
+    [16, stack(kick, hats, clap, donk)],                             // donk in
+    [16, stack(kick, hats, clap, donk, hook)],                       // hook
+    [16, stack(hook, pad)],                                          // breakdown
+    [8,  stack(hook, roll, riser).mask("<1!7 [1 1 1 0]>")],           // build-up
+    [24, stack(kick, hats, clap, donk, hook, stabs)],                // drop
+    [16, stack(kick, hats, donk)]                                    // outro
+  )
+`} />
+
+<ArrangementTimeline template="bounce" />
+
+<DoDont
+  do={[
+    'Put the donk on every offbeat and make it follow the chord roots.',
+    'Keep the kick short so it does not swallow the donk.',
+    'Write a hook you can sing after one listen, and repeat it a lot.',
+    'Make the build-up obvious: snare roll + riser + a silent last beat.',
+  ]}
+  dont={[
+    'Put a long sub bass under the donk — the donk is the bass.',
+    'Swing it — bounce is straight and driving.',
+    'Hide the hook behind reverb in the drop; keep it upfront and dry-ish.',
+    'Use slow, deep house chords and expect it to bounce.',
+  ]}
+/>

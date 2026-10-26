@@ -1,0 +1,113 @@
+Mixing is making every part **audible, in its own place, without fighting**. In Strudel you mix with code: `gain`, filters, `pan`, orbits and ducking. You do not need a perfect mix to finish a track — you need to avoid the five classic mistakes below.
+
+## 1. Levels: a loudness hierarchy
+
+Decide what matters most and make it the loudest. In house, bounce and hard house the order is almost always:
+
+| Rank | Part | Typical `gain` in Strudel (starting point) |
+|---|---|---|
+| 1 | Kick | 0.9–1.0 |
+| 2 | Bass / donk | 0.7–0.9 |
+| 3 | Clap / snare | 0.6–0.8 |
+| 4 | Lead / hook | 0.4–0.6 |
+| 5 | Chords / stabs | 0.4–0.7 |
+| 6 | Hats, percussion | 0.25–0.5 |
+| 7 | Pads, FX | 0.15–0.35 |
+
+<Callout kind="math">
+Loudness adds up. When two equally loud parts peak at the same moment, their amplitudes add: the peak is twice as high, **+6 dB**. (On average, unrelated sounds add about +3 dB.) Ten parts at `gain(1)` clip — the waveform hits the ceiling and distorts. That is why the hierarchy goes **down** from the kick, not up.
+</Callout>
+
+**Workflow:** start with the kick alone at ~0.9. Bring in the bass and turn it up until it is clear but quieter than the kick. Add each part and stop turning up as soon as you can hear it.
+
+## 2. Frequency slots
+
+Every part needs its own slice of the spectrum (lesson 1). When three parts pile up in the same band, none of them is clear.
+
+<FrequencyMap />
+
+The single most useful mixing move: **high-pass everything that is not kick or bass.** Chords, pads, hats and leads have nothing useful below ~150 Hz; removing it leaves room for the low end.
+
+<Strudel title="muddy vs clean (alternating bars)" code={`
+  setcpm(124/4)
+  kick: s("bd*4").bank("RolandTR909")
+  bass: note("[~ a1]*4").s("sawtooth").lpf(450).decay(0.15).sustain(0.3)
+  chords: chord("<Am7 Am7>").voicing().struct("[~ x]*4")
+    .s("sawtooth").lpf(2500).decay(0.2).sustain(0).gain(0.5)
+    .hpf("<20 200>")          // bar 1: full range (mud), bar 2: high-passed
+  pad: chord("Am9").voicing().s("supersaw").sustain(1).gain(0.25)
+    .hpf("<20 250>")
+`} />
+
+## 3. Panning: left–right space
+
+`pan(0)` = left, `pan(0.5)` = centre, `pan(1)` = right.
+
+| Keep in the centre | Can be spread |
+|---|---|
+| kick, bass, sub, main lead, snare/clap | hats, percussion, pads, chord layers, FX, delays |
+
+Club systems are often mono or nearly mono, so the low end must be centred and must not depend on stereo width.
+
+<Strudel title="percussion spread, low end centred" code={`
+  setcpm(124/4)
+  stack(
+    s("bd*4"),
+    s("~ cp ~ cp"),
+    s("hh*16").gain(0.3).pan(sine.range(0.3, 0.7).fast(2)),   // gently moving
+    s("rim(3,8)").gain(0.4).pan(0.75),
+    s("~ ~ ~ cb").gain(0.3).pan(0.25)
+  ).bank("RolandTR808")
+`} />
+
+## 4. Depth: front and back
+
+Dry and bright = **front**. Reverb, low-pass and lower volume = **back**. Pick one or two parts for the front (kick, hook) and push the rest back. Use one shared reverb orbit (lesson 11) so the back parts sit in the same room.
+
+## 5. Ducking for space
+
+Ducking pads, chords or the bass with the kick (lesson 11) carves a hole for each kick hit. It makes a mix sound louder and clearer at the same time.
+
+<DuckingGraph />
+
+## A mixed groove, all five moves
+
+<Strudel title="mixed: levels, slots, pan, depth, ducking" code={`
+  setcpm(126/4)
+  kick: s("bd*4").bank("RolandTR909").gain(0.95)
+    .duckorbit(2).duckdepth(0.7).duckattack(0.18)
+  clap: s("~ cp ~ cp").bank("RolandTR909").gain(0.7).room(0.15)
+  hats: s("[~ oh]*4, hh*16").bank("RolandTR909").gain(0.32).pan(0.6)
+  bass: note("[~ a1]*4").s("sawtooth").lpf(450)
+    .decay(0.15).sustain(0.3).gain(0.8)
+  stabs: chord("<Am7 Am7 FM7 Em7>").voicing().struct("[~ x ~ ~]*4")
+    .s("gm_drawbar_organ").decay(0.2).sustain(0)
+    .hpf(200).gain(0.55).room(0.35).orbit(2)
+  pad: chord("<Am9 FM7>").voicing().s("supersaw")
+    .hpf(250).lpf(2000).sustain(1).gain(0.2).room(0.5).orbit(2)
+`} />
+
+## The mix checklist
+
+1. Kick is the loudest thing; nothing clips.
+2. Only kick and bass have energy below ~120 Hz.
+3. Kick and bass are centred; the mix still works in mono.
+4. Each part can be heard when you focus on it — and is not missed when muted.
+5. At most two parts are "in front" (dry, bright, loud).
+6. Check at **low volume** and on a second system (headphones, phone, car).
+7. Compare with a reference track in the same genre at the same volume.
+
+<DoDont
+  do={[
+    'Set levels with the kick first, then add parts quieter than it.',
+    'High-pass everything except kick and bass (~150–250 Hz).',
+    'Keep the low end mono and centred.',
+    'Listen at low volume and compare with a reference track.',
+  ]}
+  dont={[
+    'Fix a quiet part by turning everything else up — turn the loud parts down instead.',
+    'Pan the bass or kick to one side.',
+    'Mix with your ears tired after hours — come back the next day.',
+    'Chase a "perfect" mix before the arrangement is finished.',
+  ]}
+/>

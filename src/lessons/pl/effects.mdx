@@ -1,0 +1,136 @@
+Synteza robi dźwięk. Efekty stawiają go **w przestrzeni**, **w czasie** i dają mu **charakter**. Użyte dobrze sklejają utwór; użyte wszędzie zamieniają go w zupę.
+
+## Jak efekty są podłączone w Strudlu: orbity
+
+Każdy wzór gra przez **orbit** — szynę efektów. **Pogłos i delay siedzą na orbicie**: wszystkie wzory na orbicie 1 dzielą jeden pogłos i jedną linię opóźnienia. *Ile* z nuty do nich trafia (`room`, `delay`) ustawiasz per nuta, ale rozmiar pogłosu oraz czas i sprzężenie delayu są wspólne, a wygrywają ostatnie ustawienia. Filtry, przester i obwiednie działają per nuta.
+
+<Chain steps={[
+  { name: 'Nuta', desc: 'oscylator albo sampel, obwiednia, filtr, przester', code: '.s().lpf().distort()' },
+  { name: 'Orbit (szyna)', desc: 'wspólny pogłos + delay dla każdego wzoru na nim', code: '.orbit(2)' },
+  { name: 'Wyjście', desc: 'wszystkie orbity zsumowane do głośników', code: '' },
+]} />
+
+**Zasada praktyczna:** partie, które potrzebują *innego* pogłosu albo delayu, daj na osobny orbit. Stopę i bas trzymaj na orbicie bez pogłosu.
+
+<Strudel title="osobne przestrzenie przez orbity" code={`
+  setcpm(124/4)
+  kick: s("bd*4").bank("RolandTR909")                       // orbit 1, sucho
+  stabs: chord("<Am7 Dm7>").voicing().struct("[~ x]*4")
+    .s("gm_drawbar_organ").decay(0.2).sustain(0)
+    .room(0.6).roomsize(4).orbit(2)                        // duży pokój
+  lead: n("0 ~ 2 4 ~ 2 ~ ~").scale("A4:minor").s("square")
+    .lpf(2000).decay(0.15).sustain(0.2).gain(0.4)
+    .delay(0.4).delaysync(3/16).delayfeedback(0.45).orbit(3) // echa
+`} />
+
+## Pogłos: przestrzeń
+
+| Kontrolka | Co ustawia |
+|---|---|
+| `.room(0..1)` | ile dźwięku idzie do pogłosu (ilość „mokrego” sygnału) |
+| `.roomsize(0..10)` | rozmiar / długość przestrzeni |
+
+Krótki, mały pogłos = pokój; długi, duży = hala albo „rozmycie” breakdownu. Pogłos odsuwa dźwięk **do tyłu** w miksie: sucho = blisko, mokro = daleko.
+
+<Strudel title="sucho → mały pokój → ogromna hala" code={`
+  setcpm(120/4)
+  s("~ cp ~ cp").bank("RolandTR909")
+    .room("<0 0.3 0.8>").roomsize("<0 1.5 8>")
+`} />
+
+## Delay: echa w czasie
+
+| Kontrolka | Co ustawia |
+|---|---|
+| `.delay(0..1)` | ilość mokrego sygnału |
+| `.delaysync(x)` | czas opóźnienia w **taktach** (cyklach) — zawsze w tempie |
+| `.delaytime(s)` | czas opóźnienia w **sekundach** |
+| `.delayfeedback(0..1)` | ile powtórzeń (trzymaj poniżej ~0.7) |
+
+Echa trafiające w siatkę brzmią muzycznie; echa poza siatką — bałaganiarsko. `delaysync` liczy za ciebie. Klasyczne wartości w muzyce tanecznej to **1/8**, **3/16** (ósemka z kropką) i **1/4**.
+
+<DelayCalc />
+
+<Strudel title="delay ósemka z kropką na prostym plucku" code={`
+  setcpm(124/4)
+  n("<[0 ~ ~ ~ 4 ~ ~ ~] [2 ~ ~ ~ 1 ~ ~ ~]>")
+    .scale("A4:minor").s("triangle").decay(0.12).sustain(0)
+    .delay(0.5).delaysync(3/16).delayfeedback(0.5)
+    ._pianoroll()
+`} />
+
+## Przester: harmoniczne i charakter
+
+Przester wygina falę, co **dodaje harmonicznych** (lekcja 1). Więcej harmonicznych = jaśniej, głośniej w odbiorze, agresywniej. Stopy, basy i hoovery w hard house i bounce są prawie zawsze w jakimś stopniu przesterowane.
+
+| Kontrolka | Charakter |
+|---|---|
+| `.shape(0..1)` | miękkie nasycenie — ciepło |
+| `.distort(0..∞)` | twardsze obcinanie — brud |
+| `.crush(1..16)` | redukcja bitów — lo-fi, cyfrowo |
+| `.coarse(n)` | redukcja częstotliwości próbkowania — aliasing, metalicznie |
+
+<Strudel title="ten sam bas: czysto, shape, distort, crush" code={`
+  setcpm(140/4)
+  note("[~ a1]*4").s("sawtooth").lpf(600)
+    .decay(0.15).sustain(0.3)
+    .shape("<0 0.6 0 0>").distort("<0 0 2 0>").crush("<16 16 16 5>")
+    ._scope()
+`} />
+
+## Filtry jako efekty
+
+Poza kształtowaniem syntezatora filtry to **narzędzia do grania na żywo**:
+
+- `.hpf()` w górę = odchudź dźwięk przed dropem,
+- `.lpf()` w górę = „otwórz” stłumioną pętlę,
+- `.djf(x)` = filtr jak w mikserze DJ-skim na **cały orbit**: poniżej 0.5 dolnoprzepustowy, powyżej 0.5 górnoprzepustowy, 0.5 = wyłączony.
+
+<Strudel title="filtr DJ-ski na całym groovie" code={`
+  setcpm(126/4)
+  stack(
+    s("bd*4, ~ cp ~ cp, [~ oh]*4, hh*16").bank("RolandTR909"),
+    note("[~ a1]*4").s("sawtooth").lpf(500).decay(0.15).sustain(0.3)
+  ).djf("<0.5 0.25 0.5 0.8>")   // wył., stłumiony, wył., odchudzony
+`} />
+
+## Ruch: phaser, tremolo, vibrato
+
+Małe efekty modulacyjne ożywiają trzymane dźwięki.
+
+<Strudel title="phaser na akordzie supersaw" code={`
+  note("[a2,e3,a3,c4]").s("supersaw").lpf(2500)
+    .sustain(1).gain(0.35)
+    .phaser("<0 2 4 8>")
+`} />
+
+## Kompresja i ducking
+
+**Kompresor** przycisza głośne momenty, żeby całość była bardziej równa. `compressor("próg:ratio:knee:atak:release")` — próg w dB, ratio np. 4 (4:1).
+
+**Ducking** (sidechain) to kompresja wyzwalana przez *inny* dźwięk: stopa na chwilę przycisza bas albo pady. To główne źródło „pompowania”. `duckorbit` znasz z lekcji 9; tak wygląda to, co robi z głośnością:
+
+<DuckingGraph />
+
+<Strudel title="pady pompujące ze stopą" code={`
+  setcpm(126/4)
+  pad: chord("<Am9 FM7>").voicing().s("supersaw")
+    .lpf(1800).sustain(1).gain(0.35).room(0.4).orbit(2)
+  kick: s("bd*4").bank("RolandTR909")
+    .duckorbit(2).duckdepth(0.85).duckattack(0.25)
+`} />
+
+<DoDont
+  do={[
+    'Trzymaj stopę i bas na sucho, na własnym orbicie.',
+    'Używaj delaysync z 1/8, 3/16 albo 1/4, żeby echa trafiały w siatkę.',
+    'Używaj jednego wspólnego orbitu z pogłosem dla większości partii — skleja je w jedną przestrzeń.',
+    'Używaj przesteru celowo: na stopie, basie albo leadzie, który ma brzmieć agresywnie.',
+  ]}
+  dont={[
+    'Dawać pogłosu na wszystko — odsuwa cały utwór do tyłu i go rozmywa.',
+    'Ustawiać delayfeedback blisko 1 — powtórzenia się nawarstwiają i robią głośne.',
+    'Oczekiwać, że dwa wzory na jednym orbicie będą miały różne ustawienia pogłosu/delayu — dzielą jeden.',
+    'Używać delayów dłuższych niż 1 sekunda; linia opóźnienia w Strudlu kończy się na tym.',
+  ]}
+/>

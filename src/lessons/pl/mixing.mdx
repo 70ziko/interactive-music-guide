@@ -1,0 +1,113 @@
+Miks to sprawienie, żeby każda partia była **słyszalna, na swoim miejscu i nie walczyła z innymi**. W Strudlu miksujesz kodem: `gain`, filtry, `pan`, orbity i ducking. Nie potrzebujesz idealnego miksu, żeby skończyć utwór — wystarczy uniknąć pięciu klasycznych błędów poniżej.
+
+## 1. Poziomy: hierarchia głośności
+
+Zdecyduj, co jest najważniejsze, i zrób to najgłośniejszym. W house, bounce i hard house kolejność jest prawie zawsze taka:
+
+| Miejsce | Partia | Typowy `gain` w Strudlu (punkt startu) |
+|---|---|---|
+| 1 | Stopa | 0.9–1.0 |
+| 2 | Bas / donk | 0.7–0.9 |
+| 3 | Klap / werbel | 0.6–0.8 |
+| 4 | Lead / hook | 0.4–0.6 |
+| 5 | Akordy / stabsy | 0.4–0.7 |
+| 6 | Hi-haty, perkusja | 0.25–0.5 |
+| 7 | Pady, FX | 0.15–0.35 |
+
+<Callout kind="math">
+Głośność się sumuje. Gdy dwie równie głośne partie mają szczyt w tym samym momencie, ich amplitudy się dodają: szczyt jest dwa razy wyższy, **+6 dB**. (Średnio niezwiązane dźwięki dodają około +3 dB.) Dziesięć partii na `gain(1)` się przesteruje — fala uderza w sufit i się zniekształca. Dlatego hierarchia idzie od stopy **w dół**, a nie w górę.
+</Callout>
+
+**Sposób pracy:** zacznij od samej stopy na ~0.9. Dodaj bas i podgłaśniaj, aż będzie wyraźny, ale cichszy od stopy. Dodawaj kolejne partie i przestań podgłaśniać, gdy tylko ją słyszysz.
+
+## 2. Pasma częstotliwości
+
+Każda partia potrzebuje własnego kawałka pasma (lekcja 1). Gdy trzy partie tłoczą się w tym samym paśmie, żadna nie jest czytelna.
+
+<FrequencyMap />
+
+Najbardziej przydatny ruch w miksie: **filtr górnoprzepustowy na wszystkim, co nie jest stopą ani basem.** Akordy, pady, haty i leady nie mają nic przydatnego poniżej ~150 Hz; wycięcie tego robi miejsce dla dołu.
+
+<Strudel title="błoto vs czysto (na zmianę co takt)" code={`
+  setcpm(124/4)
+  kick: s("bd*4").bank("RolandTR909")
+  bass: note("[~ a1]*4").s("sawtooth").lpf(450).decay(0.15).sustain(0.3)
+  chords: chord("<Am7 Am7>").voicing().struct("[~ x]*4")
+    .s("sawtooth").lpf(2500).decay(0.2).sustain(0).gain(0.5)
+    .hpf("<20 200>")          // takt 1: pełne pasmo (błoto), takt 2: z filtrem górnoprzepustowym
+  pad: chord("Am9").voicing().s("supersaw").sustain(1).gain(0.25)
+    .hpf("<20 250>")
+`} />
+
+## 3. Panorama: przestrzeń lewo–prawo
+
+`pan(0)` = lewo, `pan(0.5)` = środek, `pan(1)` = prawo.
+
+| Trzymaj na środku | Można rozłożyć |
+|---|---|
+| stopa, bas, sub, główny lead, werbel/klap | haty, perkusja, pady, warstwy akordów, FX, delaye |
+
+Nagłośnienie klubowe jest często mono albo prawie mono, więc dół musi być na środku i nie może zależeć od szerokości stereo.
+
+<Strudel title="perkusja rozłożona, dół na środku" code={`
+  setcpm(124/4)
+  stack(
+    s("bd*4"),
+    s("~ cp ~ cp"),
+    s("hh*16").gain(0.3).pan(sine.range(0.3, 0.7).fast(2)),   // delikatnie się rusza
+    s("rim(3,8)").gain(0.4).pan(0.75),
+    s("~ ~ ~ cb").gain(0.3).pan(0.25)
+  ).bank("RolandTR808")
+`} />
+
+## 4. Głębia: przód i tył
+
+Sucho i jasno = **przód**. Pogłos, filtr dolnoprzepustowy i mniejsza głośność = **tył**. Wybierz jedną albo dwie partie na przód (stopa, hook), resztę odsuń. Używaj jednego wspólnego orbitu z pogłosem (lekcja 11), żeby tylne partie siedziały w tym samym pokoju.
+
+## 5. Ducking dla przestrzeni
+
+Duckowanie padów, akordów albo basu stopą (lekcja 11) wycina dziurę na każde uderzenie stopy. Miks brzmi przez to jednocześnie głośniej i czyściej.
+
+<DuckingGraph />
+
+## Zmiksowany groove: wszystkie pięć ruchów
+
+<Strudel title="zmiksowane: poziomy, pasma, panorama, głębia, ducking" code={`
+  setcpm(126/4)
+  kick: s("bd*4").bank("RolandTR909").gain(0.95)
+    .duckorbit(2).duckdepth(0.7).duckattack(0.18)
+  clap: s("~ cp ~ cp").bank("RolandTR909").gain(0.7).room(0.15)
+  hats: s("[~ oh]*4, hh*16").bank("RolandTR909").gain(0.32).pan(0.6)
+  bass: note("[~ a1]*4").s("sawtooth").lpf(450)
+    .decay(0.15).sustain(0.3).gain(0.8)
+  stabs: chord("<Am7 Am7 FM7 Em7>").voicing().struct("[~ x ~ ~]*4")
+    .s("gm_drawbar_organ").decay(0.2).sustain(0)
+    .hpf(200).gain(0.55).room(0.35).orbit(2)
+  pad: chord("<Am9 FM7>").voicing().s("supersaw")
+    .hpf(250).lpf(2000).sustain(1).gain(0.2).room(0.5).orbit(2)
+`} />
+
+## Lista kontrolna miksu
+
+1. Stopa jest najgłośniejsza; nic się nie przesterowuje.
+2. Tylko stopa i bas mają energię poniżej ~120 Hz.
+3. Stopa i bas są na środku; miks działa w mono.
+4. Każdą partię słychać, gdy się na niej skupisz — i brakuje jej, gdy ją wyciszysz.
+5. Najwyżej dwie partie są „z przodu” (sucho, jasno, głośno).
+6. Sprawdź na **małej głośności** i na drugim sprzęcie (słuchawki, telefon, samochód).
+7. Porównaj z utworem referencyjnym z tego samego gatunku na tej samej głośności.
+
+<DoDont
+  do={[
+    'Ustawiaj poziomy od stopy, potem dodawaj partie cichsze od niej.',
+    'Filtr górnoprzepustowy na wszystkim poza stopą i basem (~150–250 Hz).',
+    'Trzymaj dół w mono i na środku.',
+    'Słuchaj na małej głośności i porównuj z utworem referencyjnym.',
+  ]}
+  dont={[
+    'Ratować cichej partii podgłaszaniem wszystkiego innego — przycisz raczej te głośne.',
+    'Panoramować basu albo stopy na bok.',
+    'Miksować zmęczonymi uszami po kilku godzinach — wróć następnego dnia.',
+    'Gonić „idealnego” miksu, zanim aranżacja jest skończona.',
+  ]}
+/>

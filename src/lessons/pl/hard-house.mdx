@@ -1,0 +1,109 @@
+Hard house to brytyjskie, wysokoenergetyczne brzmienie klubowe: szybkie, nieustępliwe, zbudowane na **stabsach basu na offbicie**, **hooverach** i ogromnych **dropach po rolce bębna**.
+
+## Skąd się wziął
+
+Hard house pojawił się w **Wielkiej Brytanii na początku lat 90.**, mocno związany z londyńskim klubem **Trade**. Jego korzenie to belgijskie i niemieckie techno, house na samplach disco i wczesny trance. Tony De Vit bywa nazywany jego „ojcem chrzestnym”; brzmienie zdefiniowały labele i imprezy takie jak Tidy, Sundissential i Frantic. Zachodzi na **hard NRG** (szybsze, bardziej trance'owe) i na **bounce / donk** (lekcja 17).
+
+## Odcisk palca
+
+| Element | Zasada |
+|---|---|
+| Tempo | około **135–165 BPM**, typowo w okolicach **150** |
+| Stopa | four on the floor, twarda, przesterowana, krótki ogon |
+| Bas | **stabsy basu na offbicie** — krótkie, punktowe, często przesterowane |
+| Leady | **hoovery**, stabsy, dęciaki; riffy na 1–2 takty |
+| Breakdown | często **długa, ostra nuta smyczków** trzymana dla napięcia |
+| Dropy | zwykle wprowadzane **rolką bębna** |
+| Haty | hat otwarty na offbicie, pędzące szesnastki |
+
+## Stab basu na offbicie
+
+Nie gładka linia basu — **stab**: krótkie, jasne, agresywne uderzenie na każdym offbicie, często akord albo stos oktaw zamiast pojedynczej nuty.
+
+<Strudel title="stab basu na offbicie" code={`
+  setcpm(150/4)
+  stab: n("<0 0 5 4>").struct("[~ x]*4")
+    .add(n("0,7"))                       // pryma + oktawa
+    .scale("A1:minor")
+    .s("sawtooth").lpf(1400).lpq(5)
+    .decay(0.1).sustain(0).distort(1.5).gain(0.7)
+  kick: s("bd*4").bank("RolandTR909").distort(1.5).decay(0.3).gain(0.9)
+  hats: s("[~ oh]*4, hh*16").bank("RolandTR909").gain(0.35)
+`} />
+
+## Smyczek napięcia
+
+Jedna wysoka nuta trzymana przez cały breakdown, może powoli się otwierająca, to podpis hard house'u. To czyste napięcie (lekcja 14): nie rozwiązuje się aż do dropu. W Strudlu działają tu dwa szczegóły: `.slow(8)` robi z niej **jedną** nutę długą na 8 taktów, a filtr otwiera się przez długą obwiednię filtra (`lpattack`), bo wzór typu `saw` na `lpf` jest odczytywany tylko w chwili startu nuty.
+
+<Strudel title="długa, ostra nuta smyczków" code={`
+  setcpm(150/4)
+  note("e5").slow(8)                       // JEDNA nuta na 8 taktów
+    .s("supersaw").unison(5).detune(0.25)
+    .attack(1.5).sustain(1).release(2)
+    .hpf(400).lpf(1500).lpenv(2).lpattack(12).lpsustain(1)  // filtr otwiera się przez ~12 s
+    .room(0.8).roomsize(8).gain(0.25)
+`} />
+
+## Szablon
+
+Pełny utwór hard house na 112 taktów (≈ 3 min przy 150 BPM): riff hoovera, stabsy na offbicie, breakdown z napięciem i drop po rolce bębna.
+
+<Strudel title="szablon utworu hard house" code={`
+  setcpm(150/4)
+  const prog = "<0 0 5 4>"
+
+  const kick   = s("bd*4").bank("RolandTR909").distort(1.5).decay(0.3).gain(0.9)
+    .duckorbit(2).duckdepth(0.5).duckattack(0.12)
+  const hats   = s("[~ oh]*4, hh*16").bank("RolandTR909").gain(0.35)
+  const clap   = s("~ cp ~ cp").bank("RolandTR909").gain(0.7)
+  const stab   = n(prog).struct("[~ x]*4").add(n("0,7")).scale("A1:minor")
+    .s("sawtooth").lpf(1400).lpq(5).decay(0.1).sustain(0).distort(1.5).gain(0.65)
+  const hoover = note("<[a2 ~ ~ a2 ~ ~ g2 ~] [c3 ~ ~ a2 ~ ~ e2 ~]>")
+    .add(note("0,12,-12")).s("supersaw").unison(5).detune(0.6)
+    .penv(-12).pattack(0.1).phaser(4).lpf(3000).distort(1)
+    .decay(0.4).sustain(0.6).release(0.1).gain(0.3).orbit(2)
+  const string = note("e5").slow(16).s("supersaw").unison(5).detune(0.25)
+    .attack(1.5).sustain(1).release(2).hpf(400)
+    .lpf(1500).lpenv(2).lpattack(20).lpsustain(1)
+    .room(0.8).roomsize(8).gain(0.22).orbit(3)
+  const roll   = s("sd*<4 4 8 8 16 16 32 32>").bank("RolandTR909")
+    .gain(saw.range(0.3, 1).slow(8)).speed(saw.range(1, 1.6).slow(8))
+
+  arrange(
+    [16, stack(kick, hats)],                                       // intro
+    [16, stack(kick, hats, clap, stab)],                           // wejście stabów
+    [16, stack(kick, hats, clap, stab, hoover)],                   // riff hoovera
+    [16, stack(string)],                                           // breakdown z napięciem
+    [8,  stack(string, roll).mask("<1!7 [1 1 1 0]>")],              // rolka bębna
+    [24, stack(kick, hats, clap, stab, hoover)],                   // drop
+    [16, stack(kick, hats, stab)]                                  // outro
+  )
+`} />
+
+<ArrangementTimeline template="hard" />
+
+## House vs bounce vs hard house
+
+| | House | Bounce / donk | Hard house |
+|---|---|---|---|
+| Tempo | 115–130 | ~140–150 | 135–165, ~150 |
+| Stopa | czysta, okrągła | punktowa, przesterowana | twarda, przesterowana, krótka |
+| Offbit | hat otwarty | **donk** (bas) | **stabsy basu** |
+| Góra | akordy, pianino, wokale | chwytliwy hook do śpiewania | riffy hoovera, stabsy, dęciaki |
+| Breakdown | akordy + pad | sam hook | długi smyczek napięcia |
+| Przed dropem | łagodne narastanie | rolka + riser | **rolka bębna** |
+
+<DoDont
+  do={[
+    'Trzymaj stopę krótką i twardą, żeby stab na offbicie miał miejsce.',
+    'Używaj stosów oktaw i przesteru na stabach i hooverach dla ciężaru.',
+    'Użyj jednej długiej nuty smyczków (albo trzymanego akordu), żeby breakdown był napięty.',
+    'Wprowadzaj każdy drop rolką bębna, która przyspiesza przez 8 taktów.',
+  ]}
+  dont={[
+    'Kłaść trzymanego sub-basu pod stabsy na offbicie — przy tym tempie gryzie się ze stopą.',
+    'Pisać długich, złożonych melodii; lepiej działają powtarzane riffy na 1–2 takty.',
+    'Swingować — hard house jest prosty.',
+    'Schodzić poniżej ~135 BPM — traci napęd (to już terytorium house).',
+  ]}
+/>

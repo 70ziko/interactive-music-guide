@@ -1,0 +1,156 @@
+This lesson is a cookbook. Each recipe names the sound, says what makes it that sound, and gives a starting patch with the 2–3 knobs that matter most. Change one knob at a time.
+
+<Callout kind="tip">
+A recipe is a starting point, not a preset. The goal is to know **which knob does what**, so you can move from "close" to "mine".
+</Callout>
+
+## Supersaw lead
+
+**What it is:** several sawtooth waves slightly detuned from each other (lesson 10). The slow beating between them sounds wide and huge — the trance and hard dance lead.
+
+| Knob | Does |
+|---|---|
+| `unison` | number of saws (3–7) |
+| `detune` | how far apart (0.1 = subtle, 0.6 = huge/out of tune) |
+| `lpf` | brightness |
+
+<Strudel title="supersaw lead" code={`
+  setcpm(140/4)
+  n("<[0 ~ 2 ~ 4 ~ 2 ~] [5 ~ 4 ~ 2 ~ 1 ~]>")
+    .scale("A4:minor").s("supersaw")
+    .unison(7).detune(0.35)
+    .lpf(3500).attack(0.005).decay(0.2).sustain(0.5).release(0.15)
+    .room(0.3).gain(0.4)
+`} />
+
+## Hoover
+
+**What it is:** the classic hoover comes from the Roland Alpha Juno's "What the" patch: three oscillators **an octave apart**, heavy **pulse-width modulation**, and thick **chorus**, all moved by a fast LFO. It became famous in early-90s rave tracks and lives on in hard house and hard NRG.
+
+Strudel has no Alpha Juno, so we approximate the ingredients:
+
+| Real hoover | Strudel approximation |
+|---|---|
+| 3 oscillators an octave apart | `.add(note("0,12,-12"))` on a supersaw |
+| PWM + chorus "swirl" | high `detune` + `phaser` |
+| pitch swoops into notes | `penv(-…)` + `pattack` |
+
+<Strudel title="hoover-ish" code={`
+  setcpm(148/4)
+  note("<[a2 ~ ~ a2 ~ ~ g2 ~] [c3 ~ ~ a2 ~ ~ e2 ~]>")
+    .add(note("0,12,-12"))
+    .s("supersaw").unison(5).detune(0.6)
+    .penv(-12).pattack(0.1)
+    .phaser(4).lpf(3000).distort(1)
+    .decay(0.4).sustain(0.6).release(0.1).gain(0.35)
+`} />
+
+## Reese bass
+
+**What it is:** two sawtooth basses **slightly detuned**, so they phase against each other and the bass slowly "moves". Named after Kevin Saunderson's alias Reese ("Just Want Another Chance", 1988); later central in jungle and drum & bass, and great for darker house.
+
+| Knob | Does |
+|---|---|
+| detune amount | speed of the movement (`0.1` semitone = slow, `0.3` = fast) |
+| `lpf` | how growly |
+| `distort` | grit |
+
+<Strudel title="reese" code={`
+  setcpm(124/4)
+  note("<a1 a1 f1 g1>")
+    .add(note("0, 0.12"))          // two saws, 0.12 semitone apart
+    .s("sawtooth").lpf(sine.range(300, 900).slow(8))
+    .sustain(1).distort(0.5).gain(0.45)
+    ._scope()
+`} />
+
+## Organ / M1-style stab
+
+**What it is:** the bright, punchy organ chord of 90s house. Short, on offbeats, often a minor 7th chord.
+
+<Strudel title="organ stab" code={`
+  setcpm(124/4)
+  chord("<Am7 Am7 Dm7 Em7>").voicing()
+    .struct("[~ x ~ ~] [x ~ ~ x] [~ ~ x ~] [~ x ~ ~]")
+    .s("gm_drawbar_organ").decay(0.2).sustain(0)
+    .hpf(180).room(0.25).gain(0.8)
+`} />
+
+## Piano house chords
+
+<Strudel title="piano house" code={`
+  setcpm(124/4)
+  chord("<Am7 FM7 CM7 G>").voicing()
+    .struct("[x ~ ~ x] [~ ~ x ~] [~ x ~ ~] [x ~ ~ ~]")
+    .s("piano").gain(0.8).room(0.3)
+`} />
+
+## Donk variations
+
+**What it is:** the bounce bassline is built around a hollow, "pipe"-like hit on every offbeat. You can shape its character with three knobs:
+
+| Knob | Lower | Higher |
+|---|---|---|
+| `penv` (pitch drop) | softer, rounder | clicky "d-" attack |
+| `decay` | tight, percussive | boomy, longer |
+| `lpf` / `distort` | woody, dark | bright, aggressive |
+
+<Strudel title="three donks (one per 2 bars)" code={`
+  setcpm(145/4)
+  donk: note("[~ a2]*4")
+    .s("<triangle triangle square square sine sine>")
+    .penv("<14 14 6 6 24 24>").pdecay(0.03)
+    .decay("<0.13 0.13 0.09 0.09 0.2 0.2>").sustain(0)
+    .lpf("<1800 1800 2600 2600 900 900>").distort("<0.6 0.6 1.2 1.2 0.2 0.2>")
+    .gain(0.9)
+  kick: s("bd*4").bank("RolandTR909").distort(1)
+`} />
+
+## Acid line
+
+Saw + resonance + filter envelope + drive (lesson 10). The `ladder` filter type is the closest to the classic squelch.
+
+<Strudel title="acid" code={`
+  setcpm(128/4)
+  note("a1 [a1 a2] c2 a1 [~ g2] a1 e2 [a1 c3]")
+    .s("sawtooth").ftype("ladder")
+    .lpf(perlin.range(300, 2000).slow(8)).lpq(16)
+    .lpenv(4).lpdecay(0.12)
+    .decay(0.15).sustain(0.2).distort(0.8).gain(0.5)
+`} />
+
+## FX: riser, downlifter, impact
+
+These are not instruments — they are **transitions** (lesson 14).
+
+| FX | Recipe |
+|---|---|
+| Riser | noise with a high-pass filter sweeping up over 4–8 bars |
+| Downlifter | noise with a low-pass sweeping down after the drop |
+| Impact | a low sine with a big pitch drop + reverb, on bar 1 of the drop |
+| Reverse crash | a crash sample played backwards (`speed(-1)`) |
+
+<Strudel title="riser → impact (4 bars, loops)" code={`
+  setcpm(128/4)
+  riser: s("white*16").mask("<1 1 1 0>")        // bars 1–3 only
+    .decay(0.07).sustain(0)
+    .hpf(saw.range(300, 10000).slow(4)).gain(saw.range(0.05, 0.4).slow(4))
+  impact: note("<~ ~ ~ a1>").s("sine")
+    .penv(36).pdecay(0.25).decay(1.2).sustain(0)
+    .room(0.6).roomsize(6).gain(0.9)
+  crash: s("<~ ~ ~ cr>").bank("RolandTR909").gain(0.5)
+`} />
+
+<DoDont
+  do={[
+    'Learn one recipe well, then change one knob at a time and listen.',
+    'Use octave stacks (+12/−12) and detune for size; filter and distortion for character.',
+    'Use reese and supersaw basses with a clean sub underneath if the low end gets wobbly.',
+    'Keep FX (risers, impacts) for transitions — they lose power if they play constantly.',
+  ]}
+  dont={[
+    'Detune a bass by more than ~0.3 semitones — it stops sounding like one note.',
+    'Use a wide, detuned sound for the sub (below ~80 Hz) — it gets weak in mono club systems.',
+    'Copy a famous patch and stop there. Change one ingredient so it becomes yours.',
+  ]}
+/>

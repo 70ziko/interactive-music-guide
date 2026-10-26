@@ -1,0 +1,135 @@
+House is repetitive on purpose — the same bar can run for minutes. What keeps it from sounding like a broken record is **small, constant change**: a hat that sometimes doubles, a filter that breathes, a fill every 4th bar. This lesson is the toolbox for that.
+
+## The two-speed rule
+
+| Speed | What changes | Example |
+|---|---|---|
+| **Every bar** (tiny) | velocity, a random ghost hat, a filter drifting | `degradeBy`, `perlin`, `?` |
+| **Every 4–8 bars** (noticeable) | a fill, a new layer, a variation of the riff | `<…>`, `lastOf`, `mask` |
+
+If nothing changes for 8 bars, the ear switches off. If everything changes every bar, there is no groove to lock onto. Aim for both speeds at once.
+
+## 1. Velocity and ghost notes (recap)
+
+A flat line of equal hits is the most common beginner mistake. Accents give the pattern a shape (lesson 4).
+
+<Strudel title="flat vs shaped hats (alternating bars)" code={`
+  setcpm(124/4)
+  stack(
+    s("bd*4, ~ cp ~ cp"),
+    s("hh*16").gain("<0.5 [0.25 0.35 0.7 0.35]*4>")
+  ).bank("RolandTR909")._punchcard()
+`} />
+
+## 2. Chance: small random changes
+
+Randomness in Strudel is **repeatable**: the same cycle gives the same "random" result, so a variation that sounds good keeps sounding the same.
+
+| Tool | Does | Use for |
+|---|---|---|
+| `"hh*16?"` | each hit plays with 50 % chance | sparse, broken hats |
+| `.degradeBy(0.2)` | drops 20 % of events | thinning busy parts |
+| `.sometimesBy(0.3, x => x.ply(2))` | applies a change to 30 % of events | occasional doubles / rolls |
+| `.sometimes(fn)` / `.often(fn)` / `.rarely(fn)` | 50 % / 75 % / 25 % | quick shortcuts |
+
+<Strudel title="hats that never repeat exactly" code={`
+  setcpm(124/4)
+  stack(
+    s("bd*4, ~ cp ~ cp, [~ oh]*4"),
+    s("hh*16").gain(0.35)
+      .degradeBy(0.15)                      // drop a few
+      .sometimesBy(0.12, x => x.ply(2))     // double a few
+  ).bank("RolandTR909")._punchcard()
+`} />
+
+## 3. Every N bars: planned variation
+
+`lastOf(n, fn)` changes the **last** bar of every `n`; `firstOf(n, fn)` the first. This is the cleanest way to write fills and turnarounds that land on the phrase grid (lesson 13).
+
+<Strudel title="fill on bar 4, bigger fill on bar 8" code={`
+  setcpm(124/4)
+  stack(
+    s("bd*4"),
+    s("~ cp ~ cp").lastOf(4, x => x.ply("<1 2>")),
+    s("[~ oh]*4").gain(0.5),
+    s("~").lastOf(8, () => s("~ ~ ~ [sd sd sd sd]").gain(0.7))
+  ).bank("RolandTR909")._punchcard()
+`} />
+
+Variation on a **riff** works the same way. `lastOf(4, x => x.rev())` plays the riff backwards on bar 4; `lastOf(2, x => x.add(n(2)))` moves it up two scale steps every other bar.
+
+<Strudel title="riff with built-in variation" code={`
+  setcpm(126/4)
+  n("0 ~ 2 ~ 4 ~ 2 0")
+    .lastOf(4, x => x.rev())
+    .firstOf(8, x => x.add(n(-1)))
+    .scale("A3:minor").s("square").lpf(1800)
+    .decay(0.15).sustain(0.2)._pianoroll()
+`} />
+
+## 4. Slow drifts: perlin noise
+
+`perlin` is smooth randomness — it wanders instead of jumping. Put it on a filter or volume and a static loop starts to breathe like a human is riding the knobs.
+
+<Strudel title="breathing filter + human-ish hats" code={`
+  setcpm(124/4)
+  stack(
+    s("bd*4, ~ cp ~ cp").bank("RolandTR909"),
+    s("hh*16").bank("RolandTR909")
+      .gain(perlin.range(0.2, 0.5).fast(4)),
+    note("[~ a1]*4").s("sawtooth")
+      .lpf(perlin.range(250, 1200).slow(4))
+      .decay(0.15).sustain(0.3)
+  )
+`} />
+
+## 5. Echoes and offsets
+
+`off(time, fn)` plays a copy of the pattern shifted later by `time`, with a change applied. It is a quick way to turn a plain line into a syncopated groove.
+
+<Strudel title="off: a shifted copy" code={`
+  setcpm(124/4)
+  stack(
+    s("bd*4").bank("RolandTR909"),
+    n("0 ~ ~ 0 ~ ~ 2 ~")
+      .off(3/16, x => x.add(n(4)).gain(0.5))   // a fifth up (4 scale steps), 3/16 later
+      .scale("A2:minor")
+      .s("sawtooth").lpf(900).decay(0.12).sustain(0)
+  )._pianoroll()
+`} />
+
+## 6. Micro-timing
+
+Swing (lesson 4) moves every second 16th. You can also push a single part slightly late or early. A clap 10 ms late feels lazy and laid-back; hats slightly early feel urgent.
+
+<Strudel title="lazy clap (every other bar)" code={`
+  setcpm(122/4)
+  stack(
+    s("bd*4"),
+    s("~ cp ~ cp").late("<0 0.012>"),     // 0.012 of a bar ≈ 23 ms at 122 BPM
+    s("hh*8").gain(0.4)
+  ).bank("RolandTR909")
+`} />
+
+<Callout kind="math">
+`late(x)` shifts by `x` cycles. With `setcpm(BPM/4)` one cycle is one bar, so `x` cycles = `x × 4 × 60 / BPM` seconds. At 122 BPM: 0.012 × 1.967 s ≈ **23 ms**. Effects under ~10 ms are felt, not heard.
+</Callout>
+
+<TryThis>
+Take the "hats that never repeat exactly" block. Change `degradeBy(0.15)` to `0.5`, then `0`. Then add `.lastOf(4, x => x.fast(2))` to the hats. Listen for when it stops sounding like a groove and starts sounding like chaos.
+</TryThis>
+
+<DoDont
+  do={[
+    'Combine tiny per-bar changes (chance, perlin) with planned 4/8-bar changes (lastOf, <…>).',
+    'Vary the least important parts the most (hats, percussion) and the kick the least.',
+    'Keep the first beat of every bar solid — vary what is around it.',
+    'Use lastOf to put fills exactly in the last bar of a phrase.',
+  ]}
+  dont={[
+    'Randomise the kick or the bass rhythm — it breaks the floor.',
+    'Use high chance values (0.5+) on parts that carry the groove.',
+    'Stack five variation functions on one line before you have heard each one alone.',
+    'Push timing more than ~20–30 ms; it starts to sound like a mistake, not a feel.',
+  ]}
+/>

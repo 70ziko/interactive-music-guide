@@ -1,0 +1,101 @@
+Bounce to house podkręcony: szybszy, twardszy i zbudowany wokół jednego nie do pomylenia dźwięku — **donka**, pustego uderzenia basu na offbicie. Jest zabawny, głośny i bez wstydu chwytliwy.
+
+## Skąd się wziął
+
+Styl wyrósł w **północno-zachodniej Anglii** (Liverpool) i najpierw nazywano go **scouse house** albo **bounce**. Gdy się rozprzestrzenił, przyjęła się nazwa **donk**, także „hard bounce”. Jego cechą rozpoznawczą jest sampel w stylu „rury” użyty jako **linia basu na offbicie**. Pokrewne sceny gdzie indziej mają własne nazwy (np. hardbass w Rosji).
+
+## Odcisk palca
+
+| Element | Zasada |
+|---|---|
+| Tempo | szybko — mniej więcej 140–150 BPM (zależy od sceny i epoki) |
+| Stopa | four on the floor, twarda i punktowa, często przesterowana |
+| **Donk** | na **każdym offbicie** — on *jest* groove'em, a nie ozdobą |
+| Haty | hat otwarty też na offbicie, zamknięte szesnastki |
+| Hook | bardzo chwytliwy lead na wierzchu, krótki i powtarzany |
+| Akordy | proste, często jasne; stabsy w dropie |
+| Narastania | rolki werbla i risery przed wielkimi dropami |
+
+Stopa i donk razem dają puls **bum-donk bum-donk**. Wszystko inne siedzi na wierzchu.
+
+## Donk na serio
+
+Donk idzie za harmonią: gra **prymę aktualnego akordu** na każdym offbicie, czasem skacząc o oktawę dla sprężystości.
+
+<Strudel title="donk idący za akordami" code={`
+  setcpm(145/4)
+  const prog = "<0 5 3 4>"               // i VI iv v
+  donk: n(prog).struct("[~ x]*4")
+    .add(n("0 0 0 7"))                     // co 4. offbit: oktawa w górę
+    .scale("A2:minor")
+    .s("triangle").penv(14).pdecay(0.03)
+    .decay(0.13).sustain(0).lpf(1800).distort(0.6).gain(0.85)
+  kick: s("bd*4").bank("RolandTR909").distort(1.2).gain(0.9)
+`} />
+
+<Callout kind="tip">
+`.add(n("0 0 0 7"))` ma jedno miejsce na każdy donk (4 na takt), więc 4. donk dostaje +7 stopni skali (= oktawa w skali 7-dźwiękowej). Spróbuj `"0 0 4 0"` (kwinta na 3. donku) albo `"0 7 0 7"` (oktawa co drugi donk).
+</Callout>
+
+## Hook
+
+Hooki bounce są krótkie, jasne i do śpiewania. Najpierw napisz rytm (lekcja 8), trzymaj go w jednej oktawie, powtarzaj.
+
+<MelodyGrid preset="bounce" />
+
+## Szablon
+
+Pełny utwór bounce na 112 taktów (≈ 3,1 min przy 145 BPM).
+
+<Strudel title="szablon utworu bounce" code={`
+  setcpm(145/4)
+  const key  = 'A:minor'
+  const prog = "<0 5 3 4>"
+
+  const kick  = s("bd*4").bank("RolandTR909").distort(1.2).gain(0.9)
+  const clap  = s("~ cp ~ cp").bank("RolandTR909").gain(0.7)
+  const hats  = s("[~ oh]*4, hh*16").bank("RolandTR909").gain("0.35")
+  const donk  = n(prog).struct("[~ x]*4").add(n("0 0 0 7")).scale("A2:minor")
+    .s("triangle").penv(14).pdecay(0.03).decay(0.13).sustain(0)
+    .lpf(1800).distort(0.6).gain(0.85)
+  const hook  = n(\`<[4 ~ 4 ~ 5 ~ 4 ~ 2 ~ 2 ~ 1 ~ 0 ~]
+                   [4 ~ 4 ~ 5 ~ 7 ~ 5 ~ 4 ~ 2 ~ ~ ~]>\`)
+    .scale("A4:minor").s("supersaw").unison(5).detune(0.3)
+    .lpf(4000).decay(0.2).sustain(0.5).gain(0.35).room(0.3).orbit(2)
+  const stabs = n("[0,2,4]").add(n(prog)).scale(key).struct("[~ x]*4")
+    .s("sawtooth").lpf(2500).decay(0.1).sustain(0).hpf(200).gain(0.35)
+  const pad   = n("[0,2,4,7]").add(n(prog)).scale(key)
+    .s("supersaw").attack(0.4).release(1.5).sustain(0.8)
+    .hpf(250).lpf(2000).gain(0.2).room(0.7).orbit(2)
+  const roll  = s("sd*<4 4 8 8 16 16 32 32>").bank("RolandTR909")
+    .gain(saw.range(0.3, 1).slow(8)).speed(saw.range(1, 1.5).slow(8))
+  const riser = s("white*16").decay(0.07).sustain(0)
+    .hpf(saw.range(300, 10000).slow(8)).gain(saw.range(0.05, 0.35).slow(8))
+
+  arrange(
+    [16, stack(kick, hats)],                                         // intro
+    [16, stack(kick, hats, clap, donk)],                             // wejście donka
+    [16, stack(kick, hats, clap, donk, hook)],                       // hook
+    [16, stack(hook, pad)],                                          // breakdown
+    [8,  stack(hook, roll, riser).mask("<1!7 [1 1 1 0]>")],           // narastanie
+    [24, stack(kick, hats, clap, donk, hook, stabs)],                // drop
+    [16, stack(kick, hats, donk)]                                    // outro
+  )
+`} />
+
+<ArrangementTimeline template="bounce" />
+
+<DoDont
+  do={[
+    'Kładź donka na każdym offbicie i niech idzie za prymami akordów.',
+    'Trzymaj stopę krótką, żeby nie połykała donka.',
+    'Napisz hook, który zaśpiewasz po jednym przesłuchaniu, i powtarzaj go dużo.',
+    'Rób narastanie oczywistym: rolka werbla + riser + ciche ostatnie uderzenie.',
+  ]}
+  dont={[
+    'Kłaść długiego sub-basu pod donkiem — donk jest basem.',
+    'Swingować — bounce jest prosty i pędzący.',
+    'Chować hooka za pogłosem w dropie; trzymaj go z przodu i raczej sucho.',
+    'Używać wolnych, deep-house\'owych akordów i oczekiwać, że będzie bujać.',
+  ]}
+/>

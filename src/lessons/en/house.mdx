@@ -1,0 +1,88 @@
+Everything in this course so far has been house-shaped. This playbook collects it into **one page you can write a track from**: the genre's fingerprint, its sub-styles, a full template, and a checklist.
+
+## The fingerprint
+
+House started in **Chicago in the early 1980s** and usually runs at about **115–130 BPM** (most tracks 120–128). Its core is the drum pattern you built in lesson 4:
+
+| Element | Rule |
+|---|---|
+| Kick | on every beat (four on the floor), usually from a drum machine (TR-909, TR-808) |
+| Hats | open hat on the offbeat, closed hats on 8ths or 16ths |
+| Clap / snare | on beats 2 and 4 |
+| Bass | offbeat or syncopated, locked to the kick |
+| Harmony | 1–4 chords, often minor 7ths / 9ths, loops of 1, 2 or 4 bars |
+| Form | 8-bar phrases, DJ-friendly intro and outro |
+
+## Sub-styles (rough guide)
+
+| Style | Feel | What to reach for |
+|---|---|---|
+| Deep house | warm, soulful, unhurried | m7/m9 chords, e-piano or pads, rounded bass, swing, lots of space |
+| Chicago / jackin' | raw, punchy, drum-machine-forward | 909/808 drums loud, simple bass, acid or organ stabs |
+| Piano house | uplifting, euphoric | piano chord riffs, major or bright minor, big breakdowns |
+| Acid house | hypnotic, squelchy | one 303-style acid line carries the track (lesson 10) |
+| Tech house | tight, groovy, minimal | dry percussion, short bass notes, small variations (lesson 5) |
+
+## The template
+
+A full, playable 112-bar house track (≈ 3.6 min at 124 BPM). Built from named layers, arranged with `arrange()` (lesson 13). Change the key, the chords and the stab sound and it becomes your track.
+
+<Strudel title="house track template" code={`
+  setcpm(124/4)
+  const key  = 'A:minor'
+  const prog = "<0 0 5 4>"                     // i i VI v
+
+  const kick  = s("bd*4").bank("RolandTR909").gain(0.95)
+    .duckorbit(2).duckdepth(0.6).duckattack(0.2)
+  const clap  = s("~ cp ~ cp").bank("RolandTR909").gain(0.7).room(0.15)
+  const hats  = s("[~ oh]*4").bank("RolandTR909").gain(0.4)
+  const shuf  = s("hh*16").bank("RolandTR909").gain("[0.2 0.32]*8")
+    .degradeBy(0.1).swingBy(1/6, 8)
+  const perc  = s("rim(3,8)").bank("RolandTR909").gain(0.35).pan(0.7)
+  const bass  = n(prog).scale("A1:minor").struct("[~ x ~ x] [~ x ~ ~] [~ x ~ x] [~ x ~ ~]")
+    .s("sawtooth").lpf(perlin.range(350, 600).slow(8)).decay(0.15).sustain(0.3).gain(0.8)
+  const stabs = n("[0,2,4,6]").add(n(prog)).scale(key)
+    .struct("[~ x ~ ~] [x ~ ~ x] [~ ~ x ~] [~ x ~ ~]")
+    .s("gm_drawbar_organ").decay(0.18).sustain(0).hpf(200).gain(0.6)
+    .room(0.3).orbit(2)
+  const pad   = n("[0,2,4,8]").add(n(prog)).scale(key)
+    .s("supersaw").attack(0.6).release(1.5).sustain(0.8)
+    .hpf(250).lpf(1600).gain(0.18).room(0.6).orbit(2)
+  const roll  = s("cp*<4 4 8 8 16 16 32 32>").bank("RolandTR909")
+    .gain(saw.range(0.3, 0.8).slow(8))
+
+  arrange(
+    [16, stack(kick, hats, shuf)],                              // intro
+    [16, stack(kick, hats, shuf, clap, bass, perc)],            // groove
+    [16, stack(kick, hats, shuf, clap, bass, perc, stabs)],     // main
+    [16, stack(stabs, pad)],                                    // breakdown
+    [8,  stack(stabs.hpf(saw.range(200, 1500).slow(8)), roll)], // build-up
+    [24, stack(kick, hats, shuf, clap, bass, perc, stabs, pad)],// drop
+    [16, stack(kick, hats, shuf, perc)]                         // outro
+  )
+`} />
+
+<ArrangementTimeline template="house" />
+
+## Make it yours: 5 changes that matter most
+
+1. **Key and progression** — try `'F:minor'` and `"<0 3 5 4>"`.
+2. **The stab sound** — swap `gm_drawbar_organ` for `piano` or `gm_epiano1` (deep), or `sawtooth` with `lpq(6)` (rave).
+3. **The bass rhythm** — change the `struct` (lesson 9).
+4. **Swing** — `swingBy(1/6, 8)` subtle → `1/3` full shuffle.
+5. **One signature sound** — an acid line, a vocal-style `vowel("a e")` lead, or a filtered loop that becomes the hook.
+
+<DoDont
+  do={[
+    'Stay between 120 and 128 BPM unless you have a reason.',
+    'Let the groove do the work: drums + bass + one hook + one chord sound is enough.',
+    'Use m7/m9 chords and swing for deep; organ or piano stabs for classic; acid for hypnotic.',
+    'Keep 16-bar DJ-friendly intro and outro.',
+  ]}
+  dont={[
+    'Add a new instrument every 8 bars until there are 12 — house is about restraint.',
+    'Make the kick distorted and hard — that is hard house territory.',
+    'Change chords every beat.',
+    'Skip the breakdown: house needs one moment where the kick goes away.',
+  ]}
+/>

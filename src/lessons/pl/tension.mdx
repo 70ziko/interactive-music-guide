@@ -1,0 +1,124 @@
+Drop uderza tylko wtedy, gdy takty przed nim sprawiły, że słuchacz go **chce**. Napięcie to obietnica; rozładowanie to jej dotrzymanie. Ta lekcja rozkłada na części narastanie z lekcji 13, pokazuje każde narzędzie osobno, a potem składa je razem.
+
+## Napięcie ≠ energia
+
+**Energia** to to, jak pełnie i głośno jest. **Napięcie** to to, jak mocno muzyka ciągnie w stronę czegoś. Breakdown ma małą energię, ale może mieć duże napięcie. Najlepszy moment utworu to zwykle duże napięcie *tuż przed* dużą energią.
+
+| Moment | Energia | Napięcie |
+|---|---|---|
+| Główny groove | duża | małe (to „dom”) |
+| Breakdown | mała | rośnie |
+| Narastanie | rośnie | **największe** |
+| 1 uderzenie ciszy przed dropem | zero | **szczyt** |
+| Drop | **największa** | rozładowane |
+
+<ArrangementTimeline template="hard" />
+
+## Narzędzia, jedno po drugim
+
+### 1. Zagęszczaj podziały
+
+Skracanie nut o połowę co 2 takty (ósemki → szesnastki → trzydziestodwójki) to najczytelniejszy sygnał „coś nadchodzi”, jaki istnieje.
+
+<Strudel title="rolka werbla: 4 → 8 → 16 → 32 na takt" code={`
+  setcpm(140/4)
+  s("sd*<4 4 8 8 16 16 32 32>").bank("RolandTR909")
+    .gain(saw.range(0.35, 1).slow(8))
+`} />
+
+### 2. Podnoś wysokość
+
+Rosnąca wysokość = rosnące napięcie. Przyspiesz sampel (`speed`) albo podnieś nutę (`add`).
+
+<Strudel title="rolka wspina się też w wysokości" code={`
+  setcpm(140/4)
+  s("sd*<4 4 8 8 16 16 32 32>").bank("RolandTR909")
+    .speed(saw.range(1, 2).slow(8))
+    .gain(saw.range(0.35, 1).slow(8))
+`} />
+
+### 3. Otwieraj (albo odchudzaj) filtr
+
+Działają dwa przeciwne ruchy: **otwierający się** filtr dolnoprzepustowy sprawia, że stłumiona pętla rozkwita; **rosnący** górnoprzepustowy wycina bas, więc dół dropu wydaje się przez kontrast ogromny.
+
+<Strudel title="górnoprzepustowy rosnący przez 8 taktów" code={`
+  setcpm(128/4)
+  stack(
+    s("bd*4, ~ cp ~ cp, [~ oh]*4").bank("RolandTR909"),
+    note("[~ a1]*4").s("sawtooth").lpf(600).decay(0.15).sustain(0.3)
+  ).hpf(saw.range(20, 1500).slow(8))
+`} />
+
+### 4. Riser
+
+Szum wspinający się w filtrze górnoprzepustowym. Wypełnia przestrzeń i wskazuje na drop jak strzałka.
+
+<Strudel title="szumowy riser" code={`
+  setcpm(128/4)
+  s("white*16").decay(0.07).sustain(0)
+    .hpf(saw.range(300, 10000).slow(8))
+    .gain(saw.range(0.05, 0.4).slow(8))
+`} />
+
+### 5. Napięcie harmoniczne
+
+Trzymaj akord, który chce się rozwiązać. W mollu najmocniej ciągną z powrotem do i akordy **v** albo **VII**, albo akord **sus**. Zakończ narastanie na takim akordzie i wpadnij z powrotem w i.
+
+<Strudel title="akord sus zawieszony, potem dom" code={`
+  setcpm(128/4)
+  chord("<Am Am Fsus2 Esus4>").voicing()
+    .s("supersaw").lpf(2000).sustain(1).gain(0.3)
+`} />
+
+### 6. Zabierz coś
+
+Wyjęcie stopy na czas narastania sprawia, że jej powrót brzmi jak uderzenie. Jedno uderzenie (albo jeden takt) prawie-ciszy tuż przed dropem to najstarszy trik muzyki tanecznej — i nadal najskuteczniejszy.
+
+## Wszystko razem: breakdown → narastanie → drop
+
+<Strudel title="8 taktów breakdownu → 8 taktów narastania → drop (24 takty, w pętli)" code={`
+  setcpm(140/4)
+  const kick  = s("bd*4").bank("RolandTR909").distort(1)
+  const hats  = s("[~ oh]*4, hh*16").bank("RolandTR909").gain(0.35)
+  const bass  = note("[~ a1]*4").s("sawtooth").lpf(500).decay(0.15).sustain(0.3)
+  const pad   = chord("<Am Am F G>").voicing().s("supersaw")
+    .lpf(1800).sustain(1).gain(0.25).room(0.5)
+  const roll  = s("sd*<4 4 8 8 16 16 32 32>").bank("RolandTR909")
+    .gain(saw.range(0.3, 1).slow(8)).speed(saw.range(1, 1.6).slow(8))
+  const riser = s("white*16").decay(0.07).sustain(0)
+    .hpf(saw.range(300, 10000).slow(8)).gain(saw.range(0.05, 0.4).slow(8))
+
+  arrange(
+    [8, pad],                                                  // breakdown
+    [8, stack(pad.hpf(saw.range(20, 800).slow(8)), roll, riser)
+          .mask("<1!7 [1 1 1 0]>")],                           // narastanie; ostatnie uderzenie cicho
+    [8, stack(kick, hats, bass, pad)]                          // drop
+  )
+`} />
+
+<Callout kind="math">
+W `arrange()` każda sekcja liczy **własne** takty od 0. Dlatego `<4 4 8 8 16 16 32 32>` rolki i każde `saw.slow(8)` zaczynają od początku dokładnie wtedy, gdy zaczyna się narastanie. `mask("<1!7 [1 1 1 0]>")` przepuszcza takty 1–7 i wycisza uderzenie 4 w takcie 8.
+</Callout>
+
+<TryThis>
+Usuń `.mask("<1!7 [1 1 1 0]>")` z narastania i zagraj ponownie. Porównaj obie wersje. Ta z cichym uderzeniem prawie zawsze uderza mocniej.
+</TryThis>
+
+## Po dropie
+
+Rozładowanie potrzebuje jeszcze jednego: **pewności siebie**. Trzymaj drop prosto przez pierwsze 8 taktów — nagrodą jest powrót stopy i basu, a nie nowe pomysły. Wariacje dodawaj od taktu 9 (lekcja 5).
+
+<DoDont
+  do={[
+    'Łącz 2–3 narzędzia napięcia: rolka + riser + filtr to klasyczne trio.',
+    'Niech każde narzędzie napięcia rośnie dokładnie przez 4, 8 albo 16 taktów, żeby szczyt wypadł na granicy frazy.',
+    'Wyjmij stopę na narastanie i przywróć ją w takcie 1 dropu.',
+    'Zostaw krótką lukę (jedno uderzenie) przed dropem.',
+  ]}
+  dont={[
+    'Narastać przez 32 takty — napięcie męczy. 8 (albo 16) wystarczy.',
+    'Wprowadzać nowej melodii w dropie. Drop to nagroda, nie nowy rozdział.',
+    'Pozwalać, żeby riser grał dalej w drop.',
+    'Używać tego samego narastania w każdej sekcji — zmień długość albo narzędzia między pierwszym a drugim dropem.',
+  ]}
+/>

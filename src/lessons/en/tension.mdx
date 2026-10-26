@@ -1,0 +1,124 @@
+A drop only hits if the bars before it made the listener **want** it. Tension is the promise; release is keeping it. This lesson takes the build-up from lesson 13 apart and shows each tool on its own, then puts them together.
+
+## Tension ≠ energy
+
+**Energy** is how full and loud it is. **Tension** is how much the music is pulling towards something. A breakdown has low energy but can have high tension. The best moment in a track is usually high tension *right before* high energy.
+
+| Moment | Energy | Tension |
+|---|---|---|
+| Main groove | high | low (it is "home") |
+| Breakdown | low | rising |
+| Build-up | rising | **highest** |
+| 1 beat of silence before the drop | zero | **peak** |
+| Drop | **highest** | released |
+
+<ArrangementTimeline template="hard" />
+
+## The tools, one by one
+
+### 1. Speed up the subdivisions
+
+Halving the note length every 2 bars (8ths → 16ths → 32nds) is the clearest "something is coming" signal there is.
+
+<Strudel title="snare roll: 4 → 8 → 16 → 32 per bar" code={`
+  setcpm(140/4)
+  s("sd*<4 4 8 8 16 16 32 32>").bank("RolandTR909")
+    .gain(saw.range(0.35, 1).slow(8))
+`} />
+
+### 2. Rise in pitch
+
+Rising pitch = rising tension. Speed up a sample (`speed`), or raise a note (`add`).
+
+<Strudel title="the roll also climbs in pitch" code={`
+  setcpm(140/4)
+  s("sd*<4 4 8 8 16 16 32 32>").bank("RolandTR909")
+    .speed(saw.range(1, 2).slow(8))
+    .gain(saw.range(0.35, 1).slow(8))
+`} />
+
+### 3. Open (or thin out) the filter
+
+Two opposite moves both work: a low-pass **opening** makes a muffled loop bloom; a high-pass **rising** removes the bass so the drop's low end feels huge by contrast.
+
+<Strudel title="high-pass rising over 8 bars" code={`
+  setcpm(128/4)
+  stack(
+    s("bd*4, ~ cp ~ cp, [~ oh]*4").bank("RolandTR909"),
+    note("[~ a1]*4").s("sawtooth").lpf(600).decay(0.15).sustain(0.3)
+  ).hpf(saw.range(20, 1500).slow(8))
+`} />
+
+### 4. The riser
+
+Noise climbing in a high-pass filter. It fills the space and points at the drop like an arrow.
+
+<Strudel title="noise riser" code={`
+  setcpm(128/4)
+  s("white*16").decay(0.07).sustain(0)
+    .hpf(saw.range(300, 10000).slow(8))
+    .gain(saw.range(0.05, 0.4).slow(8))
+`} />
+
+### 5. Harmonic tension
+
+Hold a chord that wants to resolve. In a minor key the strongest pull back to i is from **v** or **VII**, or a **sus** chord. End the build-up on that chord and drop back into i.
+
+<Strudel title="sus chord hanging, then home" code={`
+  setcpm(128/4)
+  chord("<Am Am Fsus2 Esus4>").voicing()
+    .s("supersaw").lpf(2000).sustain(1).gain(0.3)
+`} />
+
+### 6. Take something away
+
+Removing the kick for the build-up makes its return feel like an impact. One beat (or one bar) of near-silence just before the drop is the oldest trick in dance music — and still the most effective.
+
+## Putting it together: breakdown → build-up → drop
+
+<Strudel title="8-bar breakdown → 8-bar build → drop (24 bars, loops)" code={`
+  setcpm(140/4)
+  const kick  = s("bd*4").bank("RolandTR909").distort(1)
+  const hats  = s("[~ oh]*4, hh*16").bank("RolandTR909").gain(0.35)
+  const bass  = note("[~ a1]*4").s("sawtooth").lpf(500).decay(0.15).sustain(0.3)
+  const pad   = chord("<Am Am F G>").voicing().s("supersaw")
+    .lpf(1800).sustain(1).gain(0.25).room(0.5)
+  const roll  = s("sd*<4 4 8 8 16 16 32 32>").bank("RolandTR909")
+    .gain(saw.range(0.3, 1).slow(8)).speed(saw.range(1, 1.6).slow(8))
+  const riser = s("white*16").decay(0.07).sustain(0)
+    .hpf(saw.range(300, 10000).slow(8)).gain(saw.range(0.05, 0.4).slow(8))
+
+  arrange(
+    [8, pad],                                                  // breakdown
+    [8, stack(pad.hpf(saw.range(20, 800).slow(8)), roll, riser)
+          .mask("<1!7 [1 1 1 0]>")],                           // build; last beat silent
+    [8, stack(kick, hats, bass, pad)]                          // drop
+  )
+`} />
+
+<Callout kind="math">
+Inside `arrange()` each section counts its **own** bars from 0. That is why the roll's `<4 4 8 8 16 16 32 32>` and every `saw.slow(8)` start from the beginning exactly when the build starts. `mask("<1!7 [1 1 1 0]>")` lets bars 1–7 through and silences beat 4 of bar 8.
+</Callout>
+
+<TryThis>
+Delete `.mask("<1!7 [1 1 1 0]>")` from the build and play again. Compare both versions. The one with the silent beat almost always hits harder.
+</TryThis>
+
+## After the drop
+
+Release needs one more thing: **confidence**. Keep the drop simple for the first 8 bars — the payoff is the return of the kick and bass, not new ideas. Add variation from bar 9 onwards (lesson 5).
+
+<DoDont
+  do={[
+    'Combine 2–3 tension tools: roll + riser + filter is the classic trio.',
+    'Make every tension tool climb over exactly 4, 8 or 16 bars so it peaks on the phrase boundary.',
+    'Take the kick out for the build-up and bring it back on bar 1 of the drop.',
+    'Leave a short gap (one beat) before the drop.',
+  ]}
+  dont={[
+    'Build for 32 bars — tension gets tiring. 8 (or 16) is plenty.',
+    'Introduce a new melody in the drop. The drop is the payoff, not a new chapter.',
+    'Let a riser keep playing into the drop.',
+    'Use the same build-up for every section — vary length or tools between the first and second drop.',
+  ]}
+/>

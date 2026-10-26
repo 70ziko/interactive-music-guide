@@ -1,0 +1,136 @@
+Synthesis makes the sound. Effects put it **in a space**, **in time**, and give it **attitude**. Used well they glue a track together; used everywhere they turn it into soup.
+
+## How effects are wired in Strudel: orbits
+
+Every pattern plays through an **orbit** — an effects bus. **Reverb and delay live on the orbit**: all patterns on orbit 1 share one reverb and one delay line. *How much* of a note goes in (`room`, `delay`) is set per note, but the reverb size and the delay time/feedback are shared, and the most recent settings win. Filters, distortion and envelopes are per note.
+
+<Chain steps={[
+  { name: 'Note', desc: 'oscillator or sample, envelope, filter, distortion', code: '.s().lpf().distort()' },
+  { name: 'Orbit (bus)', desc: 'shared reverb + delay for every pattern on it', code: '.orbit(2)' },
+  { name: 'Output', desc: 'all orbits summed to your speakers', code: '' },
+]} />
+
+**Practical rule:** give parts that need *different* reverb or delay their own orbit. Keep kick and bass on an orbit with no reverb.
+
+<Strudel title="separate spaces with orbits" code={`
+  setcpm(124/4)
+  kick: s("bd*4").bank("RolandTR909")                       // orbit 1, dry
+  stabs: chord("<Am7 Dm7>").voicing().struct("[~ x]*4")
+    .s("gm_drawbar_organ").decay(0.2).sustain(0)
+    .room(0.6).roomsize(4).orbit(2)                        // big room
+  lead: n("0 ~ 2 4 ~ 2 ~ ~").scale("A4:minor").s("square")
+    .lpf(2000).decay(0.15).sustain(0.2).gain(0.4)
+    .delay(0.4).delaysync(3/16).delayfeedback(0.45).orbit(3) // echoes
+`} />
+
+## Reverb: space
+
+| Control | What it sets |
+|---|---|
+| `.room(0..1)` | how much of the sound is sent to the reverb (wet amount) |
+| `.roomsize(0..10)` | size / length of the space |
+
+Short, small reverb = a room; long, big reverb = a hall or a breakdown "wash". Reverb pushes a sound **back** in the mix: dry = close, wet = far.
+
+<Strudel title="dry → small room → huge hall" code={`
+  setcpm(120/4)
+  s("~ cp ~ cp").bank("RolandTR909")
+    .room("<0 0.3 0.8>").roomsize("<0 1.5 8>")
+`} />
+
+## Delay: echoes in time
+
+| Control | What it sets |
+|---|---|
+| `.delay(0..1)` | wet amount |
+| `.delaysync(x)` | delay time in **bars** (cycles) — always in tempo |
+| `.delaytime(s)` | delay time in **seconds** |
+| `.delayfeedback(0..1)` | how many repeats (keep under ~0.7) |
+
+Echoes that land on the grid sound musical; echoes off the grid sound messy. `delaysync` does the maths for you. The classic dance-music values are **1/8**, **3/16** (dotted 8th) and **1/4**.
+
+<DelayCalc />
+
+<Strudel title="dotted-8th delay on a simple pluck" code={`
+  setcpm(124/4)
+  n("<[0 ~ ~ ~ 4 ~ ~ ~] [2 ~ ~ ~ 1 ~ ~ ~]>")
+    .scale("A4:minor").s("triangle").decay(0.12).sustain(0)
+    .delay(0.5).delaysync(3/16).delayfeedback(0.5)
+    ._pianoroll()
+`} />
+
+## Distortion: harmonics and attitude
+
+Distortion bends the waveform, which **adds harmonics** (lesson 1). More harmonics = brighter, louder-sounding, more aggressive. Hard house and bounce kicks, basses and hoovers are almost always distorted to some degree.
+
+| Control | Character |
+|---|---|
+| `.shape(0..1)` | soft saturation — warmth |
+| `.distort(0..∞)` | harder clipping — grit |
+| `.crush(1..16)` | bit reduction — lo-fi, digital |
+| `.coarse(n)` | sample-rate reduction — aliasing, metallic |
+
+<Strudel title="the same bass: clean, shape, distort, crush" code={`
+  setcpm(140/4)
+  note("[~ a1]*4").s("sawtooth").lpf(600)
+    .decay(0.15).sustain(0.3)
+    .shape("<0 0.6 0 0>").distort("<0 0 2 0>").crush("<16 16 16 5>")
+    ._scope()
+`} />
+
+## Filters as effects
+
+Besides shaping a synth, filters are **performance tools**:
+
+- `.hpf()` sweep up = thin the sound out before a drop,
+- `.lpf()` sweep up = "open up" a muffled loop,
+- `.djf(x)` = a DJ-mixer filter on the **whole orbit**: below 0.5 is low-pass, above 0.5 is high-pass, 0.5 is off.
+
+<Strudel title="DJ filter on a whole groove" code={`
+  setcpm(126/4)
+  stack(
+    s("bd*4, ~ cp ~ cp, [~ oh]*4, hh*16").bank("RolandTR909"),
+    note("[~ a1]*4").s("sawtooth").lpf(500).decay(0.15).sustain(0.3)
+  ).djf("<0.5 0.25 0.5 0.8>")   // off, muffled, off, thin
+`} />
+
+## Movement: phaser, tremolo, vibrato
+
+Small modulation effects make sustained sounds come alive.
+
+<Strudel title="phaser on a supersaw chord" code={`
+  note("[a2,e3,a3,c4]").s("supersaw").lpf(2500)
+    .sustain(1).gain(0.35)
+    .phaser("<0 2 4 8>")
+`} />
+
+## Compression and ducking
+
+A **compressor** turns loud moments down so the overall level is more even. `compressor("threshold:ratio:knee:attack:release")` — threshold in dB, ratio like 4 (4:1).
+
+**Ducking** (sidechain) is compression triggered by *another* sound: the kick turns the bass or pads down for a moment. It is the main source of the "pumping" feel. You met `duckorbit` in lesson 9; here is what it does to the volume:
+
+<DuckingGraph />
+
+<Strudel title="pads pumping with the kick" code={`
+  setcpm(126/4)
+  pad: chord("<Am9 FM7>").voicing().s("supersaw")
+    .lpf(1800).sustain(1).gain(0.35).room(0.4).orbit(2)
+  kick: s("bd*4").bank("RolandTR909")
+    .duckorbit(2).duckdepth(0.85).duckattack(0.25)
+`} />
+
+<DoDont
+  do={[
+    'Keep kick and bass dry, on their own orbit.',
+    'Use delaysync with 1/8, 3/16 or 1/4 so echoes sit on the grid.',
+    'Use one shared reverb orbit for most parts — it glues them into one space.',
+    'Use distortion on purpose: on the kick, bass or lead that should feel aggressive.',
+  ]}
+  dont={[
+    'Put reverb on everything — it pushes the whole track back and blurs it.',
+    'Set delayfeedback near 1 — repeats pile up and get loud.',
+    'Expect two patterns on one orbit to have different reverb/delay settings — they share one.',
+    'Use delays longer than 1 second; Strudel’s delay line stops there.',
+  ]}
+/>

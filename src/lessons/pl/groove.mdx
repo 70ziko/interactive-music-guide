@@ -1,0 +1,135 @@
+House jest powtarzalny celowo — ten sam takt potrafi lecieć minutami. Przed brzmieniem jak zacięta płyta ratują go **małe, ciągłe zmiany**: hat, który czasem się podwaja, oddychający filtr, fill co 4. takt. Ta lekcja to skrzynka z narzędziami do tego.
+
+## Zasada dwóch prędkości
+
+| Prędkość | Co się zmienia | Przykład |
+|---|---|---|
+| **Co takt** (drobiazgi) | dynamika, losowy ghost hat, dryfujący filtr | `degradeBy`, `perlin`, `?` |
+| **Co 4–8 taktów** (wyraźnie) | fill, nowa warstwa, wariacja riffu | `<…>`, `lastOf`, `mask` |
+
+Jeśli przez 8 taktów nic się nie zmienia, ucho się wyłącza. Jeśli wszystko zmienia się co takt, nie ma groove'u, którego można się złapać. Celuj w obie prędkości naraz.
+
+## 1. Dynamika i ghost notes (powtórka)
+
+Płaska linia równych uderzeń to najczęstszy błąd początkujących. Akcenty nadają wzorowi kształt (lekcja 4).
+
+<Strudel title="płaskie vs ukształtowane haty (na zmianę co takt)" code={`
+  setcpm(124/4)
+  stack(
+    s("bd*4, ~ cp ~ cp"),
+    s("hh*16").gain("<0.5 [0.25 0.35 0.7 0.35]*4>")
+  ).bank("RolandTR909")._punchcard()
+`} />
+
+## 2. Przypadek: małe losowe zmiany
+
+Losowość w Strudlu jest **powtarzalna**: ten sam cykl daje ten sam „losowy” wynik, więc wariacja, która brzmi dobrze, brzmi tak za każdym razem.
+
+| Narzędzie | Co robi | Do czego |
+|---|---|---|
+| `"hh*16?"` | każde uderzenie gra z szansą 50 % | rzadkie, połamane haty |
+| `.degradeBy(0.2)` | usuwa 20 % zdarzeń | przerzedzanie gęstych partii |
+| `.sometimesBy(0.3, x => x.ply(2))` | zmienia 30 % zdarzeń | okazjonalne podwojenia / rolki |
+| `.sometimes(fn)` / `.often(fn)` / `.rarely(fn)` | 50 % / 75 % / 25 % | szybkie skróty |
+
+<Strudel title="haty, które nigdy nie powtarzają się dokładnie" code={`
+  setcpm(124/4)
+  stack(
+    s("bd*4, ~ cp ~ cp, [~ oh]*4"),
+    s("hh*16").gain(0.35)
+      .degradeBy(0.15)                      // kilka wypada
+      .sometimesBy(0.12, x => x.ply(2))     // kilka się podwaja
+  ).bank("RolandTR909")._punchcard()
+`} />
+
+## 3. Co N taktów: zaplanowana wariacja
+
+`lastOf(n, fn)` zmienia **ostatni** takt z każdych `n`; `firstOf(n, fn)` — pierwszy. To najczystszy sposób na fille i przejścia trafiające w siatkę fraz (lekcja 13).
+
+<Strudel title="fill w takcie 4, większy fill w takcie 8" code={`
+  setcpm(124/4)
+  stack(
+    s("bd*4"),
+    s("~ cp ~ cp").lastOf(4, x => x.ply("<1 2>")),
+    s("[~ oh]*4").gain(0.5),
+    s("~").lastOf(8, () => s("~ ~ ~ [sd sd sd sd]").gain(0.7))
+  ).bank("RolandTR909")._punchcard()
+`} />
+
+Wariacja **riffu** działa tak samo. `lastOf(4, x => x.rev())` gra riff od tyłu w takcie 4; `lastOf(2, x => x.add(n(2)))` przesuwa go o dwa stopnie skali w górę co drugi takt.
+
+<Strudel title="riff z wbudowaną wariacją" code={`
+  setcpm(126/4)
+  n("0 ~ 2 ~ 4 ~ 2 0")
+    .lastOf(4, x => x.rev())
+    .firstOf(8, x => x.add(n(-1)))
+    .scale("A3:minor").s("square").lpf(1800)
+    .decay(0.15).sustain(0.2)._pianoroll()
+`} />
+
+## 4. Wolne dryfowanie: szum perlina
+
+`perlin` to gładka losowość — wędruje zamiast skakać. Daj go na filtr albo głośność, a statyczna pętla zaczyna oddychać, jakby ktoś kręcił gałkami.
+
+<Strudel title="oddychający filtr + „ludzkie” haty" code={`
+  setcpm(124/4)
+  stack(
+    s("bd*4, ~ cp ~ cp").bank("RolandTR909"),
+    s("hh*16").bank("RolandTR909")
+      .gain(perlin.range(0.2, 0.5).fast(4)),
+    note("[~ a1]*4").s("sawtooth")
+      .lpf(perlin.range(250, 1200).slow(4))
+      .decay(0.15).sustain(0.3)
+  )
+`} />
+
+## 5. Echa i przesunięcia
+
+`off(czas, fn)` gra kopię wzoru przesuniętą o `czas`, ze zmianą. To szybki sposób, żeby z prostej linii zrobić synkopowany groove.
+
+<Strudel title="off: przesunięta kopia" code={`
+  setcpm(124/4)
+  stack(
+    s("bd*4").bank("RolandTR909"),
+    n("0 ~ ~ 0 ~ ~ 2 ~")
+      .off(3/16, x => x.add(n(4)).gain(0.5))   // kwinta w górę (4 stopnie skali), 3/16 później
+      .scale("A2:minor")
+      .s("sawtooth").lpf(900).decay(0.12).sustain(0)
+  )._pianoroll()
+`} />
+
+## 6. Mikro-timing
+
+Swing (lekcja 4) przesuwa co drugą szesnastkę. Możesz też lekko opóźnić albo przyspieszyć jedną partię. Klap 10 ms później brzmi leniwie i na luzie; haty lekko wcześniej — nerwowo.
+
+<Strudel title="leniwy klap (co drugi takt)" code={`
+  setcpm(122/4)
+  stack(
+    s("bd*4"),
+    s("~ cp ~ cp").late("<0 0.012>"),     // 0.012 taktu ≈ 23 ms przy 122 BPM
+    s("hh*8").gain(0.4)
+  ).bank("RolandTR909")
+`} />
+
+<Callout kind="math">
+`late(x)` przesuwa o `x` cykli. Przy `setcpm(BPM/4)` jeden cykl to jeden takt, więc `x` cykli = `x × 4 × 60 / BPM` sekund. Przy 122 BPM: 0,012 × 1,967 s ≈ **23 ms**. Przesunięcia poniżej ~10 ms się czuje, a nie słyszy.
+</Callout>
+
+<TryThis>
+Weź blok „haty, które nigdy nie powtarzają się dokładnie”. Zmień `degradeBy(0.15)` na `0.5`, potem na `0`. Potem dodaj hatom `.lastOf(4, x => x.fast(2))`. Posłuchaj, w którym momencie przestaje to być groove, a zaczyna chaos.
+</TryThis>
+
+<DoDont
+  do={[
+    'Łącz drobne zmiany co takt (losowość, perlin) z zaplanowanymi co 4/8 taktów (lastOf, <…>).',
+    'Najbardziej zmieniaj najmniej ważne partie (haty, perkusja), najmniej — stopę.',
+    'Pierwsze uderzenie każdego taktu trzymaj solidnie — zmieniaj to, co wokół.',
+    'Używaj lastOf, żeby fille trafiały dokładnie w ostatni takt frazy.',
+  ]}
+  dont={[
+    'Losować rytmu stopy ani basu — to rozwala parkiet.',
+    'Dawać wysokich szans (0.5+) partiom, które niosą groove.',
+    'Kłaść pięciu funkcji wariacji na jednej linii, zanim usłyszysz każdą osobno.',
+    'Przesuwać timingu o więcej niż ~20–30 ms; zaczyna to brzmieć jak błąd, a nie feeling.',
+  ]}
+/>

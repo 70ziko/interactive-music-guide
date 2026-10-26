@@ -1,0 +1,156 @@
+Ta lekcja to książka kucharska. Każdy przepis nazywa brzmienie, mówi, co sprawia, że jest tym brzmieniem, i daje startowy patch z 2–3 najważniejszymi gałkami. Zmieniaj jedną gałkę naraz.
+
+<Callout kind="tip">
+Przepis to punkt startu, nie preset. Chodzi o to, żeby wiedzieć **która gałka co robi** — wtedy przejdziesz od „podobne” do „moje”.
+</Callout>
+
+## Lead supersaw
+
+**Co to jest:** kilka fal piłokształtnych lekko rozstrojonych względem siebie (lekcja 10). Wolne dudnienie między nimi brzmi szeroko i potężnie — lead trance i hard dance.
+
+| Gałka | Co robi |
+|---|---|
+| `unison` | liczba pił (3–7) |
+| `detune` | jak daleko od siebie (0.1 = subtelnie, 0.6 = ogromnie/fałszywie) |
+| `lpf` | jasność |
+
+<Strudel title="lead supersaw" code={`
+  setcpm(140/4)
+  n("<[0 ~ 2 ~ 4 ~ 2 ~] [5 ~ 4 ~ 2 ~ 1 ~]>")
+    .scale("A4:minor").s("supersaw")
+    .unison(7).detune(0.35)
+    .lpf(3500).attack(0.005).decay(0.2).sustain(0.5).release(0.15)
+    .room(0.3).gain(0.4)
+`} />
+
+## Hoover
+
+**Co to jest:** klasyczny hoover pochodzi z patcha „What the” w Rolandzie Alpha Juno: trzy oscylatory **oktawę od siebie**, mocna **modulacja szerokości impulsu (PWM)** i gęsty **chorus**, wszystko poruszane szybkim LFO. Zasłynął w rave'owych utworach z początku lat 90. i żyje dalej w hard house i hard NRG.
+
+W Strudlu nie ma Alpha Juno, więc przybliżamy składniki:
+
+| Prawdziwy hoover | Przybliżenie w Strudlu |
+|---|---|
+| 3 oscylatory oktawę od siebie | `.add(note("0,12,-12"))` na supersaw |
+| „zawirowanie” PWM + chorus | wysoki `detune` + `phaser` |
+| wysokość wjeżdża w nuty | `penv(-…)` + `pattack` |
+
+<Strudel title="prawie hoover" code={`
+  setcpm(148/4)
+  note("<[a2 ~ ~ a2 ~ ~ g2 ~] [c3 ~ ~ a2 ~ ~ e2 ~]>")
+    .add(note("0,12,-12"))
+    .s("supersaw").unison(5).detune(0.6)
+    .penv(-12).pattack(0.1)
+    .phaser(4).lpf(3000).distort(1)
+    .decay(0.4).sustain(0.6).release(0.1).gain(0.35)
+`} />
+
+## Bas reese
+
+**Co to jest:** dwa basy piłokształtne **lekko rozstrojone**, które przesuwają się w fazie względem siebie, więc bas powoli „się rusza”. Nazwa od aliasu Kevina Saundersona — Reese („Just Want Another Chance”, 1988); później centralny w jungle i drum & bass, świetny do mroczniejszego house.
+
+| Gałka | Co robi |
+|---|---|
+| wielkość rozstrojenia | prędkość ruchu (`0.1` półtonu = wolno, `0.3` = szybko) |
+| `lpf` | ile warczenia |
+| `distort` | brud |
+
+<Strudel title="reese" code={`
+  setcpm(124/4)
+  note("<a1 a1 f1 g1>")
+    .add(note("0, 0.12"))          // dwie piły, 0.12 półtonu od siebie
+    .s("sawtooth").lpf(sine.range(300, 900).slow(8))
+    .sustain(1).distort(0.5).gain(0.45)
+    ._scope()
+`} />
+
+## Stab organowy w stylu M1
+
+**Co to jest:** jasny, punktowy akord organowy house'u lat 90. Krótki, na offbitach, często mollowy septymowy.
+
+<Strudel title="stab organowy" code={`
+  setcpm(124/4)
+  chord("<Am7 Am7 Dm7 Em7>").voicing()
+    .struct("[~ x ~ ~] [x ~ ~ x] [~ ~ x ~] [~ x ~ ~]")
+    .s("gm_drawbar_organ").decay(0.2).sustain(0)
+    .hpf(180).room(0.25).gain(0.8)
+`} />
+
+## Akordy piano house
+
+<Strudel title="piano house" code={`
+  setcpm(124/4)
+  chord("<Am7 FM7 CM7 G>").voicing()
+    .struct("[x ~ ~ x] [~ ~ x ~] [~ x ~ ~] [x ~ ~ ~]")
+    .s("piano").gain(0.8).room(0.3)
+`} />
+
+## Warianty donka
+
+**Co to jest:** linia basu bounce zbudowana wokół pustego, „rurowego” uderzenia na każdym offbicie. Jego charakter kształtujesz trzema gałkami:
+
+| Gałka | Niżej | Wyżej |
+|---|---|---|
+| `penv` (spadek wysokości) | miękciej, okrąglej | klikający atak „d-” |
+| `decay` | ciasno, perkusyjnie | dudniąco, dłużej |
+| `lpf` / `distort` | drewniano, ciemno | jasno, agresywnie |
+
+<Strudel title="trzy donki (każdy na 2 takty)" code={`
+  setcpm(145/4)
+  donk: note("[~ a2]*4")
+    .s("<triangle triangle square square sine sine>")
+    .penv("<14 14 6 6 24 24>").pdecay(0.03)
+    .decay("<0.13 0.13 0.09 0.09 0.2 0.2>").sustain(0)
+    .lpf("<1800 1800 2600 2600 900 900>").distort("<0.6 0.6 1.2 1.2 0.2 0.2>")
+    .gain(0.9)
+  kick: s("bd*4").bank("RolandTR909").distort(1)
+`} />
+
+## Linia acid
+
+Piła + rezonans + obwiednia filtra + przester (lekcja 10). Typ filtra `ladder` jest najbliżej klasycznego mlaskania.
+
+<Strudel title="acid" code={`
+  setcpm(128/4)
+  note("a1 [a1 a2] c2 a1 [~ g2] a1 e2 [a1 c3]")
+    .s("sawtooth").ftype("ladder")
+    .lpf(perlin.range(300, 2000).slow(8)).lpq(16)
+    .lpenv(4).lpdecay(0.12)
+    .decay(0.15).sustain(0.2).distort(0.8).gain(0.5)
+`} />
+
+## FX: riser, downlifter, impakt
+
+To nie są instrumenty — to **przejścia** (lekcja 14).
+
+| FX | Przepis |
+|---|---|
+| Riser | szum z filtrem górnoprzepustowym rosnącym przez 4–8 taktów |
+| Downlifter | szum z filtrem dolnoprzepustowym opadającym po dropie |
+| Impakt | niski sinus z dużym spadkiem wysokości + pogłos, w takcie 1 dropu |
+| Odwrócony crash | sampel crasha grany od tyłu (`speed(-1)`) |
+
+<Strudel title="riser → impakt (4 takty, w pętli)" code={`
+  setcpm(128/4)
+  riser: s("white*16").mask("<1 1 1 0>")        // tylko takty 1–3
+    .decay(0.07).sustain(0)
+    .hpf(saw.range(300, 10000).slow(4)).gain(saw.range(0.05, 0.4).slow(4))
+  impact: note("<~ ~ ~ a1>").s("sine")
+    .penv(36).pdecay(0.25).decay(1.2).sustain(0)
+    .room(0.6).roomsize(6).gain(0.9)
+  crash: s("<~ ~ ~ cr>").bank("RolandTR909").gain(0.5)
+`} />
+
+<DoDont
+  do={[
+    'Naucz się dobrze jednego przepisu, potem zmieniaj jedną gałkę naraz i słuchaj.',
+    'Używaj stosów oktaw (+12/−12) i rozstrojenia dla wielkości; filtra i przesteru dla charakteru.',
+    'Pod basy reese i supersaw dawaj czysty sub, jeśli dół zaczyna się chwiać.',
+    'FX (risery, impakty) trzymaj na przejścia — tracą moc, gdy grają cały czas.',
+  ]}
+  dont={[
+    'Rozstrajać basu o więcej niż ~0.3 półtonu — przestaje brzmieć jak jedna nuta.',
+    'Używać szerokiego, rozstrojonego dźwięku jako subu (poniżej ~80 Hz) — słabnie na monofonicznym nagłośnieniu klubowym.',
+    'Skopiować słynny patch i na tym poprzestać. Zmień jeden składnik, żeby stał się twój.',
+  ]}
+/>

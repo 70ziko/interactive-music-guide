@@ -400,3 +400,76 @@ p code, li code { overflow-wrap: anywhere; }
 .part-reference td, .part-reference th { white-space: normal; }
 .part-reference td:last-child { white-space: nowrap; }
 @media (min-width: 700px) { .part-reference table { display: table; } }
+
+/* =========================================================
+   Phones & touch
+   ========================================================= */
+.grid16 { --g-label: minmax(70px, 120px); }
+.grid16 + .grid16 { margin-top: 14px; }
+.piano-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+/* no double-tap zoom / 300 ms delay on fast taps (grids, keys, buttons) */
+button, .cell, .key, a, input[type='range'], select { touch-action: manipulation; }
+
+@media (max-width: 600px) {
+  .content { padding: 20px 14px 72px; }
+  h1 { font-size: 1.9rem; }
+  h2 { font-size: 1.35rem; }
+  .widget { padding: 12px 10px; }
+
+  /* step / melody grids: 8 steps per row, big cells */
+  .grid16 { --g-label: 48px; gap: 4px; }
+  .grid16 .cell { min-height: 30px; border-radius: 6px; }
+  .grid16 .g-num { font-size: 12px; }
+
+  /* piano: scroll sideways with wider keys */
+  .piano { min-width: 560px; }
+
+  /* small info tables wrap instead of being cut off */
+  .mini-table:not(.calc) { display: block; }
+  .mini-table:not(.calc) tbody { display: block; }
+  .mini-table:not(.calc) tr { display: flex; flex-wrap: wrap; gap: 2px 10px; }
+  .mini-table:not(.calc) th, .mini-table:not(.calc) td { border: 0; padding: 2px 0; white-space: normal; }
+
+  /* lesson tables: wrap text, keep code on one line */
+  td, th { white-space: normal; min-width: 4.5em; }
+  td code { white-space: nowrap; }
+
+  /* arrangement map: fit the screen instead of scrolling */
+  .arr { min-width: 0; padding-left: 66px; }
+  .widget svg.arr-energy { left: 66px; width: calc(100% - 66px); }
+  .arr-lane-name { left: -66px; width: 62px; font-size: 0.68rem; }
+  .arr-sec { font-size: 0.62rem; }
+  .arr-sec small { display: none; }
+
+  /* code blocks */
+  .strudel-host .cm-editor { font-size: 13px !important; }
+  .strudel-placeholder { font-size: 13px; }
+  .strudel-title { order: -1; flex-basis: 100%; margin: 0 0 4px 2px; }
+
+  /* harmonic sliders fill their column */
+  .harm input { width: 100%; }
+
+  /* iOS zooms into inputs smaller than 16px */
+  select { font-size: 16px; }
+}
+
+/* touchscreens: bigger tap targets, no keyboard-shortcut hint */
+@media (pointer: coarse) {
+  .btn { min-height: 40px; }
+  .seg button { min-height: 36px; padding: 0.35em 0.75em; }
+  .lang-switch button { min-height: 36px; min-width: 40px; }
+  .sidebar a { padding: 10px 10px; }
+  input[type='range'] { height: 32px; }
+  .strudel-hint:not(.loading) { display: none; }
+}
+.arr-note-head { display: flex; align-items: center; gap: 8px; }
+.arr-note-head strong { flex: 1; text-align: center; }
+.arr-note-head .btn { min-width: 40px; justify-content: center; font-size: 1.2rem; padding: 0.1em 0.5em; }
+@media (pointer: coarse) { .seg button { min-width: 40px; } }
+@media (max-width: 600px) {
+  /* slider: label on its own line, then slider + value */
+  .slider { grid-template-columns: minmax(0, 1fr) auto; gap: 2px 8px; flex-basis: 100%; }
+  .slider-label { grid-column: 1 / -1; }
+  .slider output { min-width: 0; }
+}

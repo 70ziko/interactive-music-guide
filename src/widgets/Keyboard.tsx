@@ -102,25 +102,27 @@ export default function Keyboard({ mode = 'free', root: r0 = 9, scale: s0 = 'min
       }
       caption={t.w_clickKey}
     >
-      <div className="piano" role="group" aria-label="piano">
-        {keys.map((m) => {
-          const black = BLACK.has(m % 12);
-          const wi = whites.filter((w) => w < m).length;
-          const left = black ? wi * ww - ww * 0.3 : wi * ww;
-          const deg = lit.get(m);
-          return (
-            <button
-              key={m}
-              className={`key ${black ? 'black' : 'white'} ${deg !== undefined ? 'lit' : ''} ${deg === 0 ? 'root' : ''} ${last === m ? 'pressed' : ''}`}
-              style={{ left: `${left}%`, width: `${black ? ww * 0.6 : ww}%` }}
-              onClick={() => press(m)}
-              aria-label={midiName(m)}
-            >
-              {deg !== undefined && <span className="deg">{mode === 'chord' ? ['R', '3', '5', '7', '9'][deg] ?? '' : deg + 1}</span>}
-              {!black && m % 12 === 0 && <span className="cname">{midiName(m)}</span>}
-            </button>
-          );
-        })}
+      <div className="piano-scroll">
+        <div className="piano" role="group" aria-label="piano">
+          {keys.map((m) => {
+            const black = BLACK.has(m % 12);
+            const wi = whites.filter((w) => w < m).length;
+            const left = black ? wi * ww - ww * 0.3 : wi * ww;
+            const deg = lit.get(m);
+            return (
+              <button
+                key={m}
+                className={`key ${black ? 'black' : 'white'} ${deg !== undefined ? 'lit' : ''} ${deg === 0 ? 'root' : ''} ${last === m ? 'pressed' : ''}`}
+                style={{ left: `${left}%`, width: `${black ? ww * 0.6 : ww}%` }}
+                onClick={() => press(m)}
+                aria-label={midiName(m)}
+              >
+                {deg !== undefined && <span className="deg">{mode === 'chord' ? ['R', '3', '5', '7', '9'][deg] ?? '' : deg + 1}</span>}
+                {!black && m % 12 === 0 && <span className="cname">{midiName(m)}</span>}
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       {mode === 'scale' && (

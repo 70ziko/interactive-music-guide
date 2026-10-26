@@ -21,6 +21,17 @@ export default function Layout({ children }: { children: ReactNode }) {
     setOpen(false);
   }, [loc.pathname]);
 
+  // phones: the page behind the open menu should not scroll; Escape closes the menu
+  useEffect(() => {
+    document.body.style.overflow = open ? 'hidden' : '';
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setOpen(false);
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.body.style.overflow = '';
+      document.removeEventListener('keydown', onKey);
+    };
+  }, [open]);
+
   const switchTo = (l: Lang) => {
     if (l === lang) return;
     rememberScroll();

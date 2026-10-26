@@ -3,7 +3,7 @@ import { useLang } from '../i18n/LangContext';
 import Strudel from '../components/StrudelBlock';
 import { NOTE_NAMES } from '../audio/tone';
 import { SCALES } from './Keyboard';
-import { Controls, Seg, Slider, useFrame, Widget } from './ui';
+import { Controls, Seg, Slider, useFrame, useNarrow, Widget } from './ui';
 
 type Notes = (number | null)[];
 const ROWS = [7, 6, 5, 4, 3, 2, 1, 0]; // scale degrees, top = octave
@@ -40,7 +40,8 @@ function toCode(notes: Notes, root: number, scale: string, sound: keyof typeof S
   return `setcpm(${Math.round(bpm)}/4)
 // ${c.mel}
 melody: n("${beats.join(' ')}")
-  .scale("${key}")${SOUNDS[sound]}.gain(0.5)
+  .scale("${key}")
+  ${SOUNDS[sound]}.gain(0.5)
 // ${c.bg}
 pad: n("[0,2,4]").scale("${chordKey}").s("sawtooth")
   .lpf(900).sustain(1).gain(0.18)
@@ -59,6 +60,9 @@ export default function MelodyGrid({ preset = 'hook' }: { preset?: keyof typeof 
   const [step, setStep] = useState(-1);
   const [playing, setPlaying] = useState(false);
   const clock = useRef<(() => number) | null>(null);
+  const narrow = useNarrow();
+  const all = Array.from({ length: 16 }, (_, i) => i);
+  const halves = narrow ? [all.slice(0, 8), all.slice(8)] : [all];
 
   const code = useMemo(() => toCode(notes, root, scale, sound, bpm, lang), [notes, root, scale, sound, bpm, lang]);
 
@@ -88,33 +92,35 @@ export default function MelodyGrid({ preset = 'hook' }: { preset?: keyof typeof 
           : 'One note per step. Rows are scale degrees (0 = tonic; highlighted rows are the tonic), so you cannot hit a "wrong" note. The pad plays the tonic chord so you can hear which notes feel at home.'
       }
     >
-      <div className="grid16 mgrid">
-        <div className="g-head" />
-        {Array.from({ length: 16 }, (_, i) => (
-          <div key={i} className={`g-num ${i % 4 === 0 ? 'beat' : ''} ${step === i ? 'now' : ''}`}>
-            {i % 4 === 0 ? i / 4 + 1 : i % 4 === 2 ? '&' : '·'}
-          </div>
-        ))}
-        {ROWS.map((row) => {
-          const tonic = row % SCALES[scale].steps.length === 0;
-          return (
-          <div key={row} style={{ display: 'contents' }}>
-            <div className={`g-head ${tonic ? 'tonic' : ''}`}>
-              <code>{row}</code> <span>{noteName(root, scale, row)}</span>
+      {halves.map((steps) => (
+        <div className="grid16 mgrid" key={steps[0]} style={{ gridTemplateColumns: `var(--g-label) repeat(${steps.length}, minmax(0, 1fr))` }}>
+          <div className="g-head" />
+          {steps.map((i) => (
+            <div key={i} className={`g-num ${i % 4 === 0 ? 'beat' : ''} ${step === i ? 'now' : ''}`}>
+              {i % 4 === 0 ? i / 4 + 1 : i % 4 === 2 ? '&' : '·'}
             </div>
-            {Array.from({ length: 16 }, (_, i) => (
-              <button
-                key={i}
-                className={`cell ${notes[i] === row ? 'on' : ''} ${tonic ? 'tonic-row' : ''} ${i % 4 === 0 ? 'beat' : ''} ${step === i ? 'now' : ''}`}
-                onClick={() => place(row, i)}
-                aria-label={`${noteName(root, scale, row)} ${t.w_step} ${i + 1}`}
-                aria-pressed={notes[i] === row}
-              />
-            ))}
-          </div>
-          );
-        })}
-      </div>
+          ))}
+          {ROWS.map((row) => {
+            const tonic = row % SCALES[scale].steps.length === 0;
+            return (
+              <div key={row} style={{ display: 'contents' }}>
+                <div className={`g-head ${tonic ? 'tonic' : ''}`}>
+                  <code>{row}</code> <span>{noteName(root, scale, row)}</span>
+                </div>
+                {steps.map((i) => (
+                  <button
+                    key={i}
+                    className={`cell ${notes[i] === row ? 'on' : ''} ${tonic ? 'tonic-row' : ''} ${i % 4 === 0 ? 'beat' : ''} ${step === i ? 'now' : ''}`}
+                    onClick={() => place(row, i)}
+                    aria-label={`${noteName(root, scale, row)} ${t.w_step} ${i + 1}`}
+                    aria-pressed={notes[i] === row}
+                  />
+                ))}
+              </div>
+            );
+          })}
+        </div>
+      ))}
       <Controls>
         <Seg
           label={t.w_preset}

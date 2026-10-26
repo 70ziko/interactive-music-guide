@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { useLang } from '../i18n/LangContext';
 import Strudel from '../components/StrudelBlock';
-import { Controls, Seg, Slider, useFrame, Widget } from './ui';
+import { Controls, Seg, Slider, useFrame, useNarrow, Widget } from './ui';
 
 type Track = 'bd' | 'cp' | 'sd' | 'hh' | 'oh' | 'rim';
 
@@ -88,6 +88,10 @@ export default function StepGrid({ preset = 'four', tracks = ['bd', 'cp', 'hh', 
   const [step, setStep] = useState(-1);
   const clock = useRef<(() => number) | null>(null);
   const [playing, setPlaying] = useState(false);
+  // phones: two rows of 8 steps instead of one row of 16, so cells are big enough to tap
+  const narrow = useNarrow();
+  const all = Array.from({ length: 16 }, (_, i) => i);
+  const halves = narrow ? [all.slice(0, 8), all.slice(8)] : [all];
 
   const code = useMemo(() => gridToCode(pattern, tracks, bpm, swing, lang), [pattern, tracks, bpm, swing, lang]);
 
@@ -127,30 +131,32 @@ export default function StepGrid({ preset = 'four', tracks = ['bd', 'cp', 'hh', 
           : 'Click cells. The code below updates live — if it is playing you hear the change at once. 1 bar = 4 beats = 16 steps.'
       }
     >
-      <div className="grid16" style={{ ['--rows' as string]: tracks.length }}>
-        <div className="g-head" />
-        {Array.from({ length: 16 }, (_, i) => (
-          <div key={i} className={`g-num ${i % 4 === 0 ? 'beat' : ''} ${step === i ? 'now' : ''}`}>
-            {i % 4 === 0 ? i / 4 + 1 : i % 4 === 2 ? '&' : '·'}
-          </div>
-        ))}
-        {tracks.map((tr) => (
-          <div className="g-row" key={tr} style={{ display: 'contents' }}>
-            <div className="g-head">
-              <code>{tr}</code> <span>{lang === 'pl' ? TRACK_INFO[tr].pl : TRACK_INFO[tr].en}</span>
+      {halves.map((steps) => (
+        <div className="grid16" key={steps[0]} style={{ gridTemplateColumns: `var(--g-label) repeat(${steps.length}, minmax(0, 1fr))` }}>
+          <div className="g-head" />
+          {steps.map((i) => (
+            <div key={i} className={`g-num ${i % 4 === 0 ? 'beat' : ''} ${step === i ? 'now' : ''}`}>
+              {i % 4 === 0 ? i / 4 + 1 : i % 4 === 2 ? '&' : '·'}
             </div>
-            {Array.from({ length: 16 }, (_, i) => (
-              <button
-                key={i}
-                className={`cell t-${tr} ${pattern[tr].has(i) ? 'on' : ''} ${i % 4 === 0 ? 'beat' : ''} ${step === i ? 'now' : ''}`}
-                onClick={() => toggle(tr, i)}
-                aria-label={`${tr} ${t.w_step} ${i + 1}`}
-                aria-pressed={pattern[tr].has(i)}
-              />
-            ))}
-          </div>
-        ))}
-      </div>
+          ))}
+          {tracks.map((tr) => (
+            <div className="g-row" key={tr} style={{ display: 'contents' }}>
+              <div className="g-head">
+                <code>{tr}</code> <span>{lang === 'pl' ? TRACK_INFO[tr].pl : TRACK_INFO[tr].en}</span>
+              </div>
+              {steps.map((i) => (
+                <button
+                  key={i}
+                  className={`cell t-${tr} ${pattern[tr].has(i) ? 'on' : ''} ${i % 4 === 0 ? 'beat' : ''} ${step === i ? 'now' : ''}`}
+                  onClick={() => toggle(tr, i)}
+                  aria-label={`${tr} ${t.w_step} ${i + 1}`}
+                  aria-pressed={pattern[tr].has(i)}
+                />
+              ))}
+            </div>
+          ))}
+        </div>
+      ))}
       <Controls>
         <Seg
           label={t.w_preset}

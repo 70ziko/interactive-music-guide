@@ -157,7 +157,7 @@ export default function Strudel({ code, title, live, onClock }: StrudelProps) {
       <div className="strudel-host" ref={hostRef} />
       {!ready && <pre className="strudel-placeholder">{initial}</pre>}
       {error && <div className="strudel-error">{error}</div>}
-      <figcaption className="strudel-hint">
+      <figcaption className={`strudel-hint ${pending ? 'loading' : ''}`}>
         {pending ? t.loadingSounds : t.keysHint}
       </figcaption>
     </figure>

@@ -140,3 +140,16 @@ export function plot(fn: (x: number) => number, w: number, h: number, n = 400, p
   }
   return pts.join(' ');
 }
+
+/** true on phone-width screens; updates on resize / rotation. */
+export function useNarrow(maxWidth = 600) {
+  const query = `(max-width: ${maxWidth}px)`;
+  const [narrow, setNarrow] = useState(() => typeof window !== 'undefined' && window.matchMedia(query).matches);
+  useEffect(() => {
+    const mq = window.matchMedia(query);
+    const on = () => setNarrow(mq.matches);
+    mq.addEventListener('change', on);
+    return () => mq.removeEventListener('change', on);
+  }, [query]);
+  return narrow;
+}

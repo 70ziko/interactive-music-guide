@@ -91,6 +91,7 @@ export default function ArrangementTimeline({ template = 'house' }) {
   const pct = (b: number) => (b / totalBars) * 100;
   const energyPts = cols.map((c) => `${pct(c.start + c.bars / 2)},${100 - c.energy * 9}`).join(' ');
   const cur = T.sections[sel] ?? T.sections[0];
+  const n = T.sections.length;
 
   return (
     <Widget
@@ -136,9 +137,17 @@ export default function ArrangementTimeline({ template = 'house' }) {
         </div>
       </div>
       <div className="arr-note">
-        <strong>
-          {cur.name[lang]} · {cur.bars} {t.w_bars} · {t.w_energy} {cur.energy}/10
-        </strong>
+        <div className="arr-note-head">
+          <button className="btn" onClick={() => setSel((s) => (s + n - 1) % n)} aria-label={t.prev}>
+            ‹
+          </button>
+          <strong>
+            {cur.name[lang]} · {cur.bars} {t.w_bars} · {t.w_energy} {cur.energy}/10
+          </strong>
+          <button className="btn" onClick={() => setSel((s) => (s + 1) % n)} aria-label={t.next}>
+            ›
+          </button>
+        </div>
         <p>{cur.note[lang]}</p>
       </div>
       <Seg

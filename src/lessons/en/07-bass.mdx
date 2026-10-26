@@ -1,0 +1,130 @@
+The bass does two jobs at once: it tells the ear **which chord** you are on (it plays the root), and it is the kick's **groove partner**. Get the kick–bass relationship right and a track works on a club system. Get it wrong and it turns to mush.
+
+## The problem: kick and bass share the same space
+
+A kick's energy sits around 40–120 Hz. A bassline sits around 40–250 Hz (lesson 1). When both hit at the same moment, their low frequencies add up and fight. You hear it as a boomy, undefined low end.
+
+There are three fixes, and dance music uses all of them:
+
+| Fix | How | Used in |
+|---|---|---|
+| **Time**: put the bass between kicks | offbeat or syncopated bass | house, trance, bounce, hard house |
+| **Volume**: duck the bass when the kick hits | sidechain compression / `duckorbit` | almost everything |
+| **Frequency**: let one own the sub | filter the other (`hpf`, shorter kick tail) | mixing |
+
+## Fix 1: the offbeat bass
+
+Kick on the beat, bass on the "&". They never collide, and together they make the **oom-pah** pulse. This is the backbone of bounce and hard house.
+
+<Strudel title="kick on the beat, bass on the offbeat" code={`
+  setcpm(128/4)
+  stack(
+    s("bd*4").bank("RolandTR909").color("#ff5c8a"),
+    note("[~ a1]*4").s("sawtooth").lpf(380)
+      .decay(0.15).sustain(0.3).color("#5ce1e6")
+  )._punchcard()
+`} />
+
+Bass patterns to know, all built around the kick:
+
+<Strudel title="five bass grooves (one per bar)" code={`
+  setcpm(126/4)
+  stack(
+    s("bd*4").bank("RolandTR909"),
+    note(\`<
+      [~ a1]*4
+      [~ a1 ~ a2]*2
+      [~ a1 a1 a1]*4
+      [a1 ~ ~ a1 ~ ~ a1 ~ ~ ~ a1 ~ c2 ~ a1 ~]
+      [~ a1 ~ [a1 a2]]*2
+    >\`).s("sawtooth").lpf(450).decay(0.12).sustain(0.2)
+  )._punchcard()
+`} />
+
+| Bar | Pattern | Name |
+|---|---|---|
+| 1 | `[~ a1]*4` | offbeat — house/trance/hard house standard |
+| 2 | `[~ a1 ~ a2]*2` | octave jump — bouncy |
+| 3 | `[~ a1 a1 a1]*4` | rolling 16ths — driving, "galloping" |
+| 4 | syncopated | deep house / garage groove |
+| 5 | offbeat + octave pickup | bounce flavour |
+
+## The bass follows the chords
+
+Play the **root** of each chord. If the chords are Am – F – C – G, the bass plays A – F – C – G. Use scale degrees so it always matches (lesson 5).
+
+<Strudel title="bass locked to the chords" code={`
+  setcpm(128/4)
+  const prog = "<0 5 2 6>"   // i VI III VII
+  chords: n("[0,2,4]").add(n(prog))       // triad shape, moved by the progression
+    .scale("A3:minor").struct("[~ x]*4")
+    .s("sawtooth").lpf(2000).decay(0.12).sustain(0).gain(0.4)
+  bass: n(prog).scale("A1:minor").struct("[~ x]*4")
+    .s("sawtooth").lpf(400).decay(0.15).sustain(0.3)
+  kick: s("bd*4").bank("RolandTR909")
+`} />
+
+## The donk (bounce / scouse house)
+
+The **donk** is the signature of bounce: a short, hollow, plucky bass hit on every offbeat, pitched higher than a normal sub bass so it cuts through. There is no single official patch. This recipe gets you close: a triangle wave, a fast pitch drop at the start (that "d-" attack), a very short body, and a little drive.
+
+<Strudel title="donk recipe" code={`
+  setcpm(145/4)
+  donk: note("[~ a2]*4")
+    .s("triangle")
+    .penv(14).pdecay(0.03)      // quick pitch drop = the "d" of donk
+    .decay(0.13).sustain(0)     // short, no tail
+    .lpf(1800).distort(0.6)
+    .gain(0.9)
+  kick: s("bd*4").bank("RolandTR909").distort(1)
+  hats: s("[~ oh]*4, hh*16").bank("RolandTR909").gain(0.4)
+`} />
+
+<TryThis>
+Change `penv(14)` to `penv(0)` (no pitch drop) and then to `penv(30)`. Then raise `decay` to 0.3. Hear how each knob moves it away from or toward the donk.
+</TryThis>
+
+## Fix 2: ducking (sidechain)
+
+Even with an offbeat bass, a long kick tail overlaps the bass. **Ducking** turns the bass down for a moment every time the kick hits, then lets it swell back. This creates the famous "pumping" feel.
+
+In Strudel, put the bass on its own **orbit** (a separate effects bus), then tell the kick to duck that orbit:
+
+<Strudel title="sidechain ducking" code={`
+  setcpm(126/4)
+  bass: note("<a1 f1 c2 g1>").s("sawtooth").lpf(500)
+    .sustain(1).orbit(2)               // a long held note, on orbit 2
+  kick: s("bd*4").bank("RolandTR909")
+    .duckorbit(2)                      // duck orbit 2 on every kick
+    .duckdepth("<0 0.6 0.9 1>")        // bar 1: no duck … bar 4: full duck
+    .duckattack(0.2)                   // how long the bass takes to come back
+`} />
+
+## Fix 3: one owner for the sub
+
+If your kick has a long boomy tail, keep the bass out of the sub with a high-pass filter, or shorten the kick. If your bass is a deep sine, use a punchier, shorter kick. Never let both be big in the sub at the same time.
+
+<Strudel title="separating with filters" code={`
+  setcpm(128/4)
+  stack(
+    s("bd*4").bank("RolandTR909").decay(0.25),       // shorter kick
+    note("[~ a1]*4").s("sawtooth")
+      .hpf("<20 20 90 90>")                           // bars 3–4: bass sub removed
+      .lpf(500).decay(0.15).sustain(0.3)
+  )
+`} />
+
+<DoDont
+  do={[
+    'Place the bass between kicks (offbeat or syncopated) as your default.',
+    'Play chord roots in the bass, using the same key variable as the chords.',
+    'Duck the bass (or the pads) with duckorbit for pump and space.',
+    'Decide which one owns the sub: kick or bass.',
+  ]}
+  dont={[
+    'Put a long bass note exactly on every kick without ducking.',
+    'Play chords or thirds in the bass register.',
+    'Use reverb on the bass — it smears the low end. Keep bass dry.',
+    'Make the donk long. Its power is how short it is.',
+  ]}
+/>

@@ -1,0 +1,115 @@
+Wysokość dźwięku to częstotliwość, którą słyszysz. Ta lekcja zamienia to na liczby, których używa Strudel, i wyjaśnia, czemu niektóre połączenia nut brzmią gładko, a inne napięte.
+
+## Oktawa: ×2
+
+Podwój częstotliwość, a dostaniesz **tę samą nutę oktawę wyżej**. A3 = 220 Hz, A4 = 440 Hz, A5 = 880 Hz. Każda harmoniczna niskiego A pokrywa się z harmoniczną wysokiego A, więc ucho słyszy je jako „tę samą nutę”.
+
+Muzyka zachodnia dzieli każdą oktawę na **12 równych kroków** zwanych półtonami. Równych, czyli każdy krok mnoży częstotliwość przez tę samą liczbę:
+
+<Formula>jeden półton = ×2^(1/12) ≈ ×1,0595</Formula>
+
+Dwanaście takich kroków daje dokładnie ×2. Daj każdemu klawiszowi numer (numer MIDI: A4 = 69, C4 = 60), a częstotliwość dowolnej nuty to:
+
+<Formula>f = 440 · 2^((m − 69) / 12)</Formula>
+
+<Keyboard />
+
+Strudel przyjmuje obie formy. Te dwie linie grają te same trzy A:
+
+<Strudel title="nazwy albo liczby" code={`
+  note("<[a2 a3 a4] [45 57 69]>")
+    .s("triangle")
+    ._pianoroll()
+`} />
+
+## Interwały to stosunki
+
+**Interwał** to odległość między dwiema nutami. Muzycznie liczysz półtony. Fizycznie to **stosunek** częstotliwości.
+
+| Interwał | Półtony | Czysty stosunek | Charakter |
+|---|---|---|---|
+| Pryma | 0 | 1 : 1 | ta sama nuta |
+| Oktawa | 12 | 2 : 1 | ta sama nuta, wyżej |
+| Kwinta | 7 | 3 : 2 | mocna, otwarta, „power” |
+| Kwarta | 5 | 4 : 3 | otwarta, trochę zawieszona |
+| Tercja wielka | 4 | 5 : 4 | jasna, wesoła |
+| Tercja mała | 3 | 6 : 5 | ciemna, nastrojowa — domyślna w house |
+| Tryton | 6 | 45 : 32 | napięty, niestabilny |
+
+**Prostszy stosunek → gładsze brzmienie.** Przy 3 : 2 co 3. cykl górnej nuty pokrywa się z co 2. cyklem dolnej, a wiele ich harmonicznych trafia w te same częstotliwości. Przy 45 : 32 prawie nigdy się nie pokrywają i ucho słyszy tarcie.
+
+<IntervalLab />
+
+<Strudel title="interwały nad A3" code={`
+  // oktawa, kwinta, kwarta, tercja wielka, tercja mała, tryton
+  note("[a3,a4] [a3,e4] [a3,d4] [a3,c#4] [a3,c4] [a3,d#4]")
+    .s("sawtooth").lpf(1800)
+    .slow(3)
+    ._pianoroll()
+`} />
+
+<Callout kind="warn">
+**Nuta to nie stosunek.** C to po prostu częstotliwość (C4 ≈ 261,6 Hz). Stosunek typu 3 : 2 opisuje *odległość między dwiema nutami* — kwintę, na przykład A3 (220 Hz) → E4 (330 Hz). Trzymaj te dwie idee osobno: nuty to punkty, interwały to odległości.
+</Callout>
+
+## Przyspieszony rytm staje się wysokością
+
+Twoja intuicja, że „nuty to przyspieszone wzory”, jest trafna w precyzyjnym sensie. Kliknięcie powtarzane 2 razy na sekundę to rytm. Powtarzane 200 razy na sekundę to ton 200 Hz. Nie ma przełącznika między jednym a drugim — gdzieś około 20 powtórzeń na sekundę ucho przestaje liczyć i zaczyna słyszeć wysokość.
+
+Więc **polirytm 3 : 2** (trzy uderzenia na dwa w tym samym czasie) przyspieszony powyżej ~20 Hz staje się **kwintą**. Ten sam wzór jest rytmem przy jednej prędkości i harmonią przy innej.
+
+<RhythmToPitch />
+
+<TryThis>
+Wybierz **3:2**, wciśnij Zagraj przy 1 cyklu/s i licz „1-2-3 na 1-2”. Powoli podnoś tempo. Około 10–20 cykli/s zamienia się w brzęczenie. Powyżej ~40 to dwie nuty w odległości kwinty. Potem spróbuj **5:4**: tercja wielka.
+</TryThis>
+
+To samo w Strudlu: rytm 3 : 2, szybszy z każdym taktem.
+
+<Strudel title="rytm 3:2, szybciej co takt" code={`
+  stack(
+    s("rim*3"),
+    s("bd*2")
+  ).bank("RolandTR909")
+   .fast("<1 2 4 8>")
+`} />
+
+A 3 : 2 jako wysokość: 330 Hz na 220 Hz.
+
+<Strudel title="3:2 jako kwinta" code={`
+  freq("220, 330").s("sawtooth").lpf(2000)
+    ._scope()
+`} />
+
+## Małe kłamstwo stroju równomiernie temperowanego
+
+12 równych kroków nie trafia dokładnie w czyste stosunki. Kwinta to 7 półtonów = 2^(7/12) = **1,4983**, a nie 1,5. Tercja wielka to 2^(4/12) = **1,2599**, a nie 1,25.
+
+Muzycy mierzą to w **centach**: 100 centów = 1 półton.
+
+<Formula>centy = 1200 · log2(stosunek)</Formula>
+
+- Kwinta równomierna vs czysta: **−2 centy**. W praktyce niesłyszalne.
+- Tercja wielka równomierna vs czysta: **+14 centów**. Słychać lekkie migotanie albo dudnienie.
+
+Syntezatory, Strudel i każdy DAW używają stroju równomiernego, więc nigdy nie musisz stroić ręcznie. Co jest ważne przy pisaniu: **oktawy i kwinty są stabilne jak skała**, tercje są trochę szorstkie. Dlatego basy, hoovery i supersawy układa się z oktaw i kwint dla mocy, a tercje zostają w środku pasma, nigdy w basie.
+
+<Strudel title="moc: pryma + kwinta + oktawa" code={`
+  note("<a1 f1 c2 g1>")
+    .add(note("0,7,12"))   // pryma, kwinta, oktawa
+    .s("sawtooth").lpf(900)
+    ._pianoroll()
+`} />
+
+<DoDont
+  do={[
+    'Myśl o nutach jak o liczbach: note(57) to A3, +12 to oktawa, +7 to kwinta.',
+    'Używaj oktaw i kwint, żeby pogrubić basy i leady.',
+    'Trzymaj tercje (wielkie/małe) w środku pasma, od mniej więcej C3 w górę.',
+  ]}
+  dont={[
+    'Układać tercji w niskim rejestrze (poniżej ~C3) — robi się błoto.',
+    'Mylić nuty (częstotliwości) z interwałem (stosunkiem dwóch częstotliwości).',
+    'Rozstrajać „dla grubości” bez słuchania dudnienia; mały detune = szerokość, duży = fałsz.',
+  ]}
+/>

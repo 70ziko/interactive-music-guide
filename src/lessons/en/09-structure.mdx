@@ -1,0 +1,152 @@
+A loop is not a track. A track is the same few loops **switched on and off in blocks of 8 bars**, so energy rises and falls. Dance music structure is simple and strict — that is good news: you can plan it with arithmetic.
+
+## Everything happens in 8s
+
+Dancers and DJs feel music in **phrases of 8 bars** (and 16, 32). New elements enter on the first bar of a phrase. Fills happen in the last bar (lesson 4). If something changes on bar 7, the dance floor feels it as a mistake.
+
+<Callout kind="math">
+With `setcpm(BPM/4)`, **1 cycle = 1 bar**. So:
+- 8 bars at 124 BPM = 8 × 4 × 60 / 124 = **15.5 s**
+- 32 bars ≈ **1 minute** at 128 BPM
+- A 6-minute club track ≈ 190 bars ≈ 24 phrases of 8.
+
+Section lengths in Strudel are just cycle counts: 8, 16, 32.
+</Callout>
+
+## The sections
+
+<ArrangementTimeline />
+
+| Section | Job | Typical moves |
+|---|---|---|
+| **Intro** | let a DJ mix in | drums only, maybe filtered |
+| **Groove / build** | establish the track | add one layer every 8 bars: bass, clap, percussion |
+| **Main** | the hook | chords or lead enter |
+| **Breakdown** | release, emotion | kick out; chords, pad, melody exposed |
+| **Build-up** | tension | snare roll speeds up, riser climbs, filter opens, kick may stay out |
+| **Drop** | payoff | everything back at once on bar 1 of a phrase |
+| **Outro** | let a DJ mix out | strip back to drums |
+
+<TryThis>
+Put on a house or hard house track you like. Count bars from the first kick ("1-2-3-4, 2-2-3-4 … 8-2-3-4"). Mark where each new sound enters. You will find almost every change lands on bar 1, 9, 17, 33…
+</TryThis>
+
+## Energy tools
+
+Energy is not just volume. These are the levers:
+
+| Up | Down |
+|---|---|
+| add a layer | remove a layer |
+| open the filter (`lpf` up) | close the filter |
+| faster subdivisions (8ths → 16ths → 32nds) | longer notes, more space |
+| higher notes, octave up | lower or no melody |
+| more hats / percussion | kick out |
+| riser (rising noise) | reverb tail, silence |
+
+### Snare roll and riser
+
+The build-up classic: a snare that doubles its speed every 2 bars, a noise riser whose filter climbs, both getting louder. `saw.range(a, b).slow(8)` climbs from `a` to `b` over 8 bars.
+
+<Strudel title="8-bar build-up" code={`
+  setcpm(128/4)
+  roll: s("sd*<4 4 8 8 16 16 32 32>").bank("RolandTR909")
+    .gain(saw.range(0.3, 1).slow(8))
+    .speed(saw.range(1, 1.6).slow(8))      // pitch rises too
+  riser: s("white*16").decay(0.06).sustain(0)
+    .hpf(saw.range(400, 9000).slow(8))
+    .gain(saw.range(0.05, 0.35).slow(8))
+  chords: chord("Am7").voicing().struct("[~ x]*4")
+    .s("sawtooth").lpf(saw.range(400, 4000).slow(8)).decay(0.15).sustain(0)
+`} />
+
+## Arranging in Strudel
+
+### Option A: `arrange()` — write the whole track
+
+`arrange([cycles, pattern], …)` plays each pattern for that many cycles (= bars), then the next. Build named layers once, then list the sections. This is a complete, playable 72-bar house track skeleton (≈ 2.3 minutes).
+
+<Strudel title="full track with arrange()" code={`
+  setcpm(124/4)
+  const key = 'A:minor'
+  const prog = "<0 0 5 4>"   // i i VI v, one chord per bar
+
+  const kick = s("bd*4").bank("RolandTR909")
+  const hats = s("[~ oh]*4, hh*16").bank("RolandTR909").gain(0.35)
+  const clap = s("~ cp ~ cp").bank("RolandTR909")
+  const bass = n(prog).scale("A1:minor").struct("[~ x]*4")
+    .s("sawtooth").lpf(420).decay(0.15).sustain(0.3)
+  const stabs = n("[0,2,4,6]").add(n(prog)).scale(key)
+    .struct("[~ x ~ ~] [x ~ ~ x] [~ ~ x ~] [~ x ~ ~]")
+    .s("gm_drawbar_organ").decay(0.18).sustain(0).gain(0.7)
+  const pad = n("[0,2,4]").add(n(prog)).scale(key)
+    .s("supersaw").attack(0.5).release(1.5).lpf(1200).room(0.7).gain(0.25)
+  const roll = s("sd*<4 4 8 8 16 16 32 32>").bank("RolandTR909")
+    .gain(saw.range(0.3, 0.9).slow(8))
+  const riser = s("white*16").decay(0.06).sustain(0)
+    .hpf(saw.range(400, 9000).slow(8)).gain(0.25)
+
+  arrange(
+    [8,  stack(kick, hats)],                              // intro
+    [8,  stack(kick, hats, clap, bass)],                  // groove
+    [16, stack(kick, hats, clap, bass, stabs)],           // main
+    [8,  stack(stabs, pad)],                              // breakdown
+    [8,  stack(stabs, roll, riser)],                      // build-up
+    [16, stack(kick, hats, clap, bass, stabs, pad)],      // drop
+    [8,  stack(kick, hats)]                               // outro
+  )
+`} />
+
+### Option B: labels + `_` — arrange live
+
+When live coding you usually do not write the arrangement in advance. You keep every layer as a labelled line and **mute/unmute** with `_` on phrase boundaries. Same layers, different workflow:
+
+<Strudel title="live arrangement: toggle the _" code={`
+  setcpm(124/4)
+  kick: s("bd*4").bank("RolandTR909")
+  hats: s("[~ oh]*4, hh*16").bank("RolandTR909").gain(0.35)
+  _clap: s("~ cp ~ cp").bank("RolandTR909")
+  _bass: n("<0 0 5 4>").scale("A1:minor").struct("[~ x]*4")
+    .s("sawtooth").lpf(420).decay(0.15).sustain(0.3)
+  _stabs: chord("<Am7 Am7 FM7 Em7>").voicing()
+    .struct("[~ x ~ ~] [x ~ ~ x] [~ ~ x ~] [~ x ~ ~]")
+    .s("gm_drawbar_organ").decay(0.18).sustain(0).gain(0.7)
+`} />
+
+<TryThis>
+Play the block above. Every 8 bars, remove one `_` and press **Update** (Ctrl/⌘+Enter): clap, then bass, then stabs. Then put `_` back on kick for a breakdown and remove it again for the drop.
+</TryThis>
+
+### Option C: `mask()` per layer
+
+`.mask("<0!8 1!8>")` silences a layer for 8 bars, then plays it for 8. Each layer gets its own on/off schedule; the whole cycle repeats.
+
+<Strudel title="masks: each layer has a schedule (32 bars)" code={`
+  setcpm(124/4)
+  stack(
+    s("bd*4").mask("<1!8 1!8 0!8 1!8>"),             // out in bars 17–24
+    s("~ cp ~ cp").mask("<0!8 1!8 0!8 1!8>"),        // in from bar 9
+    s("[~ oh]*4").gain(0.4),                          // always
+    note("[~ a1]*4").s("sawtooth").lpf(400)
+      .decay(0.15).sustain(0.3).mask("<0!8 1!8 0!8 1!8>")
+  ).bank("RolandTR909")
+`} />
+
+<DoDont
+  do={[
+    'Plan the track in 8-bar blocks before writing details. Sketch: intro 16, groove 16, main 32, break 16, build 8, drop 32, outro 16.',
+    'Bring in or take out one element per phrase.',
+    'Make the drop land on bar 1 of a phrase, after a build-up of 8 (or 16) bars.',
+    'Keep intro and outro drums-first so DJs can mix.',
+  ]}
+  dont={[
+    'Change things in the middle of a phrase (bar 3, bar 7).',
+    'Put everything in from the start — you have nowhere to go.',
+    'Make the breakdown longer than the drop that follows it.',
+    'Forget the last-bar fill before a new section.',
+  ]}
+/>
+
+## What next
+
+You now have the full chain: sound → pitch → rhythm → harmony → bass → synth → structure. Next lessons (coming in phase 2): effects in depth, sound-design recipes (hoover, reese, donk variations), groove and variation, and genre playbooks for house, bounce and hard house with complete templates.

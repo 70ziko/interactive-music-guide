@@ -1,0 +1,116 @@
+House, bounce and hard house share one drum skeleton. Learn its four rules and you can write a working beat in under a minute, then spend your time on what makes it yours.
+
+## The four rules
+
+| # | Rule | Steps (of 16) | Why |
+|---|---|---|---|
+| 1 | **Kick on every beat** ("four on the floor") | 1, 5, 9, 13 | The steady pulse dancers lock onto |
+| 2 | **Clap or snare on beats 2 and 4** (the backbeat) | 5, 13 | Answers the kick, gives the bar a shape |
+| 3 | **Open hat on every offbeat** ("&") | 3, 7, 11, 15 | Fills the gap between kicks → the bounce, the "pump" |
+| 4 | **Closed hats on 16ths** (optional, quieter) | most steps | Drive and texture |
+
+Rule 3 is the heart of the genre: kick–hat–kick–hat is the "oom-tss" you know. In bounce and hard house the offbeat is often played by the **bass** as well (lesson 7).
+
+<StepGrid preset="house" tracks={['bd', 'cp', 'hh', 'oh', 'rim', 'sd']} />
+
+<TryThis>
+Click through the presets: **Four on the floor → + offbeat hat → House**. Each step adds one rule. Then load **Hard house / bounce**: same rules, 145 BPM, plus a snare on the last two 16ths that kicks into the next bar.
+</TryThis>
+
+## Groove: the space between "correct" and "alive"
+
+A machine-perfect grid sounds stiff. Three tools fix that.
+
+### 1. Dynamics (velocity)
+
+Not every hit should be equally loud. Accent the offbeat hats, keep the in-between 16ths quiet ("ghost notes").
+
+<Strudel title="hat dynamics" code={`
+  setcpm(124/4)
+  stack(
+    s("bd*4"),
+    s("hh*16").gain("[0.25 0.35 0.7 0.35]*4"),  // per beat: quiet-quiet-LOUD-quiet
+  ).bank("RolandTR909")._punchcard()
+`} />
+
+### 2. Swing (shuffle)
+
+Swing delays every second 16th a little. `swingBy(x, n)` splits the cycle into `n` slices and delays the second half of each slice by `x` of a half slice. With `n = 8` each slice is an 8th note, so the delayed half is the "e" and "a" 16ths.
+
+<Callout kind="math">
+Straight 16ths sit at 0 and ½ of each 8th. With `swingBy(1/3, 8)` the second one moves to ½ + ⅓·½ = **⅔**. The pair now splits 2 : 1 — a triplet feel. Smaller values (1/6, 1/8) give a subtle "humanised" lilt; 1/3 is a full shuffle.
+</Callout>
+
+<Strudel title="swing on / off every 2 bars" code={`
+  setcpm(122/4)
+  stack(
+    s("bd*4, ~ cp ~ cp"),
+    s("hh*16").gain("[0.3 0.5]*8"),
+    s("[~ oh]*4").gain(0.5)
+  ).bank("RolandTR909")
+   .swingBy("<0 0 0.33 0.33>", 8)
+`} />
+
+### 3. Euclidean rhythms
+
+`x(k,n)` spreads `k` hits as evenly as possible over `n` steps. Many traditional rhythms are Euclidean: `(3,8)` is the Cuban tresillo, `(5,8)` the cinquillo. They are great for percussion that sits *against* the straight kick.
+
+<Strudel title="euclid percussion" code={`
+  setcpm(124/4)
+  stack(
+    s("bd*4, ~ cp ~ cp, [~ oh]*4").bank("RolandTR909"),
+    s("rim(3,8)").bank("RolandTR909").gain(0.6),
+    s("<~ cb(5,16)>").bank("RolandTR808").gain(0.4)
+  )._punchcard()
+`} />
+
+## Fills: tell the listener a section is ending
+
+Dance music moves in 4- and 8-bar phrases (lesson 9). A small change in the **last bar** of a phrase — a clap roll, a dropped kick, an extra hat — tells the listener "something new is coming". `<…>` makes this easy: give it 4 values, change only the last one.
+
+<Strudel title="fill every 4th bar" code={`
+  setcpm(124/4)
+  stack(
+    s("bd*4"),
+    s("<[~ cp]*2 [~ cp]*2 [~ cp]*2 [~ cp ~ [cp cp]]>"),
+    s("[~ oh]*4").gain(0.5),
+    s("<~ ~ ~ [~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ sd sd sd sd]>").gain(0.6)
+  ).bank("RolandTR909")._punchcard()
+`} />
+
+## Harder: towards hard house
+
+Hard house and bounce keep the same skeleton but push it: faster, a distorted kick, the snare more prominent, rolls into every drop. `distort` adds harmonics to the kick (lesson 1: more harmonics = brighter, more aggressive).
+
+<Strudel title="hard kick" code={`
+  setcpm(145/4)
+  stack(
+    s("bd*4").distort("<0 1 2 3>").gain(0.8),
+    s("~ cp ~ cp"),
+    s("[~ oh]*4").gain(0.55),
+    s("hh*16").gain(0.25)
+  ).bank("RolandTR909")
+`} />
+
+| | House | Bounce / scouse | Hard house |
+|---|---|---|---|
+| Tempo (roughly) | 120–128 | 140–150 | 140–150 |
+| Kick | round, clean | punchy | hard, distorted |
+| Offbeat | open hat | open hat **and** bass ("donk") | open hat and bass stabs |
+| Swing | often | rare | rare |
+| Fills | subtle | snare rolls | long snare rolls into drops |
+
+<DoDont
+  do={[
+    'Start every beat from the 4 rules, then break one rule on purpose.',
+    'Make the offbeat hat the loudest hat.',
+    'Change something in the last bar of every 4- or 8-bar phrase.',
+    'Use one drum machine bank for kick, clap and hats so they sound like one kit.',
+  ]}
+  dont={[
+    'Put the clap on 1 and 3 — it fights the kick.',
+    'Leave every hit at the same volume.',
+    'Fill every bar. A fill only works because the bars before it were steady.',
+    'Swing a hard house beat heavily — the genre is straight and driving.',
+  ]}
+/>

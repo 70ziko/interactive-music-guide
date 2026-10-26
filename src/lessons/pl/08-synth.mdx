@@ -1,0 +1,158 @@
+Prawie każde brzmienie syntezatora w house, bounce i hard house powstaje z jednego przepisu — **syntezy subtraktywnej**: weź dźwięk pełen harmonicznych, a potem go rzeźb. Naucz się czterech etapów, a przeczytasz (i odbudujesz) dowolny patch.
+
+<Chain steps={[
+  { name: '1. Oscylator', desc: 'robi surową falę i jej harmoniczne', code: '.s("sawtooth")' },
+  { name: '2. Filtr', desc: 'usuwa harmoniczne → kształtuje barwę', code: '.lpf(800).lpq(5)' },
+  { name: '3. Obwiednia', desc: 'głośność w czasie: attack, decay, sustain, release', code: '.attack(0.01).decay(0.2)' },
+  { name: '4. Modulacja', desc: 'LFO i obwiednie, które kręcą innymi gałkami', code: '.lpf(sine.range(300,3000))' },
+  { name: '5. Efekty', desc: 'przestrzeń i brud: pogłos, delay, przester', code: '.room(0.4).distort(1)' },
+]} />
+
+## 1. Oscylator: wybierz harmoniczne
+
+Z lekcji 1: sinus = 1 harmoniczna, trójkąt/prostokąt = nieparzyste, piła = wszystkie. Dla muzyki tanecznej ważne są jeszcze dwa źródła:
+
+- **supersaw** — kilka pił lekko rozstrojonych względem siebie. Rozstrojenie sprawia, że powoli dudnią (lekcja 2), co brzmi szeroko i potężnie. Od tego zaczynają się leady trance, stabsy hard house i brzmienia w stylu hoovera.
+- **szum** (`white`, `pink`) — wszystkie częstotliwości naraz. Hi-haty, risery, „oddech” w dźwięku.
+
+<Strudel title="piła vs supersaw" code={`
+  note("<[a2,e3,a3] [a2,e3,a3]>")
+    .s("<sawtooth supersaw>")
+    .lpf(3000).gain(0.5)
+    .sustain(1)
+    ._spectrum()
+`} />
+
+<Strudel title="supersaw: więcej głosów, więcej rozstrojenia" code={`
+  note("a3").s("supersaw")
+    .unison("<1 3 7 7>")       // ile pił
+    .detune("<0 0.2 0.2 0.6>") // jak bardzo są rozstrojone
+    .lpf(4000).gain(0.4).sustain(1)
+`} />
+
+## 2. Filtr: wyrzeźb harmoniczne
+
+**Filtr dolnoprzepustowy** (`lpf`) przepuszcza niskie częstotliwości i usuwa harmoniczne powyżej **częstotliwości odcięcia** (cutoff). **Rezonans** (`lpq`) podbija wąskie pasmo tuż przy odcięciu — ten mlaszczący, „wokalny” dźwięk „łał”.
+
+<FilterCurve />
+
+<TryThis>
+Wciśnij **Zagraj piłę**. Przesuń odcięcie z 16 kHz do 100 Hz: jasno → ciemno → stłumione. Teraz ustaw rezonans na ~12 i przesuń jeszcze raz: ten gwiżdżący szczyt to fundament acid house. Włącz **LFO**, żeby sinus kręcił odcięciem za ciebie.
+</TryThis>
+
+## 3. Obwiednia: głośność w czasie
+
+Każda nuta ma kształt w czasie. **ADSR**: jak szybko startuje (Attack), jak szybko opada do poziomu trzymania (Decay), poziom trzymania (Sustain), jak długo wybrzmiewa po puszczeniu (Release).
+
+<AdsrGraph />
+
+| Brzmienie | A | D | S | R |
+|---|---|---|---|---|
+| Pluck / stab | ~0 | krótki | 0 | krótki |
+| Bas | ~0 | krótki | wysoki | bardzo krótki |
+| Pad | wolny | średni | wysoki | długi |
+| Donk | 0 | bardzo krótki | 0 | 0 |
+
+## 4. Modulacja: niech gałki się ruszają
+
+Statyczny dźwięk nudzi się po 8 taktach. **Modulacja** automatycznie porusza parametrem.
+
+- **LFO** (oscylator niskiej częstotliwości) to wolna fala użyta jako ręka na gałce. W Strudlu `sine`, `saw`, `tri`, `square` i `perlin` (gładki losowy) to ciągłe wzory: `sine.range(300, 3000).slow(8)` idzie od 300 do 3000 i z powrotem przez 8 taktów.
+- **Obwiednia filtra** otwiera filtr na początku każdej nuty i z powrotem go zamyka: `lpenv` ustawia jak daleko (w oktawach), `lpattack`/`lpdecay` jak szybko.
+
+<Strudel title="LFO na odcięciu (wolny sweep)" code={`
+  setcpm(124/4)
+  note("[~ a1]*4").s("sawtooth")
+    .lpf(sine.range(200, 2500).slow(8))
+    .lpq(6).decay(0.2).sustain(0.3)
+    ._scope()
+`} />
+
+<Strudel title="obwiednia filtra: ta sama nuta, różne lpenv" code={`
+  setcpm(124/4)
+  note("a2*8").s("sawtooth")
+    .lpf(300).lpq(8)
+    .lpenv("<0 2 4 6>")      // o ile oktaw filtr otwiera się na nutę
+    .lpdecay(0.12)
+    .decay(0.2).sustain(0)
+`} />
+
+## Przepisy
+
+Łączą wszystkie cztery etapy. Traktuj je jako punkt startu: zmieniaj jedną liczbę naraz i słuchaj.
+
+### Linia acid (w stylu TB-303)
+
+Piła + wysoki rezonans + obwiednia filtra + wolno ruszające się odcięcie + trochę przesteru. Akcent i slide sprawiają, że „mówi”; tu większość tej roboty robi wzór oktaw i pauz.
+
+<Strudel title="acid" code={`
+  setcpm(126/4)
+  acid: note("a1 a2 a1 [a1 c2] a1 [~ a2] e2 [a1 g2]")
+    .s("sawtooth").ftype("ladder")
+    .lpf(sine.range(300, 1800).slow(16)).lpq(14)
+    .lpenv(3).lpdecay(0.1)
+    .decay(0.15).sustain(0.2)
+    .distort(0.8).gain(0.6)
+  kick: s("bd*4").bank("RolandTR909")
+`} />
+
+### Pluck akordowy
+
+<Strudel title="pluck" code={`
+  setcpm(124/4)
+  chord("<Am7 FM7>").voicing()
+    .struct("[~ x ~ x] [~ ~ x ~]")
+    .s("sawtooth").lpf(600).lpenv(4).lpdecay(0.08)
+    .decay(0.2).sustain(0).room(0.3)
+    ._pianoroll()
+`} />
+
+### Pad
+
+Wolny atak, długie wybrzmienie, odfiltrowany supersaw, dużo pogłosu. Pady siedzą za wszystkim i wypełniają breakdowny.
+
+<Strudel title="pad" code={`
+  chord("<Am9 FM7>/2").voicing()
+    .s("supersaw").unison(5).detune(0.3)
+    .attack(0.8).release(2).sustain(0.8)
+    .lpf(1400).room(0.8).size(0.9).gain(0.35)
+`} />
+
+### Lead w stylu hoovera (hard house / bounce)
+
+Prawdziwy hoover pochodzi z patcha Rolanda Alpha Juno z modulacją szerokości impulsu i pitch bendami. W Strudlu złapiesz *ideę*: rozstrojony supersaw ułożony w oktawy, z obwiednią wysokości, która wjeżdża w każdą nutę, plus przester.
+
+<Strudel title="prawie hoover" code={`
+  setcpm(145/4)
+  hoover: note("<[a3 ~ ~ a3 ~ ~ g3 ~] [c4 ~ ~ a3 ~ ~ e3 ~]>")
+    .add(note("0,12"))                 // ułożenie w oktawy
+    .s("supersaw").unison(7).detune(0.5)
+    .penv(-7).pattack(0.08)            // wjazd w górę w każdą nutę
+    .lpf(2600).distort(1.2).gain(0.4)
+    .decay(0.3).sustain(0.6).release(0.1)
+  kick: s("bd*4").bank("RolandTR909").distort(1)
+`} />
+
+## 5. Efekty (pierwsze spojrzenie)
+
+| Efekt | Strudel | Do czego | Uważaj |
+|---|---|---|---|
+| Pogłos | `.room(0.4).size(0.8)` | przestrzeń, głębia, breakdowny | nigdy na bas ani stopę |
+| Delay | `.delay(0.5).delaytime(3/16)` | echa w czasie, wypełnia luki | trzymaj czas delayu na siatce (1/8, 3/16) |
+| Przester | `.distort(1)` / `.shape(0.5)` | dodaje harmoniczne, agresję | szybko robi się głośno |
+| Bit crush | `.crush(6)` | lo-fi, rave'owy brud | małe dawki |
+
+<DoDont
+  do={[
+    'Zaczynaj każdy syntezator od piły (albo supersaw) i kształtuj filtrem.',
+    'Krótkie obwiednie (pluck/stab) do partii rytmicznych, długie do padów.',
+    'Daj przynajmniej jedną wolną modulację (sine.range().slow()) na każdą partię, która powtarza się 8+ taktów.',
+    'Trzymaj czasy delayu na siatce: 1/8, 3/16, 1/4 taktu.',
+  ]}
+  dont={[
+    'Podkręcać rezonansu na basie bez sprawdzenia głośności — szczyt potrafi głośno wyskoczyć.',
+    'Dawać pogłosu na bas albo stopę.',
+    'Układać wielu rozstrojonych supersawów w niskim rejestrze — szeroko + nisko = papka.',
+    'Kręcić trzema gałkami naraz. Zmień jedną, posłuchaj, potem następną.',
+  ]}
+/>

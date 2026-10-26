@@ -1,0 +1,112 @@
+Everything in a track — kick, bass, hoover, vocal — is one thing: **air pressure moving back and forth**. A speaker cone pushes air forward and pulls it back. Your eardrum copies that motion. Three numbers describe it.
+
+| Property | What it is | Unit | You hear it as |
+|---|---|---|---|
+| **Frequency** `f` | How many back-and-forth cycles per second | Hz (hertz) | Pitch: low ↔ high |
+| **Amplitude** `A` | How far the air moves | 0–1 (or dB) | Loudness |
+| **Waveform** | The *shape* of one cycle | — | Tone colour (timbre) |
+
+## One cycle, as math
+
+The simplest sound is a sine wave:
+
+<Formula>y(t) = A · sin(2π · f · t)</Formula>
+
+- `t` is time in seconds.
+- `2π · f · t` is how far round the circle you are: one full turn (2π) per cycle, `f` turns per second.
+- The **period** `T = 1 / f` is the length of one cycle. 110 Hz → T = 9.09 ms.
+
+Humans hear roughly 20 Hz to 20 000 Hz. Below ~20 Hz you feel pulses rather than pitch — keep that in mind, it comes back in lesson 2.
+
+<WaveScope />
+
+<TryThis>
+1. Press **Play tone**, keep it on sine.
+2. Drag the frequency from 40 Hz to 1 kHz. Watch more cycles squeeze into the same 20 ms window.
+3. Switch between sine, triangle, square and sawtooth at the same frequency. Same pitch, different colour.
+</TryThis>
+
+## Harmonics: why a saw sounds different from a sine
+
+A sawtooth is not a new kind of thing. It is **many sine waves added together**: one at `f`, one at `2f`, one at `3f`, and so on, each quieter. These are the **harmonics** (also called partials or overtones). This is Fourier's idea: any repeating shape = a sum of sines at whole-number multiples of the base frequency.
+
+| Waveform | Which harmonics | How loud is harmonic `n` | Sound |
+|---|---|---|---|
+| Sine | only 1 | — | pure, round, sub-bass |
+| Triangle | odd: 1, 3, 5… | 1/n² | soft, flute-like |
+| Square | odd: 1, 3, 5… | 1/n | hollow, reedy, "8-bit" |
+| Sawtooth | all: 1, 2, 3… | 1/n | bright, buzzy — the raw material of most synth leads, basses and hoovers |
+
+<HarmonicBuilder />
+
+<TryThis>
+Start from **sine**. Raise only harmonics 3, 5 and 7. You are building a square wave by hand. Then press **sawtooth** and look: every bar is filled.
+</TryThis>
+
+<Callout kind="math">
+The base frequency `f` sets the pitch. The harmonics sit at `2f, 3f, 4f…`, so the *spacing* between them is always `f`. Your brain reads that regular spacing as "one note" instead of many. That is why a sawtooth with 50 harmonics still sounds like a single A.
+</Callout>
+
+## Hear it in Strudel
+
+Each `<…>` value plays for one cycle, so this steps through the four waveforms on the same note. `._scope()` draws the real output under the line.
+
+<Strudel title="four waveforms, one note" code={`
+  note("a2*4")
+    .s("<sine triangle square sawtooth>")
+    .gain(0.6)
+    ._scope()
+`} />
+
+The harmonic series itself, played as a melody: 110, 220, 330 … 880 Hz. These are the exact frequencies hiding inside one sawtooth at 110 Hz.
+
+<Strudel title="the harmonic series" code={`
+  freq("110 220 330 440 550 660 770 880")
+    .s("sine")
+    .decay(0.2).sustain(0)
+    ._pianoroll()
+`} />
+
+`._spectrum()` shows frequencies from left (low) to right (high). Compare a sine and a saw:
+
+<Strudel title="spectrum" code={`
+  note("a2").s("<sine sawtooth>")
+    .gain(0.5)
+    ._spectrum()
+`} />
+
+## Where things live: the frequency map
+
+Every part of a house track owns a slice of the frequency range. Most mixing problems are two parts fighting for the same slice.
+
+| Range | Name | What lives there |
+|---|---|---|
+| 20–60 Hz | Sub | Body of the kick, sub-bass sine. Felt more than heard. |
+| 60–250 Hz | Bass | Bassline, kick punch, the "donk" |
+| 250 Hz–2 kHz | Mids | Chords, stabs, vocals, hoover body |
+| 2–6 kHz | Presence | Clap/snare snap, lead bite |
+| 6–20 kHz | Air | Hi-hats, cymbals, noise risers |
+
+A hi-hat is mostly **noise**: all frequencies at once, no harmonic spacing, so no pitch. A kick is mostly a **sine that drops in pitch fast** (from ~150 Hz to ~50 Hz in a few tens of milliseconds).
+
+<Strudel title="sine kick vs noise hat" code={`
+  stack(
+    // kick: a sine whose pitch falls quickly
+    note("a1*4").s("sine").penv(24).pdecay(0.06).decay(0.25).sustain(0),
+    // hat: white noise, very short, high-passed
+    s("~ white ~ white").decay(0.04).sustain(0).hpf(7000).gain(0.4)
+  )._scope()
+`} />
+
+<DoDont
+  do={[
+    'Check bass and kick on headphones or real speakers. Laptop speakers barely reproduce anything below ~100 Hz.',
+    'Give each part its own frequency slice (sub, bass, mids, air).',
+    'Use sawtooth as the default starting point for leads and basses — it has every harmonic, so filters have something to shape.',
+  ]}
+  dont={[
+    'Play raw square or saw waves loud with no filter — all those harmonics get harsh fast.',
+    'Put two parts in the sub range (below ~60 Hz) at the same time.',
+    'Judge a mix at high volume only. Loud makes everything sound better than it is.',
+  ]}
+/>

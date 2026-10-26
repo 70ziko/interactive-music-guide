@@ -1,0 +1,99 @@
+There are 12 notes per octave. A **scale** picks 7 (or 5) of them. A **key** is a scale plus a home note, the **tonic**. Pick a key at the start of a track, stay inside it, and almost nothing you play will sound wrong.
+
+## Why limit yourself to 7 notes?
+
+The notes of a scale are chosen so that most pairs form simple ratios (fifths, fourths, thirds — lesson 2). Notes outside the scale form more complex ratios with the tonic and with each other, so they sound like friction. A key is a pre-filtered set of notes that work together.
+
+## Scales are step patterns
+
+A scale is defined by its **steps**, not its notes. W = whole step (2 semitones), H = half step (1 semitone). Start the same pattern on any note and you get that scale in a new key.
+
+| Scale | Steps | Mood | Where you hear it |
+|---|---|---|---|
+| Major | W W H W W W H | bright, happy | piano house, anthems |
+| Natural minor | W H W W H W W | dark, emotional | most house, bounce, hard house |
+| Dorian | W H W W W H W | minor but warmer (raised 6th) | deep house, soulful grooves |
+| Phrygian | H W W W H W W | very dark, tense (flat 2nd) | hard/techy riffs |
+| Minor pentatonic | 5 notes: 0 3 5 7 10 | can't-go-wrong minor | basslines, simple hooks |
+
+<Keyboard mode="scale" root={9} scale="minor" scales={['major', 'minor', 'dorian', 'phrygian', 'pentaMin']} />
+
+<TryThis>
+1. Keep root **A**, press **▶ Scale** for Natural minor, then Major. Same starting note, totally different mood.
+2. Switch the root to **C** and pick Major. Compare with A Natural minor: **the same white keys**. A minor is the *relative minor* of C major — same notes, different home.
+</TryThis>
+
+## Scale degrees: numbers instead of note names
+
+In Strudel, `n()` with `.scale()` counts **steps inside the scale**, starting at 0 (the tonic). `0 1 2 3 4 5 6` are the 7 notes, `7` is the tonic an octave up, `-1` is one scale step below the tonic.
+
+<Strudel title="up and down the scale" code={`
+  n("0 1 2 3 4 5 6 7 6 5 4 3 2 1 0 -1")
+    .scale("A3:minor")
+    .s("triangle")
+    ._pianoroll()
+`} />
+
+The big win: change one string and the whole melody moves to a new key or mood, and stays correct.
+
+<Strudel title="same melody, four scales" code={`
+  n("0 2 4 7 6 4 2 1")
+    .scale("<A3:minor A3:major A3:dorian A3:phrygian>")
+    .s("sawtooth").lpf(1500).decay(0.2).sustain(0.3)
+    ._pianoroll()
+`} />
+
+## One key for the whole track
+
+Put the key in a variable and use it everywhere. Single quotes make it a plain text value (double quotes would turn it into a pattern).
+
+<Strudel title="bass + melody sharing one key" code={`
+  setcpm(124/4)
+  const key = 'A:minor'
+  bass: n("<0 0 5 4>*4").scale(key).transpose(-24) // same key, 2 octaves down
+    .s("sawtooth").lpf(400).decay(0.15).sustain(0)
+  lead: n("<[0 2 4 2] [4 ~ 2 ~] [5 4 2 0] [1 ~ 0 ~]>*2")
+    .scale(key).s("square").lpf(2000).gain(0.4)
+    .decay(0.15).sustain(0)
+  drums: s("bd*4, [~ oh]*4, ~ cp ~ cp").bank("RolandTR909")
+`} />
+
+<Callout kind="tip">
+Change `'A:minor'` to `'F:minor'` or `'C:dorian'` and press Update. Everything follows. This is how you test which key suits a sound before committing.
+</Callout>
+
+## Home and away: tension in a scale
+
+Not all scale notes feel the same against the tonic.
+
+| Degree (in `n`) | Name | Feeling over the tonic |
+|---|---|---|
+| 0 | tonic (1st) | home, resolved |
+| 4 | fifth | stable, strong |
+| 2 | third | stable, sets major/minor mood |
+| 3 | fourth | slightly hanging |
+| 5 | sixth | colour (dorian raises it → warmer) |
+| 1 | second | passing, wants to move |
+| 6 | seventh | tension, wants to resolve up to the tonic |
+
+End a phrase on 0, 2 or 4 and it sounds finished. End on 1 or 6 and it sounds like a question. Hooks often ask the question in bar 2 and answer it in bar 4.
+
+<Strudel title="question… answer" code={`
+  n("<[0 2 4 2] [4 5 6 ~] [0 2 4 2] [4 2 1 0]>")
+    .scale("A3:minor").s("triangle")
+    ._pianoroll()
+`} />
+
+<DoDont
+  do={[
+    'Choose the key first: tonic + scale. Write it in one variable.',
+    'Use n("…").scale(key) for every melodic part, so they can never clash.',
+    'Use minor pentatonic for basslines when unsure — it has no "wrong" notes.',
+    'End phrases on the tonic (0) or the fifth (4) to sound finished.',
+  ]}
+  dont={[
+    'Write raw note names in one part and scale degrees in another key in a different part.',
+    'Change key in the middle of a dance track unless you plan it (and the DJ will hate you).',
+    'Sit on the 2nd or 7th degree for long — they are tension notes, use them to move.',
+  ]}
+/>

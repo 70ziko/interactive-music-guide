@@ -1,0 +1,130 @@
+Bas robi dwie rzeczy naraz: mówi uchu, **na jakim akordzie** jesteś (gra prymę), i jest **partnerem stopy w groovie**. Ustaw dobrze relację stopa–bas, a utwór zadziała na klubowym nagłośnieniu. Ustaw źle, a zrobi się papka.
+
+## Problem: stopa i bas dzielą tę samą przestrzeń
+
+Energia stopy siedzi w okolicach 40–120 Hz. Linia basu w okolicach 40–250 Hz (lekcja 1). Gdy obie uderzają w tym samym momencie, ich niskie częstotliwości się sumują i walczą. Słyszysz to jako dudniący, nieczytelny dół.
+
+Są trzy rozwiązania i muzyka taneczna używa wszystkich:
+
+| Rozwiązanie | Jak | Gdzie |
+|---|---|---|
+| **Czas**: bas między stopami | bas na offbicie albo synkopowany | house, trance, bounce, hard house |
+| **Głośność**: przycisz bas, gdy uderza stopa | kompresja sidechain / `duckorbit` | prawie wszędzie |
+| **Pasmo**: niech jedno ma sub na własność | odfiltruj drugie (`hpf`, krótszy ogon stopy) | miks |
+
+## Rozwiązanie 1: bas na offbicie
+
+Stopa na uderzeniu, bas na „&”. Nigdy się nie zderzają, a razem dają puls **um-pa**. To kręgosłup bounce i hard house.
+
+<Strudel title="stopa na uderzeniu, bas na offbicie" code={`
+  setcpm(128/4)
+  stack(
+    s("bd*4").bank("RolandTR909").color("#ff5c8a"),
+    note("[~ a1]*4").s("sawtooth").lpf(380)
+      .decay(0.15).sustain(0.3).color("#5ce1e6")
+  )._punchcard()
+`} />
+
+Wzory basu, które warto znać, wszystkie zbudowane wokół stopy:
+
+<Strudel title="pięć groove'ów basu (jeden na takt)" code={`
+  setcpm(126/4)
+  stack(
+    s("bd*4").bank("RolandTR909"),
+    note(\`<
+      [~ a1]*4
+      [~ a1 ~ a2]*2
+      [~ a1 a1 a1]*4
+      [a1 ~ ~ a1 ~ ~ a1 ~ ~ ~ a1 ~ c2 ~ a1 ~]
+      [~ a1 ~ [a1 a2]]*2
+    >\`).s("sawtooth").lpf(450).decay(0.12).sustain(0.2)
+  )._punchcard()
+`} />
+
+| Takt | Wzór | Nazwa |
+|---|---|---|
+| 1 | `[~ a1]*4` | offbit — standard house/trance/hard house |
+| 2 | `[~ a1 ~ a2]*2` | skok o oktawę — sprężysty |
+| 3 | `[~ a1 a1 a1]*4` | toczące się szesnastki — pędzący, „galop” |
+| 4 | synkopowany | groove deep house / garage |
+| 5 | offbit + oktawowy przedtakt | smak bounce |
+
+## Bas idzie za akordami
+
+Graj **prymę** każdego akordu. Jeśli akordy to Am – F – C – G, bas gra A – F – C – G. Używaj stopni skali, żeby zawsze pasowało (lekcja 5).
+
+<Strudel title="bas przypięty do akordów" code={`
+  setcpm(128/4)
+  const prog = "<0 5 2 6>"   // i VI III VII
+  chords: n("[0,2,4]").add(n(prog))       // kształt trójdźwięku przesuwany progresją
+    .scale("A3:minor").struct("[~ x]*4")
+    .s("sawtooth").lpf(2000).decay(0.12).sustain(0).gain(0.4)
+  bass: n(prog).scale("A1:minor").struct("[~ x]*4")
+    .s("sawtooth").lpf(400).decay(0.15).sustain(0.3)
+  kick: s("bd*4").bank("RolandTR909")
+`} />
+
+## Donk (bounce / scouse house)
+
+**Donk** to podpis bounce: krótkie, puste, szarpnięte uderzenie basu na każdym offbicie, wyżej niż zwykły sub-bas, żeby się przebijało. Nie ma jednego oficjalnego presetu. Ten przepis daje podobny efekt: fala trójkątna, szybki spadek wysokości na starcie (to „d-” w donk), bardzo krótkie ciało i trochę przesteru.
+
+<Strudel title="przepis na donk" code={`
+  setcpm(145/4)
+  donk: note("[~ a2]*4")
+    .s("triangle")
+    .penv(14).pdecay(0.03)      // szybki spadek wysokości = „d” w donk
+    .decay(0.13).sustain(0)     // krótko, bez ogona
+    .lpf(1800).distort(0.6)
+    .gain(0.9)
+  kick: s("bd*4").bank("RolandTR909").distort(1)
+  hats: s("[~ oh]*4, hh*16").bank("RolandTR909").gain(0.4)
+`} />
+
+<TryThis>
+Zmień `penv(14)` na `penv(0)` (bez spadku wysokości), a potem na `penv(30)`. Potem podnieś `decay` do 0.3. Posłuchaj, jak każda gałka oddala albo przybliża brzmienie do donka.
+</TryThis>
+
+## Rozwiązanie 2: ducking (sidechain)
+
+Nawet z basem na offbicie długi ogon stopy nachodzi na bas. **Ducking** na chwilę przycisza bas przy każdym uderzeniu stopy, a potem pozwala mu wrócić. Tak powstaje słynne „pompowanie”.
+
+W Strudlu daj bas na osobny **orbit** (osobna szyna efektów), a potem każ stopie przyciszać ten orbit:
+
+<Strudel title="ducking sidechain" code={`
+  setcpm(126/4)
+  bass: note("<a1 f1 c2 g1>").s("sawtooth").lpf(500)
+    .sustain(1).orbit(2)               // długa trzymana nuta na orbicie 2
+  kick: s("bd*4").bank("RolandTR909")
+    .duckorbit(2)                      // przyciszaj orbit 2 przy każdej stopie
+    .duckdepth("<0 0.6 0.9 1>")        // takt 1: bez duckingu … takt 4: pełny
+    .duckattack(0.2)                   // jak długo bas wraca
+`} />
+
+## Rozwiązanie 3: jeden właściciel subu
+
+Jeśli stopa ma długi, dudniący ogon, wytnij sub z basu filtrem górnoprzepustowym albo skróć stopę. Jeśli bas to głęboki sinus, użyj krótszej, bardziej punktowej stopy. Nigdy nie pozwól, żeby oba były duże w subie naraz.
+
+<Strudel title="rozdzielanie filtrami" code={`
+  setcpm(128/4)
+  stack(
+    s("bd*4").bank("RolandTR909").decay(0.25),       // krótsza stopa
+    note("[~ a1]*4").s("sawtooth")
+      .hpf("<20 20 90 90>")                           // takty 3–4: sub basu wycięty
+      .lpf(500).decay(0.15).sustain(0.3)
+  )
+`} />
+
+<DoDont
+  do={[
+    'Domyślnie kładź bas między stopami (offbit albo synkopa).',
+    'Graj w basie prymy akordów, z tej samej zmiennej tonacji co akordy.',
+    'Przyciszaj bas (albo pady) przez duckorbit dla pompowania i przestrzeni.',
+    'Zdecyduj, kto ma sub na własność: stopa czy bas.',
+  ]}
+  dont={[
+    'Kłaść długiej nuty basu dokładnie na każdej stopie bez duckingu.',
+    'Grać akordów ani tercji w rejestrze basu.',
+    'Dawać pogłosu na bas — rozmazuje dół. Bas zostaw suchy.',
+    'Robić długiego donka. Jego siła to krótkość.',
+  ]}
+/>

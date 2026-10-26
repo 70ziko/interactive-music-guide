@@ -1,0 +1,112 @@
+**Akord** to trzy albo więcej nut zagranych razem. W house akordy to warstwa emocji: stab mollowego akordu septymowego na offbicie to połowa brzmienia gatunku.
+
+## Budowa akordu: układaj tercje
+
+Weź dowolny stopień skali, pomiń jeden, weź następny, pomiń jeden, weź następny. W liczbach stopni to **0, 2, 4**. Wynik to **trójdźwięk**.
+
+Czy jest durowy, czy mollowy, zależy od odstępów liczonych w półtonach:
+
+| Akord | Odstępy (półtony) | Symbol | Brzmienie |
+|---|---|---|---|
+| Dur | 4 + 3 | `C` | jasny, stabilny |
+| Moll | 3 + 4 | `Cm` | ciemny, miękki |
+| Moll septymowy | 3 + 4 + 3 | `Cm7` | gładki, klasyczny akord house |
+| Moll z noną | 3 + 4 + 3 + 4 | `Cm9` | bogaty, deep house |
+| Wielki septymowy | 4 + 3 + 4 | `CM7` / `C^7` | marzycielski, otwarty |
+| Dominanta septymowa | 4 + 3 + 3 | `C7` | bluesowy, chce iść dalej |
+| Sus2 / Sus4 | 2 + 5 / 5 + 2 | `Csus2` | otwarty, ani dur, ani moll |
+
+<Keyboard mode="chord" root={9} chord="min7" chords={['maj', 'min', 'min7', 'min9', 'maj7', 'dom7', 'sus2', 'sus4']} />
+
+<TryThis>
+Tonika **A**: zagraj **Am**, potem **Am7**, potem **Am9**. Każda dodana tercja robi go miększym i bardziej „house”. Potem spróbuj **A** (dur) — zobacz, jak jedna nuta (C → C#) odwraca nastrój.
+</TryThis>
+
+## Akordy ze skali
+
+Jeśli zbudujesz każdy trójdźwięk z nut samej skali, dostaniesz **akordy diatoniczne** tonacji. Wszystkie do siebie pasują. Nazywamy je cyframi rzymskimi: wielkie = dur, małe = moll, ° = zmniejszony.
+
+| Tonacja A-moll | i | ii° | III | iv | v | VI | VII |
+|---|---|---|---|---|---|---|---|
+| Akord | Am | Bdim | C | Dm | Em | F | G |
+| Stopnie `n` | 0,2,4 | 1,3,5 | 2,4,6 | 3,5,7 | 4,6,8 | 5,7,9 | 6,8,10 |
+
+Strudel buduje je za ciebie: wpisz stopnie w `[ , ]`, a `.scale()` dobierze właściwe nuty.
+
+<Strudel title="i – VI – III – VII w A-moll" code={`
+  setcpm(124/4)
+  n("<[0,2,4] [5,7,9] [2,4,6] [6,8,10]>")
+    .scale("A3:minor")
+    .s("sawtooth").lpf(1400).gain(0.5)
+    ._pianoroll()
+`} />
+
+Ta progresja — **i – VI – III – VII** (Am F C G) — to jedna z najczęściej używanych progresji mollowych w muzyce tanecznej. Inne bezpieczne pętle w mollu:
+
+| Progresja | W A-moll | Klimat |
+|---|---|---|
+| i – VI – III – VII | Am F C G | epicki, hymniczny |
+| i – VII – VI – VII | Am G F G | pędzący, rave |
+| i – iv | Am Dm | hipnotyczny vamp na dwa akordy, bardzo house |
+| i – VI | Am F | melancholijny, gotowy na breakdown |
+| i (jeden akord) | Am7 | deep house: groove robi robotę |
+
+## Koło kwintowe
+
+Ułóż 12 tonacji tak, żeby każdy krok był kwintą w górę (×3/2). Sąsiedzi dzielą 6 z 7 nut. Akordy dowolnej tonacji leżą w małym klinie: tonacja, jej dwóch sąsiadów i ich paralele mollowe.
+
+<CircleOfFifths />
+
+Używaj go, żeby odpowiedzieć sobie „które akordy pasują do tego?” — patrz na klin. I żeby płynnie przechodzić między tonacjami: sąsiedzi na kole brzmią pokrewnie.
+
+## Voicing: jak ułożyć nuty
+
+Ten sam akord można zagrać z nutami w różnej kolejności i oktawach. Skakanie z jednego akordu w położeniu zasadniczym do następnego brzmi topornie. Przesuwanie każdej nuty **najkrótszą drogą** brzmi gładko — to **prowadzenie głosów**. `voicing()` w Strudlu robi to za ciebie.
+
+<Strudel title="symbole akordów + automatyczny voicing" code={`
+  setcpm(124/4)
+  chord("<Am7 Dm7 FM7 Em7>")
+    .voicing()
+    .s("gm_epiano1").gain(0.7)
+    ._pianoroll()
+`} />
+
+## Stab house
+
+Krótkie akordy, rytmiczne, zwykle na offbitach albo synkopowanych szesnastkach. `.struct()` nadaje akordowi rytm: `x` = graj, `~` = pauza.
+
+<Strudel title="stabsy organowe house" code={`
+  setcpm(124/4)
+  stabs: chord("<Am7 Am7 Dm7 Em7>")
+    .voicing()
+    .struct("[~ x ~ ~] [x ~ ~ x] [~ ~ x ~] [~ x ~ ~]")
+    .s("gm_drawbar_organ").decay(0.18).sustain(0).gain(0.8)
+  drums: s("bd*4, [~ oh]*4, ~ cp ~ cp").bank("RolandTR909")
+  bass: n("<0 0 3 4>*8").scale("A1:minor").struct("[~ x]*4")
+    .s("sawtooth").lpf(350).decay(0.12).sustain(0)
+`} />
+
+<Strudel title="klasyczne stabsy z piły na offbicie (bardziej rave)" code={`
+  setcpm(128/4)
+  chord("<Am Am F G>")
+    .voicing()
+    .struct("[~ x]*4")
+    .s("sawtooth").lpf(2200).lpq(4)
+    .decay(0.12).sustain(0).room(0.3)
+    ._pianoroll()
+`} />
+
+<DoDont
+  do={[
+    'Zacznij od akordu i i jednego innego. Dwa akordy wystarczą na utwór house.',
+    'Używaj akordów m7 i m9 dla brzmienia deep/soul, zwykłych trójdźwięków dla rave/hard.',
+    'Pozwól voicing() zająć się przewrotami, żeby akordy płynęły.',
+    'Trzymaj stabsy krótko (mały decay, zero sustain), żeby zostawiały miejsce stopie.',
+  ]}
+  dont={[
+    'Grać akordów poniżej ~C3 — tercje w basie robią błoto (lekcja 2).',
+    'Zmieniać akordu na każde uderzenie. W house normalny jest jeden akord na takt (albo na 2 takty).',
+    'Używać akordów spoza tonacji bez powodu (akordy pożyczone to zaawansowany trik).',
+    'Pozwalać, żeby pryma akordu walczyła z basem. Jeśli bas gra A, akord też powinien być akordem A (albo bas idzie razem z nim).',
+  ]}
+/>

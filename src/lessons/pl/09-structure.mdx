@@ -1,0 +1,152 @@
+Pętla to jeszcze nie utwór. Utwór to te same kilka pętli **włączanych i wyłączanych w blokach po 8 taktów**, tak żeby energia rosła i opadała. Struktura muzyki tanecznej jest prosta i ścisła — to dobra wiadomość: da się ją zaplanować arytmetyką.
+
+## Wszystko dzieje się w ósemkach
+
+Tancerze i DJ-e czują muzykę we **frazach po 8 taktów** (oraz 16, 32). Nowe elementy wchodzą w pierwszym takcie frazy. Fille dzieją się w ostatnim takcie (lekcja 4). Jeśli coś zmieni się w takcie 7, parkiet odczuje to jako błąd.
+
+<Callout kind="math">
+Przy `setcpm(BPM/4)` **1 cykl = 1 takt**. Czyli:
+- 8 taktów przy 124 BPM = 8 × 4 × 60 / 124 = **15,5 s**
+- 32 takty ≈ **1 minuta** przy 128 BPM
+- 6-minutowy utwór klubowy ≈ 190 taktów ≈ 24 frazy po 8.
+
+Długości sekcji w Strudlu to po prostu liczby cykli: 8, 16, 32.
+</Callout>
+
+## Sekcje
+
+<ArrangementTimeline />
+
+| Sekcja | Zadanie | Typowe ruchy |
+|---|---|---|
+| **Intro** | pozwolić DJ-owi wmiksować | same bębny, może przefiltrowane |
+| **Groove / budowanie** | ustanowić utwór | dodawaj jedną warstwę co 8 taktów: bas, klap, perkusja |
+| **Główna** | motyw (hook) | wchodzą akordy albo lead |
+| **Breakdown** | oddech, emocje | stopa wypada; akordy, pad, melodia na wierzchu |
+| **Narastanie (build-up)** | napięcie | rolka werbla przyspiesza, riser rośnie, filtr się otwiera, stopa może zostać wyłączona |
+| **Drop** | nagroda | wszystko wraca naraz w takcie 1 frazy |
+| **Outro** | pozwolić DJ-owi wymiksować | rozbierz do bębnów |
+
+<TryThis>
+Włącz utwór house albo hard house, który lubisz. Licz takty od pierwszej stopy („1-2-3-4, 2-2-3-4 … 8-2-3-4”). Zaznacz, gdzie wchodzi każdy nowy dźwięk. Prawie każda zmiana wypada w takcie 1, 9, 17, 33…
+</TryThis>
+
+## Narzędzia energii
+
+Energia to nie tylko głośność. Oto dźwignie:
+
+| W górę | W dół |
+|---|---|
+| dodaj warstwę | usuń warstwę |
+| otwórz filtr (`lpf` w górę) | zamknij filtr |
+| gęstsze podziały (ósemki → szesnastki → trzydziestodwójki) | dłuższe nuty, więcej przestrzeni |
+| wyższe nuty, oktawa w górę | niżej albo bez melodii |
+| więcej hatów / perkusji | stopa wyłączona |
+| riser (rosnący szum) | ogon pogłosu, cisza |
+
+### Rolka werbla i riser
+
+Klasyk narastania: werbel, który podwaja tempo co 2 takty, szumowy riser, którego filtr wspina się w górę, oba coraz głośniejsze. `saw.range(a, b).slow(8)` rośnie od `a` do `b` przez 8 taktów.
+
+<Strudel title="8-taktowe narastanie" code={`
+  setcpm(128/4)
+  roll: s("sd*<4 4 8 8 16 16 32 32>").bank("RolandTR909")
+    .gain(saw.range(0.3, 1).slow(8))
+    .speed(saw.range(1, 1.6).slow(8))      // wysokość też rośnie
+  riser: s("white*16").decay(0.06).sustain(0)
+    .hpf(saw.range(400, 9000).slow(8))
+    .gain(saw.range(0.05, 0.35).slow(8))
+  chords: chord("Am7").voicing().struct("[~ x]*4")
+    .s("sawtooth").lpf(saw.range(400, 4000).slow(8)).decay(0.15).sustain(0)
+`} />
+
+## Aranżowanie w Strudlu
+
+### Opcja A: `arrange()` — zapisz cały utwór
+
+`arrange([cykle, wzór], …)` gra każdy wzór przez tyle cykli (= taktów), potem następny. Zbuduj nazwane warstwy raz, potem wypisz sekcje. To kompletny, grający szkielet utworu house na 72 takty (≈ 2,3 minuty).
+
+<Strudel title="cały utwór przez arrange()" code={`
+  setcpm(124/4)
+  const key = 'A:minor'
+  const prog = "<0 0 5 4>"   // i i VI v, jeden akord na takt
+
+  const kick = s("bd*4").bank("RolandTR909")
+  const hats = s("[~ oh]*4, hh*16").bank("RolandTR909").gain(0.35)
+  const clap = s("~ cp ~ cp").bank("RolandTR909")
+  const bass = n(prog).scale("A1:minor").struct("[~ x]*4")
+    .s("sawtooth").lpf(420).decay(0.15).sustain(0.3)
+  const stabs = n("[0,2,4,6]").add(n(prog)).scale(key)
+    .struct("[~ x ~ ~] [x ~ ~ x] [~ ~ x ~] [~ x ~ ~]")
+    .s("gm_drawbar_organ").decay(0.18).sustain(0).gain(0.7)
+  const pad = n("[0,2,4]").add(n(prog)).scale(key)
+    .s("supersaw").attack(0.5).release(1.5).lpf(1200).room(0.7).gain(0.25)
+  const roll = s("sd*<4 4 8 8 16 16 32 32>").bank("RolandTR909")
+    .gain(saw.range(0.3, 0.9).slow(8))
+  const riser = s("white*16").decay(0.06).sustain(0)
+    .hpf(saw.range(400, 9000).slow(8)).gain(0.25)
+
+  arrange(
+    [8,  stack(kick, hats)],                              // intro
+    [8,  stack(kick, hats, clap, bass)],                  // groove
+    [16, stack(kick, hats, clap, bass, stabs)],           // główna
+    [8,  stack(stabs, pad)],                              // breakdown
+    [8,  stack(stabs, roll, riser)],                      // narastanie
+    [16, stack(kick, hats, clap, bass, stabs, pad)],      // drop
+    [8,  stack(kick, hats)]                               // outro
+  )
+`} />
+
+### Opcja B: etykiety + `_` — aranżuj na żywo
+
+Przy live codingu zwykle nie piszesz aranżacji z góry. Trzymasz każdą warstwę jako linię z etykietą i **wyciszasz/włączasz** ją przez `_` na granicach fraz. Te same warstwy, inny sposób pracy:
+
+<Strudel title="aranżacja na żywo: przełączaj _" code={`
+  setcpm(124/4)
+  kick: s("bd*4").bank("RolandTR909")
+  hats: s("[~ oh]*4, hh*16").bank("RolandTR909").gain(0.35)
+  _clap: s("~ cp ~ cp").bank("RolandTR909")
+  _bass: n("<0 0 5 4>").scale("A1:minor").struct("[~ x]*4")
+    .s("sawtooth").lpf(420).decay(0.15).sustain(0.3)
+  _stabs: chord("<Am7 Am7 FM7 Em7>").voicing()
+    .struct("[~ x ~ ~] [x ~ ~ x] [~ ~ x ~] [~ x ~ ~]")
+    .s("gm_drawbar_organ").decay(0.18).sustain(0).gain(0.7)
+`} />
+
+<TryThis>
+Zagraj blok powyżej. Co 8 taktów usuń jedno `_` i wciśnij **Aktualizuj** (Ctrl/⌘+Enter): klap, potem bas, potem stabsy. Potem dodaj `_` przed kick na breakdown i usuń je z powrotem na drop.
+</TryThis>
+
+### Opcja C: `mask()` dla każdej warstwy
+
+`.mask("<0!8 1!8>")` wycisza warstwę na 8 taktów, a potem gra ją przez 8. Każda warstwa ma własny harmonogram; całość się powtarza.
+
+<Strudel title="maski: każda warstwa ma harmonogram (32 takty)" code={`
+  setcpm(124/4)
+  stack(
+    s("bd*4").mask("<1!8 1!8 0!8 1!8>"),             // wypada w taktach 17–24
+    s("~ cp ~ cp").mask("<0!8 1!8 0!8 1!8>"),        // wchodzi od taktu 9
+    s("[~ oh]*4").gain(0.4),                          // zawsze
+    note("[~ a1]*4").s("sawtooth").lpf(400)
+      .decay(0.15).sustain(0.3).mask("<0!8 1!8 0!8 1!8>")
+  ).bank("RolandTR909")
+`} />
+
+<DoDont
+  do={[
+    'Zaplanuj utwór w blokach po 8 taktów, zanim napiszesz szczegóły. Szkic: intro 16, groove 16, główna 32, break 16, narastanie 8, drop 32, outro 16.',
+    'Wprowadzaj albo usuwaj jeden element na frazę.',
+    'Niech drop wypada w takcie 1 frazy, po narastaniu 8 (albo 16) taktów.',
+    'Intro i outro zaczynaj od bębnów, żeby DJ-e mogli miksować.',
+  ]}
+  dont={[
+    'Zmieniać czegoś w środku frazy (takt 3, takt 7).',
+    'Wrzucać wszystkiego od początku — nie masz potem dokąd iść.',
+    'Robić breakdownu dłuższego niż drop, który po nim następuje.',
+    'Zapominać o fillu w ostatnim takcie przed nową sekcją.',
+  ]}
+/>
+
+## Co dalej
+
+Masz teraz cały łańcuch: dźwięk → wysokość → rytm → harmonia → bas → synteza → struktura. Kolejne lekcje (w fazie 2): efekty w głąb, przepisy na brzmienia (hoover, reese, warianty donka), groove i wariacje oraz podręczniki gatunków house, bounce i hard house z kompletnymi szablonami.

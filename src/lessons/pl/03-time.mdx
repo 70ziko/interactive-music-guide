@@ -1,0 +1,108 @@
+Rytm to *kiedy* dźwięki się pojawiają. Muzyka taneczna jedzie po ścisłej siatce, a Strudel opisuje tę siatkę jedną jednostką: **cyklem**.
+
+## Uderzenia, takty, BPM — i cykle
+
+- **Uderzenie** (beat) to jeden puls, do którego kiwasz głową. W house każda stopa to jedno uderzenie.
+- **Takt** to 4 uderzenia. Prawie cała muzyka taneczna jest w 4/4: cztery uderzenia na takt.
+- **BPM** = uderzenia na minutę. House ≈ 120–128, bounce i hard house ≈ 140–150.
+- **Cykl** to jednostka czasu w Strudlu. Wszystko w `s("…")` jest ściśnięte w jeden cykl.
+
+Ustaw **1 cykl = 1 takt**, a Strudel mówi tym samym językiem co każdy DJ:
+
+<Formula>setcpm(BPM / 4)    // cykle na minutę = takty na minutę</Formula>
+
+<Callout kind="math">
+Przy 124 BPM:
+- jedno uderzenie = 60 / 124 = **0,484 s**
+- jeden takt = 4 uderzenia = **1,935 s**
+- jedna szesnastka (krok) = 0,484 / 4 = **0,121 s**
+
+`setcpm(124/4)` = 31 cykli na minutę. `setcps` to to samo w cyklach na sekundę: `setcps(124/60/4)`.
+</Callout>
+
+## Siatka 16 kroków
+
+Podziel każde uderzenie na 4 i takt ma **16 kroków**. Automaty perkusyjne (TR-909, TR-808) są zbudowane na tej siatce, tak samo jak prawie każdy wzór bębnów house. Licz kroki jako **1 i & a 2 i & a 3 i & a 4 i & a** — „&” to **offbit**, w połowie między dwiema stopami.
+
+<StepGrid preset="four" presets={['empty', 'four', 'offbeat', 'house']} />
+
+<TryThis>
+1. Wciśnij **Graj** w bloku kodu pod siatką.
+2. Kliknij 4 kratki na „&” w rzędzie hi-hatu otwartego (kroki 3, 7, 11, 15). To klasyczny hat na offbicie w house.
+3. Dodaj klaśnięcie na uderzeniach 2 i 4. Patrz, jak kod zmienia się przy klikaniu.
+</TryThis>
+
+## Mini-notacja: siatka jako tekst
+
+Mini-notacja Strudla to mały język do zapisywania tej siatki. Zasada pod spodem wszystkiego: **elementy oddzielone spacjami dzielą cykl po równo.**
+
+| Piszesz | Znaczenie | Przykład |
+|---|---|---|
+| `a b c d` | 4 równe kroki | `s("bd hh sd hh")` |
+| `~` | pauza (cisza) | `s("bd ~ ~ bd")` |
+| `[a b]` | ściśnij w jeden krok | `s("bd [hh hh]")` |
+| `a*4` | powtórz 4× w swoim kroku | `s("hh*8")` |
+| `a!3` | skopiuj 3× jako osobne kroki | `s("bd!3 sd")` |
+| `<a b>` | jeden na cykl, na zmianę | `s("<bd sd>")` |
+| `a, b` | grają razem (warstwy) | `s("bd*4, hh*8")` |
+| `a(3,8)` | Euklides: 3 uderzenia na 8 | `s("bd(3,8)")` |
+| `a?` | 50 % szans na zagranie | `s("hh*16?")` |
+| `a@3` | rozciągnij na 3 kroki | `note("c@3 e")` |
+
+Te cztery linie grają tę samą stopę four-on-the-floor:
+
+<Strudel title="ten sam rytm, cztery zapisy" code={`
+  setcpm(124/4)
+  s("bd bd bd bd").bank("RolandTR909")
+  // s("bd*4")
+  // s("[bd ~ ~ ~]*4")
+  // s("bd!4")
+`} />
+
+Warstwy przez `,` — cały bit w jednej linii:
+
+<Strudel title="bit house w jednej linii" code={`
+  setcpm(124/4)
+  s("bd*4, [~ cp]*2, [~ hh]*4, hh*16?")
+    .bank("RolandTR909")
+    ._punchcard()
+`} />
+
+## Kilka wzorów naraz: etykiety
+
+Wszystko w jednym stringu szybko robi się nieczytelne. Daj każdej partii własną linię z **etykietą**. Każda linia z etykietą gra w tym samym czasie. Dodaj `_` przed etykietą, żeby wyciszyć tę linię — tak budujesz i rozbierasz aranżację podczas live codingu.
+
+<Strudel title="partie z etykietami" code={`
+  setcpm(124/4)
+  kick: s("bd*4").bank("RolandTR909")
+  clap: s("~ cp ~ cp").bank("RolandTR909")
+  hats: s("[~ oh]*4").bank("RolandTR909").gain(0.5)
+  _bass: note("[~ a1]*4").s("sawtooth").lpf(400)   // wyciszone: usuń _, żeby usłyszeć
+`} />
+
+## Dłużej niż jeden takt
+
+`<…>` przechodzi przez wartości po jednej na cykl, więc to najprostszy sposób na frazy 2-, 4- albo 8-taktowe. `.slow(n)` rozciąga wzór na `n` cykli. `.fast(n)` go ściska.
+
+<Strudel title="fraza 4-taktowa" code={`
+  setcpm(124/4)
+  stack(
+    s("bd*4, [~ cp]*2, [~ hh]*4").bank("RolandTR909"),
+    // jedna nuta basu na takt, 4 takty
+    note("<a1 a1 f1 g1>*8").s("sawtooth").lpf(500).decay(0.15).sustain(0)
+  )._pianoroll()
+`} />
+
+<DoDont
+  do={[
+    'Zaczynaj każdy utwór od setcpm(BPM/4), żeby 1 cykl = 1 takt.',
+    'Myśl w 16 krokach na takt, 4 na uderzenie.',
+    'Używaj etykiet (kick:, bass:, …) i _ do wyciszania — jedna linia na instrument.',
+    'Pisz frazy po 4 albo 8 taktów przez <…>.',
+  ]}
+  dont={[
+    'Mieszać długości cykli przypadkiem: wzór 3-krokowy na 4-krokowym się rozjeżdża (fajne celowo, mylące przypadkiem).',
+    'Zmieniać tempa w środku utworu. DJ-e house potrzebują stałego BPM do miksowania.',
+    'Pisać 30 zdarzeń w jednym stringu. Podziel na linie z etykietami.',
+  ]}
+/>

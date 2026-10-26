@@ -1,0 +1,112 @@
+Wszystko w utworze — stopa, bas, hoover, wokal — to jedna rzecz: **ciśnienie powietrza poruszające się tam i z powrotem**. Membrana głośnika popycha powietrze do przodu i cofa je. Twój bębenek w uchu kopiuje ten ruch. Opisują go trzy liczby.
+
+| Cecha | Co to jest | Jednostka | Słyszysz jako |
+|---|---|---|---|
+| **Częstotliwość** `f` | Ile cykli tam-i-z-powrotem na sekundę | Hz (herc) | Wysokość: nisko ↔ wysoko |
+| **Amplituda** `A` | Jak daleko porusza się powietrze | 0–1 (lub dB) | Głośność |
+| **Kształt fali** | *Kształt* jednego cyklu | — | Barwa (timbre) |
+
+## Jeden cykl jako matematyka
+
+Najprostszy dźwięk to sinusoida:
+
+<Formula>y(t) = A · sin(2π · f · t)</Formula>
+
+- `t` to czas w sekundach.
+- `2π · f · t` mówi, jak daleko jesteś na okręgu: jeden pełny obrót (2π) na cykl, `f` obrotów na sekundę.
+- **Okres** `T = 1 / f` to długość jednego cyklu. 110 Hz → T = 9,09 ms.
+
+Człowiek słyszy mniej więcej od 20 Hz do 20 000 Hz. Poniżej ~20 Hz czujesz pulsowanie zamiast wysokości — zapamiętaj to, wróci w lekcji 2.
+
+<WaveScope />
+
+<TryThis>
+1. Wciśnij **Zagraj ton**, zostaw sinus.
+2. Przeciągnij częstotliwość od 40 Hz do 1 kHz. Zobacz, jak coraz więcej cykli mieści się w tym samym oknie 20 ms.
+3. Przełączaj sine, triangle, square i sawtooth przy tej samej częstotliwości. Ta sama wysokość, inna barwa.
+</TryThis>
+
+## Harmoniczne: czemu piła brzmi inaczej niż sinus
+
+Piła (sawtooth) to nie jest nowy rodzaj dźwięku. To **wiele sinusów dodanych razem**: jeden na `f`, jeden na `2f`, jeden na `3f` i tak dalej, każdy cichszy. To są **harmoniczne** (alikwoty, tony składowe). To idea Fouriera: każdy powtarzający się kształt = suma sinusów o częstotliwościach będących całkowitymi wielokrotnościami częstotliwości podstawowej.
+
+| Kształt | Które harmoniczne | Głośność harmonicznej `n` | Brzmienie |
+|---|---|---|---|
+| Sinus | tylko 1 | — | czysty, okrągły, sub-bas |
+| Trójkąt | nieparzyste: 1, 3, 5… | 1/n² | miękki, jak flet |
+| Prostokąt | nieparzyste: 1, 3, 5… | 1/n | pusty, nosowy, „8-bit” |
+| Piła | wszystkie: 1, 2, 3… | 1/n | jasna, brzęcząca — surowiec większości leadów, basów i hooverów |
+
+<HarmonicBuilder />
+
+<TryThis>
+Zacznij od **sine**. Podnieś tylko harmoniczne 3, 5 i 7. Budujesz ręcznie falę prostokątną. Potem wciśnij **sawtooth** i popatrz: każdy suwak jest w użyciu.
+</TryThis>
+
+<Callout kind="math">
+Częstotliwość podstawowa `f` ustala wysokość. Harmoniczne leżą na `2f, 3f, 4f…`, więc *odstęp* między nimi to zawsze `f`. Mózg odczytuje ten regularny odstęp jako „jedną nutę”, a nie wiele. Dlatego piła z 50 harmonicznymi nadal brzmi jak jedno A.
+</Callout>
+
+## Posłuchaj w Strudlu
+
+Każda wartość w `<…>` gra przez jeden cykl, więc ten kod przechodzi przez cztery kształty fali na tej samej nucie. `._scope()` rysuje prawdziwy sygnał pod linią.
+
+<Strudel title="cztery kształty, jedna nuta" code={`
+  note("a2*4")
+    .s("<sine triangle square sawtooth>")
+    .gain(0.6)
+    ._scope()
+`} />
+
+Szereg harmoniczny zagrany jako melodia: 110, 220, 330 … 880 Hz. To dokładnie te częstotliwości, które siedzą w jednej pile 110 Hz.
+
+<Strudel title="szereg harmoniczny" code={`
+  freq("110 220 330 440 550 660 770 880")
+    .s("sine")
+    .decay(0.2).sustain(0)
+    ._pianoroll()
+`} />
+
+`._spectrum()` pokazuje częstotliwości od lewej (nisko) do prawej (wysoko). Porównaj sinus i piłę:
+
+<Strudel title="widmo" code={`
+  note("a2").s("<sine sawtooth>")
+    .gain(0.5)
+    ._spectrum()
+`} />
+
+## Gdzie co mieszka: mapa częstotliwości
+
+Każda część utworu house zajmuje swój kawałek pasma. Większość problemów w miksie to dwie partie walczące o ten sam kawałek.
+
+| Zakres | Nazwa | Co tam mieszka |
+|---|---|---|
+| 20–60 Hz | Sub | Ciało stopy, sub-basowy sinus. Bardziej czuć niż słychać. |
+| 60–250 Hz | Bas | Linia basu, uderzenie stopy, „donk” |
+| 250 Hz–2 kHz | Środek | Akordy, stabsy, wokal, ciało hoovera |
+| 2–6 kHz | Prezencja | Trzask klapa/werbla, ostrość leadu |
+| 6–20 kHz | Powietrze | Hi-haty, talerze, szumowe risery |
+
+Hi-hat to głównie **szum**: wszystkie częstotliwości naraz, bez regularnych odstępów, więc bez wysokości. Stopa to głównie **sinus, który szybko opada w wysokości** (z ~150 Hz do ~50 Hz w kilkadziesiąt milisekund).
+
+<Strudel title="sinusowa stopa vs szumowy hat" code={`
+  stack(
+    // stopa: sinus, którego wysokość szybko spada
+    note("a1*4").s("sine").penv(24).pdecay(0.06).decay(0.25).sustain(0),
+    // hat: biały szum, bardzo krótki, przepuszczony przez górnoprzepustowy filtr
+    s("~ white ~ white").decay(0.04).sustain(0).hpf(7000).gain(0.4)
+  )._scope()
+`} />
+
+<DoDont
+  do={[
+    'Sprawdzaj bas i stopę na słuchawkach albo prawdziwych głośnikach. Głośniki laptopa prawie nic nie grają poniżej ~100 Hz.',
+    'Daj każdej partii jej własny kawałek pasma (sub, bas, środek, powietrze).',
+    'Zaczynaj leady i basy od piły — ma wszystkie harmoniczne, więc filtr ma co kształtować.',
+  ]}
+  dont={[
+    'Grać surowego prostokąta albo piły głośno bez filtra — te harmoniczne szybko stają się ostre.',
+    'Wkładać dwóch partii w zakres sub (poniżej ~60 Hz) jednocześnie.',
+    'Oceniać miksu tylko na dużej głośności. Głośno wszystko brzmi lepiej niż jest.',
+  ]}
+/>

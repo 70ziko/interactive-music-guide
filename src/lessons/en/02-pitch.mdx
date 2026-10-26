@@ -1,0 +1,115 @@
+Pitch is frequency, heard. This lesson turns that into the numbers Strudel uses, and explains why some note combinations sound smooth and others tense.
+
+## The octave: ×2
+
+Double a frequency and you get **the same note, one octave higher**. A3 = 220 Hz, A4 = 440 Hz, A5 = 880 Hz. Every harmonic of the low A lines up with a harmonic of the high A, so the ear hears them as "the same note".
+
+Western music splits each octave into **12 equal steps** called semitones. Equal means each step multiplies the frequency by the same number:
+
+<Formula>one semitone = ×2^(1/12) ≈ ×1.0595</Formula>
+
+Twelve of those multiply to exactly ×2. Give every key a number (the MIDI number: A4 = 69, C4 = 60) and the frequency of any note is:
+
+<Formula>f = 440 · 2^((m − 69) / 12)</Formula>
+
+<Keyboard />
+
+Strudel accepts both forms. These two lines play the same three A's:
+
+<Strudel title="names or numbers" code={`
+  note("<[a2 a3 a4] [45 57 69]>")
+    .s("triangle")
+    ._pianoroll()
+`} />
+
+## Intervals are ratios
+
+An **interval** is the distance between two notes. Musically you count semitones. Physically it is a **ratio** of frequencies.
+
+| Interval | Semitones | Pure ratio | Character |
+|---|---|---|---|
+| Unison | 0 | 1 : 1 | same note |
+| Octave | 12 | 2 : 1 | same note, higher |
+| Fifth | 7 | 3 : 2 | strong, open, "power" |
+| Fourth | 5 | 4 : 3 | open, a bit hanging |
+| Major third | 4 | 5 : 4 | bright, happy |
+| Minor third | 3 | 6 : 5 | dark, moody — the house default |
+| Tritone | 6 | 45 : 32 | tense, unstable |
+
+**Simpler ratio → smoother sound.** With 3 : 2, every 3rd cycle of the upper note lines up with every 2nd cycle of the lower note, and many of their harmonics land on the same frequencies. With 45 : 32 they almost never line up, and the ear hears friction.
+
+<IntervalLab />
+
+<Strudel title="intervals over A3" code={`
+  // octave, fifth, fourth, major 3rd, minor 3rd, tritone
+  note("[a3,a4] [a3,e4] [a3,d4] [a3,c#4] [a3,c4] [a3,d#4]")
+    .s("sawtooth").lpf(1800)
+    .slow(3)
+    ._pianoroll()
+`} />
+
+<Callout kind="warn">
+**A note is not a ratio.** C is just a frequency (C4 ≈ 261.6 Hz). A ratio like 3 : 2 describes the *distance between two notes* — a fifth, for example A3 (220 Hz) → E4 (330 Hz). Keep the two ideas apart: notes are points, intervals are distances.
+</Callout>
+
+## Rhythm sped up becomes pitch
+
+Your intuition that "notes are sped-up patterns" is right in a precise way. A click repeated 2 times per second is a rhythm. Repeated 200 times per second it is a 200 Hz tone. There is no switch between the two — somewhere around 20 repeats per second the ear stops counting and starts hearing pitch.
+
+So a **3 : 2 polyrhythm** (three hits against two in the same time) sped up past ~20 Hz becomes **a fifth**. The same pattern is rhythm at one speed and harmony at another.
+
+<RhythmToPitch />
+
+<TryThis>
+Pick **3:2**, press Play at 1 cycle/s and count "1-2-3 against 1-2". Slowly drag the speed up. Around 10–20 cycles/s it turns into a buzz. Past ~40 it is two notes a fifth apart. Then try **5:4**: a major third.
+</TryThis>
+
+The same thing in Strudel: the 3 : 2 rhythm, getting faster every bar.
+
+<Strudel title="3:2 rhythm, faster each bar" code={`
+  stack(
+    s("rim*3"),
+    s("bd*2")
+  ).bank("RolandTR909")
+   .fast("<1 2 4 8>")
+`} />
+
+And 3 : 2 as pitch: 330 Hz against 220 Hz.
+
+<Strudel title="3:2 as a fifth" code={`
+  freq("220, 330").s("sawtooth").lpf(2000)
+    ._scope()
+`} />
+
+## The small lie of equal temperament
+
+12 equal steps cannot hit the pure ratios exactly. A fifth is 7 semitones = 2^(7/12) = **1.4983**, not 1.5. A major third is 2^(4/12) = **1.2599**, not 1.25.
+
+Musicians measure this in **cents**: 100 cents = 1 semitone.
+
+<Formula>cents = 1200 · log2(ratio)</Formula>
+
+- Equal fifth vs pure fifth: **−2 cents**. Inaudible in practice.
+- Equal major third vs pure: **+14 cents**. Audible as a slight shimmer or beating.
+
+Synths, Strudel and every DAW use equal temperament, so you never need to tune by hand. What matters for writing: **octaves and fifths are rock-solid**, thirds are a little rough. That is why basses, hoovers and supersaws stack octaves and fifths for power, and why thirds stay in the mids, never in the bass.
+
+<Strudel title="power: root + fifth + octave" code={`
+  note("<a1 f1 c2 g1>")
+    .add(note("0,7,12"))   // root, fifth, octave
+    .s("sawtooth").lpf(900)
+    ._pianoroll()
+`} />
+
+<DoDont
+  do={[
+    'Think of notes as numbers: note(57) is A3, +12 is one octave, +7 is a fifth.',
+    'Use octaves and fifths to make basses and leads thicker.',
+    'Keep thirds (major/minor) in the mid range, around C3 and above.',
+  ]}
+  dont={[
+    'Stack thirds in the low register (below ~C3) — it turns to mud.',
+    'Confuse a note (a frequency) with an interval (a ratio between two frequencies).',
+    'Detune things "to make them fatter" without listening for beating; small detune = width, big detune = out of tune.',
+  ]}
+/>

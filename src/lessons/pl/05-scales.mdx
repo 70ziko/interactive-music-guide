@@ -1,0 +1,99 @@
+W oktawie jest 12 nut. **Skala** wybiera z nich 7 (albo 5). **Tonacja** to skala plus nuta „domowa” — **tonika**. Wybierz tonację na początku utworu, trzymaj się jej, a prawie nic, co zagrasz, nie zabrzmi źle.
+
+## Po co ograniczać się do 7 nut?
+
+Nuty skali są dobrane tak, że większość par tworzy proste stosunki (kwinty, kwarty, tercje — lekcja 2). Nuty spoza skali tworzą z toniką i ze sobą bardziej złożone stosunki, więc brzmią jak tarcie. Tonacja to wstępnie przefiltrowany zestaw nut, które do siebie pasują.
+
+## Skale to wzory kroków
+
+Skalę definiują jej **kroki**, a nie konkretne nuty. W = cały ton (2 półtony), H = półton (1 półton). Zacznij ten sam wzór od dowolnej nuty i masz tę skalę w nowej tonacji.
+
+| Skala | Kroki | Nastrój | Gdzie ją słychać |
+|---|---|---|---|
+| Dur (jońska) | W W H W W W H | jasna, radosna | piano house, hymny |
+| Moll naturalny | W H W W H W W | ciemna, emocjonalna | większość house, bounce, hard house |
+| Dorycka | W H W W W H W | moll, ale cieplejsza (podwyższona 6.) | deep house, soulowe groovy |
+| Frygijska | H W W W H W W | bardzo ciemna, napięta (obniżona 2.) | twarde/techowe riffy |
+| Pentatonika moll | 5 nut: 0 3 5 7 10 | moll bez pomyłek | linie basu, proste motywy |
+
+<Keyboard mode="scale" root={9} scale="minor" scales={['major', 'minor', 'dorian', 'phrygian', 'pentaMin']} />
+
+<TryThis>
+1. Zostaw tonikę **A**, wciśnij **▶ Skala** dla mollu naturalnego, potem dla duru. Ta sama nuta startowa, zupełnie inny nastrój.
+2. Zmień tonikę na **C** i wybierz dur. Porównaj z A-moll: **te same białe klawisze**. A-moll to *paralela* C-dur — te same nuty, inny dom.
+</TryThis>
+
+## Stopnie skali: liczby zamiast nazw nut
+
+W Strudlu `n()` razem z `.scale()` liczy **kroki wewnątrz skali**, zaczynając od 0 (tonika). `0 1 2 3 4 5 6` to 7 nut, `7` to tonika oktawę wyżej, `-1` to jeden stopień poniżej toniki.
+
+<Strudel title="w górę i w dół skali" code={`
+  n("0 1 2 3 4 5 6 7 6 5 4 3 2 1 0 -1")
+    .scale("A3:minor")
+    .s("triangle")
+    ._pianoroll()
+`} />
+
+Wielka zaleta: zmień jeden string, a cała melodia przenosi się do nowej tonacji albo nastroju i dalej jest poprawna.
+
+<Strudel title="ta sama melodia, cztery skale" code={`
+  n("0 2 4 7 6 4 2 1")
+    .scale("<A3:minor A3:major A3:dorian A3:phrygian>")
+    .s("sawtooth").lpf(1500).decay(0.2).sustain(0.3)
+    ._pianoroll()
+`} />
+
+## Jedna tonacja na cały utwór
+
+Wpisz tonację do zmiennej i używaj jej wszędzie. Pojedyncze cudzysłowy dają zwykły tekst (podwójne zamieniłyby go we wzór).
+
+<Strudel title="bas + melodia w jednej tonacji" code={`
+  setcpm(124/4)
+  const key = 'A:minor'
+  bass: n("<0 0 5 4>*4").scale(key).transpose(-24) // ta sama tonacja, 2 oktawy niżej
+    .s("sawtooth").lpf(400).decay(0.15).sustain(0)
+  lead: n("<[0 2 4 2] [4 ~ 2 ~] [5 4 2 0] [1 ~ 0 ~]>*2")
+    .scale(key).s("square").lpf(2000).gain(0.4)
+    .decay(0.15).sustain(0)
+  drums: s("bd*4, [~ oh]*4, ~ cp ~ cp").bank("RolandTR909")
+`} />
+
+<Callout kind="tip">
+Zmień `'A:minor'` na `'F:minor'` albo `'C:dorian'` i wciśnij Aktualizuj. Wszystko idzie za tym. Tak sprawdzasz, która tonacja pasuje do brzmienia, zanim się zdecydujesz.
+</Callout>
+
+## Dom i wyjście z domu: napięcie w skali
+
+Nie wszystkie nuty skali brzmią tak samo na tle toniki.
+
+| Stopień (w `n`) | Nazwa | Odczucie nad toniką |
+|---|---|---|
+| 0 | tonika (1.) | dom, rozwiązanie |
+| 4 | kwinta | stabilna, mocna |
+| 2 | tercja | stabilna, ustala dur/moll |
+| 3 | kwarta | lekko zawieszona |
+| 5 | seksta | kolor (dorycka ją podwyższa → cieplej) |
+| 1 | sekunda | przejściowa, chce się ruszyć |
+| 6 | septyma | napięcie, chce rozwiązać się w górę do toniki |
+
+Zakończ frazę na 0, 2 albo 4 — brzmi jak koniec. Zakończ na 1 albo 6 — brzmi jak pytanie. Motywy często zadają pytanie w takcie 2 i odpowiadają w takcie 4.
+
+<Strudel title="pytanie… odpowiedź" code={`
+  n("<[0 2 4 2] [4 5 6 ~] [0 2 4 2] [4 2 1 0]>")
+    .scale("A3:minor").s("triangle")
+    ._pianoroll()
+`} />
+
+<DoDont
+  do={[
+    'Najpierw wybierz tonację: tonika + skala. Zapisz ją w jednej zmiennej.',
+    'Używaj n("…").scale(key) w każdej partii melodycznej, żeby nigdy się nie gryzły.',
+    'Gdy nie wiesz, co zagrać w basie — pentatonika moll nie ma „złych” nut.',
+    'Kończ frazy na tonice (0) albo kwincie (4), żeby brzmiały na zamknięte.',
+  ]}
+  dont={[
+    'Pisać surowych nazw nut w jednej partii, a stopni skali w innej tonacji w drugiej.',
+    'Zmieniać tonacji w środku utworu tanecznego, chyba że to zaplanujesz (a DJ cię znienawidzi).',
+    'Siedzieć długo na 2. albo 7. stopniu — to nuty napięcia, używaj ich do ruchu.',
+  ]}
+/>

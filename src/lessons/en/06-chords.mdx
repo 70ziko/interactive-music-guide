@@ -1,0 +1,112 @@
+A **chord** is three or more notes played together. In house, chords are the emotional layer: a minor 7th stab on the offbeat is half of the genre's sound.
+
+## Building a chord: stack thirds
+
+Take any scale degree, skip one, take the next, skip one, take the next. In scale-degree numbers that is **0, 2, 4**. The result is a **triad**.
+
+Whether it is major or minor depends on the gaps, counted in semitones:
+
+| Chord | Gaps (semitones) | Symbol | Sound |
+|---|---|---|---|
+| Major | 4 + 3 | `C` | bright, stable |
+| Minor | 3 + 4 | `Cm` | dark, soft |
+| Minor 7th | 3 + 4 + 3 | `Cm7` | smooth, the classic house chord |
+| Minor 9th | 3 + 4 + 3 + 4 | `Cm9` | lush, deep house |
+| Major 7th | 4 + 3 + 4 | `CM7` / `C^7` | dreamy, open |
+| Dominant 7th | 4 + 3 + 3 | `C7` | bluesy, wants to move |
+| Sus2 / Sus4 | 2 + 5 / 5 + 2 | `Csus2` | open, neither major nor minor |
+
+<Keyboard mode="chord" root={9} chord="min7" chords={['maj', 'min', 'min7', 'min9', 'maj7', 'dom7', 'sus2', 'sus4']} />
+
+<TryThis>
+Root **A**: play **Am**, then **Am7**, then **Am9**. Each added third makes it softer and more "house". Then try **A** (major) — notice how one note (C → C#) flips the mood.
+</TryThis>
+
+## Chords from the scale
+
+If you build every triad from the scale's own notes, you get the **diatonic chords** of the key. They all fit together. We name them with Roman numerals: uppercase = major, lowercase = minor, ° = diminished.
+
+| Key of A minor | i | ii° | III | iv | v | VI | VII |
+|---|---|---|---|---|---|---|---|
+| Chord | Am | Bdim | C | Dm | Em | F | G |
+| Degrees `n` | 0,2,4 | 1,3,5 | 2,4,6 | 3,5,7 | 4,6,8 | 5,7,9 | 6,8,10 |
+
+Strudel builds them for you: write the degrees inside `[ , ]` and `.scale()` picks the right notes.
+
+<Strudel title="i – VI – III – VII in A minor" code={`
+  setcpm(124/4)
+  n("<[0,2,4] [5,7,9] [2,4,6] [6,8,10]>")
+    .scale("A3:minor")
+    .s("sawtooth").lpf(1400).gain(0.5)
+    ._pianoroll()
+`} />
+
+That progression — **i – VI – III – VII** (Am F C G) — is one of the most used minor progressions in dance music. Other safe loops in a minor key:
+
+| Progression | In A minor | Feel |
+|---|---|---|
+| i – VI – III – VII | Am F C G | epic, anthemic |
+| i – VII – VI – VII | Am G F G | driving, rave |
+| i – iv | Am Dm | hypnotic two-chord vamp, very house |
+| i – VI | Am F | melancholic, breakdown-ready |
+| i (one chord) | Am7 | deep house: groove does the work |
+
+## The circle of fifths
+
+Arrange the 12 keys so each step is a fifth up (×3/2). Neighbours share 6 of their 7 notes. The chords of any key sit in a small wedge: the key, its two neighbours, and their relative minors.
+
+<CircleOfFifths />
+
+Use it to answer "which chords go with this one?" — look at the wedge. And to move between keys smoothly: neighbours on the circle sound related.
+
+## Voicing: how to stack the notes
+
+The same chord can be played with its notes in different orders and octaves. Jumping from one root-position chord to the next sounds clumsy. Moving each note **the shortest distance** sounds smooth — this is called **voice leading**. Strudel's `voicing()` does it for you.
+
+<Strudel title="chord symbols + automatic voicing" code={`
+  setcpm(124/4)
+  chord("<Am7 Dm7 FM7 Em7>")
+    .voicing()
+    .s("gm_epiano1").gain(0.7)
+    ._pianoroll()
+`} />
+
+## The house stab
+
+Short chords, rhythmic, usually on offbeats or syncopated 16ths. `.struct()` gives the chord a rhythm: `x` = play, `~` = rest.
+
+<Strudel title="house organ stabs" code={`
+  setcpm(124/4)
+  stabs: chord("<Am7 Am7 Dm7 Em7>")
+    .voicing()
+    .struct("[~ x ~ ~] [x ~ ~ x] [~ ~ x ~] [~ x ~ ~]")
+    .s("gm_drawbar_organ").decay(0.18).sustain(0).gain(0.8)
+  drums: s("bd*4, [~ oh]*4, ~ cp ~ cp").bank("RolandTR909")
+  bass: n("<0 0 3 4>*8").scale("A1:minor").struct("[~ x]*4")
+    .s("sawtooth").lpf(350).decay(0.12).sustain(0)
+`} />
+
+<Strudel title="classic offbeat saw stabs (more rave)" code={`
+  setcpm(128/4)
+  chord("<Am Am F G>")
+    .voicing()
+    .struct("[~ x]*4")
+    .s("sawtooth").lpf(2200).lpq(4)
+    .decay(0.12).sustain(0).room(0.3)
+    ._pianoroll()
+`} />
+
+<DoDont
+  do={[
+    'Start with the i chord and one other chord. Two chords are enough for a house track.',
+    'Use minor 7th and minor 9th chords for a deep/soulful sound, plain triads for rave/hard sounds.',
+    'Let voicing() handle inversions so chords move smoothly.',
+    'Keep stab chords short (low decay, no sustain) so they leave space for the kick.',
+  ]}
+  dont={[
+    'Play chords below ~C3 — thirds in the bass turn to mud (lesson 2).',
+    'Change chord on every beat. In house, one chord per bar (or per 2 bars) is normal.',
+    'Use chords outside the key unless you know why (borrowed chords are an advanced trick).',
+    'Let the chord root fight the bass. If the bass plays A, the chord should be an A chord too (or the bass moves with it).',
+  ]}
+/>

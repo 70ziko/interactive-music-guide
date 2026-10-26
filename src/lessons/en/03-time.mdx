@@ -1,0 +1,108 @@
+Rhythm is *when* sounds happen. Dance music runs on a strict grid, and Strudel describes that grid with one unit: the **cycle**.
+
+## Beats, bars, BPM — and cycles
+
+- A **beat** is one pulse you would nod your head to. In house, every kick is one beat.
+- A **bar** (measure) is 4 beats. Almost all dance music is in 4/4: four beats per bar.
+- **BPM** = beats per minute. House ≈ 120–128, bounce and hard house ≈ 140–150.
+- A **cycle** is Strudel's unit of time. Everything inside `s("…")` is squeezed into one cycle.
+
+Make **1 cycle = 1 bar** and Strudel speaks the same language as every DJ:
+
+<Formula>setcpm(BPM / 4)    // cycles per minute = bars per minute</Formula>
+
+<Callout kind="math">
+At 124 BPM:
+- one beat = 60 / 124 = **0.484 s**
+- one bar = 4 beats = **1.935 s**
+- one 16th note (step) = 0.484 / 4 = **0.121 s**
+
+`setcpm(124/4)` = 31 cycles per minute. `setcps` is the same in cycles per second: `setcps(124/60/4)`.
+</Callout>
+
+## The 16-step grid
+
+Split each beat into 4 and a bar has **16 steps**. Drum machines (TR-909, TR-808) are built on this grid, and so is almost every house drum pattern. Count the steps as **1 e & a 2 e & a 3 e & a 4 e & a** — the "&" is the **offbeat**, halfway between two kicks.
+
+<StepGrid preset="four" presets={['empty', 'four', 'offbeat', 'house']} />
+
+<TryThis>
+1. Press **Play** in the code block under the grid.
+2. Click the 4 cells on "&" in the Open hat row (steps 3, 7, 11, 15). That is the classic house offbeat hat.
+3. Add a clap on beats 2 and 4. Watch the code change as you click.
+</TryThis>
+
+## Mini-notation: the grid as text
+
+Strudel's mini-notation is a tiny language for writing that grid. The rule underneath everything: **items separated by spaces share the cycle equally.**
+
+| You write | Meaning | Example |
+|---|---|---|
+| `a b c d` | 4 equal steps | `s("bd hh sd hh")` |
+| `~` | rest (silence) | `s("bd ~ ~ bd")` |
+| `[a b]` | squeeze into one step | `s("bd [hh hh]")` |
+| `a*4` | repeat 4× inside its step | `s("hh*8")` |
+| `a!3` | copy 3× as separate steps | `s("bd!3 sd")` |
+| `<a b>` | one per cycle, alternating | `s("<bd sd>")` |
+| `a, b` | play together (layers) | `s("bd*4, hh*8")` |
+| `a(3,8)` | Euclid: 3 hits spread over 8 | `s("bd(3,8)")` |
+| `a?` | 50 % chance to play | `s("hh*16?")` |
+| `a@3` | stretch to 3 steps long | `note("c@3 e")` |
+
+These four lines all play the same four-on-the-floor kick:
+
+<Strudel title="same rhythm, four spellings" code={`
+  setcpm(124/4)
+  s("bd bd bd bd").bank("RolandTR909")
+  // s("bd*4")
+  // s("[bd ~ ~ ~]*4")
+  // s("bd!4")
+`} />
+
+Layers with `,` — a full beat in one line:
+
+<Strudel title="one-line house beat" code={`
+  setcpm(124/4)
+  s("bd*4, [~ cp]*2, [~ hh]*4, hh*16?")
+    .bank("RolandTR909")
+    ._punchcard()
+`} />
+
+## Several patterns at once: labels
+
+Writing everything in one string gets hard to read. Give each part its own line with a **label**. Every labelled line plays at the same time. Put `_` in front of a label to mute that line — this is how you build and strip arrangements while live coding.
+
+<Strudel title="labelled parts" code={`
+  setcpm(124/4)
+  kick: s("bd*4").bank("RolandTR909")
+  clap: s("~ cp ~ cp").bank("RolandTR909")
+  hats: s("[~ oh]*4").bank("RolandTR909").gain(0.5)
+  _bass: note("[~ a1]*4").s("sawtooth").lpf(400)   // muted: remove the _ to hear it
+`} />
+
+## Longer than one bar
+
+`<…>` steps through values one cycle at a time, so it is the easiest way to write 2-, 4- or 8-bar phrases. `.slow(n)` stretches a pattern over `n` cycles. `.fast(n)` squeezes it.
+
+<Strudel title="a 4-bar phrase" code={`
+  setcpm(124/4)
+  stack(
+    s("bd*4, [~ cp]*2, [~ hh]*4").bank("RolandTR909"),
+    // one bass note per bar, 4 bars
+    note("<a1 a1 f1 g1>*8").s("sawtooth").lpf(500).decay(0.15).sustain(0)
+  )._pianoroll()
+`} />
+
+<DoDont
+  do={[
+    'Start every track with setcpm(BPM/4) so 1 cycle = 1 bar.',
+    'Think in 16 steps per bar, 4 per beat.',
+    'Use labels (kick:, bass:, …) and _ to mute — one line per instrument.',
+    'Write phrases in 4 or 8 bars with <…>.',
+  ]}
+  dont={[
+    'Mix cycle lengths by accident: a 3-step pattern against a 4-step one drifts (fun on purpose, confusing by accident).',
+    'Change tempo inside a track. House DJs need a steady BPM to mix.',
+    'Write 30 events in one string. Split into labelled lines.',
+  ]}
+/>

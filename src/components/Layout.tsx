@@ -2,6 +2,7 @@ import { useEffect, useState, type ReactNode } from 'react';
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { LANGS, saveLang, useLang, type Lang } from '../i18n/LangContext';
 import { lessons, type Part } from '../lessons';
+import { rememberScroll } from '../scrollAnchor';
 
 const parts: Part[] = ['sound', 'rhythm', 'harmony', 'synth', 'structure'];
 
@@ -21,7 +22,11 @@ export default function Layout({ children }: { children: ReactNode }) {
     setOpen(false);
   }, [loc.pathname]);
 
-  const switchTo = (l: Lang) => nav(loc.pathname.replace(/^\/(en|pl)/, `/${l}`));
+  const switchTo = (l: Lang) => {
+    if (l === lang) return;
+    rememberScroll();
+    nav(loc.pathname.replace(/^\/(en|pl)/, `/${l}`));
+  };
 
   return (
     <div className="app">

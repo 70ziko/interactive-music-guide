@@ -33,9 +33,11 @@ export const en = {
   // parts
   part_sound: 'Sound & math',
   part_rhythm: 'Rhythm',
-  part_harmony: 'Harmony',
-  part_synth: 'Synthesis',
-  part_structure: 'Song structure',
+  part_harmony: 'Harmony & melody',
+  part_synth: 'Synthesis & sound design',
+  part_structure: 'Arrangement & mix',
+  part_genres: 'Genres & practice',
+  part_reference: 'Reference',
   // home
   howTitle: 'How to use this guide',
   how: [

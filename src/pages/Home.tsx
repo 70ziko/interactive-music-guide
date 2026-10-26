@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useLang } from '../i18n/LangContext';
-import { lessons } from '../lessons';
+import { lessonNumber, lessons } from '../lessons';
 
 export default function Home() {
   const { lang, t } = useLang();
@@ -42,7 +42,7 @@ export default function Home() {
           {lessons.map((l) => (
             <Link key={l.slug} to={`/${lang}/${l.slug}`} className={`card part-${l.part}`}>
               <span className="card-part">
-                {l.slug.slice(0, 2)} · {t[`part_${l.part}`]}
+                {lessonNumber(l.slug) ? `${lessonNumber(l.slug)} · ` : ''}{t[`part_${l.part}`]}
               </span>
               <strong>{l.title[lang]}</strong>
               <span>{l.blurb[lang]}</span>

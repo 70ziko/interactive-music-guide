@@ -1,8 +1,8 @@
 import { Suspense, useEffect } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, Navigate, useParams } from 'react-router-dom';
 import { MDXProvider } from '@mdx-js/react';
 import { useLang } from '../i18n/LangContext';
-import { lessonComponent, lessonIndex, lessons } from '../lessons';
+import { lessonComponent, lessonIndex, lessonNumber, lessons } from '../lessons';
 import { mdxComponents } from '../components/mdxComponents';
 import { restoreScroll } from '../scrollAnchor';
 
@@ -25,6 +25,8 @@ export default function LessonPage() {
     window.scrollTo(0, 0);
   }, [slug]);
 
+  // old numbered links (#/en/01-sound) → #/en/sound
+  if (/^\d\d-/.test(slug)) return <Navigate to={`/${lang}/${slug.slice(3)}`} replace />;
   if (idx < 0 || !Body) return <p>{t.notFound}</p>;
   const meta = lessons[idx];
   const prev = lessons[idx - 1];
@@ -33,7 +35,7 @@ export default function LessonPage() {
   return (
     <article className={`lesson part-${meta.part}`}>
       <div className="eyebrow">
-        {t.lesson} {meta.slug.slice(0, 2)} · {t[`part_${meta.part}`]}
+        {lessonNumber(meta.slug) ? `${t.lesson} ${lessonNumber(meta.slug)} · ` : ''}{t[`part_${meta.part}`]}
       </div>
       <h1>{meta.title[lang]}</h1>
       <MDXProvider components={mdxComponents}>

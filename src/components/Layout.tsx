@@ -1,10 +1,9 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { LANGS, saveLang, useLang, type Lang } from '../i18n/LangContext';
-import { lessons, type Part } from '../lessons';
+import { lessonNumber, lessons, PARTS } from '../lessons';
 import { rememberScroll } from '../scrollAnchor';
 
-const parts: Part[] = ['sound', 'rhythm', 'harmony', 'synth', 'structure'];
 
 export default function Layout({ children }: { children: ReactNode }) {
   const { lang, t } = useLang();
@@ -55,14 +54,14 @@ export default function Layout({ children }: { children: ReactNode }) {
           <NavLink to={`/${lang}`} end className="side-home">
             {t.home}
           </NavLink>
-          {parts.map((p) => (
+          {PARTS.map((p) => (
             <div key={p} className={`side-part part-${p}`}>
               <div className="side-part-title">{t[`part_${p}`]}</div>
               {lessons
                 .filter((l) => l.part === p)
                 .map((l) => (
                   <NavLink key={l.slug} to={`/${lang}/${l.slug}`}>
-                    <span className="num">{l.slug.slice(0, 2)}</span>
+                    <span className="num">{lessonNumber(l.slug) ?? '•'}</span>
                     {l.title[lang]}
                   </NavLink>
                 ))}

@@ -59,6 +59,20 @@ const TEMPLATES: Record<string, { en: string; pl: string; bpm: number; sections:
       S('Outro', 'Outro', 16, 4, ['kick', 'hats', 'bass'], 'Drums + bass out for mixing.', 'Bębny + bas na wyjście do miksu.'),
     ],
   },
+  bounce: {
+    en: 'Bounce / donk (~145 BPM)',
+    pl: 'Bounce / donk (~145 BPM)',
+    bpm: 145,
+    sections: [
+      S('Intro', 'Intro', 16, 4, ['kick', 'hats'], 'Kick and offbeat hats; a filtered hint of the donk.', 'Stopa i hi-haty na offbicie; przefiltrowana zapowiedź donka.'),
+      S('Donk in', 'Wejście donka', 16, 6, ['kick', 'hats', 'clap', 'bass'], 'The donk takes the offbeat. This IS the groove.', 'Donk zajmuje offbit. To JEST groove.'),
+      S('Hook', 'Hook', 16, 8, ['kick', 'hats', 'clap', 'bass', 'lead'], 'Catchy lead hook on top, short and repeated.', 'Chwytliwy lead na wierzchu, krótki i powtarzany.'),
+      S('Breakdown', 'Breakdown', 16, 3, ['lead', 'pad', 'fx'], 'Hook alone with pad and reverb — let the crowd sing it.', 'Sam hook z padem i pogłosem — niech tłum go zaśpiewa.'),
+      S('Build-up', 'Narastanie', 8, 7, ['clap', 'lead', 'fx'], 'Snare roll, rising filter, donk teases.', 'Rolka werbla, rosnący filtr, zapowiedzi donka.'),
+      S('Drop', 'Drop', 32, 10, ['kick', 'hats', 'clap', 'bass', 'chords', 'lead'], 'Everything, hook + donk + stabs.', 'Wszystko: hook + donk + stabsy.'),
+      S('Outro', 'Outro', 16, 4, ['kick', 'hats', 'bass'], 'Kick, hats and donk for the next mix.', 'Stopa, haty i donk pod następny miks.'),
+    ],
+  },
 };
 
 export default function ArrangementTimeline({ template = 'house' }) {

@@ -10,6 +10,10 @@ import CircleOfFifths from '../widgets/CircleOfFifths';
 import AdsrGraph from '../widgets/AdsrGraph';
 import FilterCurve from '../widgets/FilterCurve';
 import ArrangementTimeline from '../widgets/ArrangementTimeline';
+import MelodyGrid from '../widgets/MelodyGrid';
+import DelayCalc from '../widgets/DelayCalc';
+import DuckingGraph from '../widgets/DuckingGraph';
+import FrequencyMap from '../widgets/FrequencyMap';
 
 // Everything lessons can use without importing.
 export const mdxComponents = {
@@ -29,4 +33,8 @@ export const mdxComponents = {
   AdsrGraph,
   FilterCurve,
   ArrangementTimeline,
+  MelodyGrid,
+  DelayCalc,
+  DuckingGraph,
+  FrequencyMap,
 };

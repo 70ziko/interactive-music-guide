@@ -17,6 +17,8 @@
   --p-harmony: #ff5c8a;
   --p-synth: #b28dff;
   --p-structure: #5fd39a;
+  --p-genres: #ff9a5c;
+  --p-reference: #9aa3ff;
 
   --code-bg: #14131b;
   --radius: 12px;
@@ -44,6 +46,8 @@
     --p-harmony: #d61f58;
     --p-synth: #6d3fd1;
     --p-structure: #127a4b;
+    --p-genres: #b45309;
+    --p-reference: #4c55c7;
     color-scheme: light;
   }
 }
@@ -82,6 +86,8 @@ button { font: inherit; color: inherit; }
 .part-harmony { --part: var(--p-harmony); }
 .part-synth { --part: var(--p-synth); }
 .part-structure { --part: var(--p-structure); }
+.part-genres { --part: var(--p-genres); }
+.part-reference { --part: var(--p-reference); }
 
 /* ---------- buttons ---------- */
 .btn {
@@ -364,3 +370,33 @@ button { font: inherit; color: inherit; }
 
 /* long inline code in prose must wrap on phones */
 p code, li code { overflow-wrap: anywhere; }
+
+/* melody grid */
+.mgrid .cell.tonic-row { background: color-mix(in srgb, var(--part, var(--accent)) 12%, var(--surface-2)); }
+.mgrid .cell.on { background: var(--part, var(--accent)); border-color: transparent; }
+.mgrid .g-head.tonic code { color: var(--part, var(--accent)); }
+.mgrid .g-head span { font-family: var(--font-mono); font-size: 0.72rem; }
+
+/* tempo calculator */
+.calc { margin-top: 10px; }
+.calc td code { font-size: 0.78rem; white-space: nowrap; }
+
+/* frequency map */
+.fmap { position: relative; margin: 6px 0 12px; padding-top: 18px; }
+.fmap-gridwrap { position: absolute; top: 0; bottom: 0; left: 96px; right: 0; pointer-events: none; }
+.fmap-grid { position: absolute; top: 0; bottom: 0; border-left: 1px dashed var(--line); }
+.fmap-grid span { position: absolute; top: 0; left: 4px; font: 11px var(--font-mono); color: var(--muted); white-space: nowrap; }
+.fmap-row { display: flex; align-items: center; height: 22px; gap: 6px; }
+.fmap-name { width: 90px; flex: none; font-size: 0.78rem; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.fmap-track { position: relative; flex: 1; height: 14px; }
+.fmap-bar { position: absolute; top: 0; height: 100%; border-radius: 4px; }
+.fmap-bar.faded { opacity: 0.3; }
+.fmap-band { position: absolute; top: 3px; height: 8px; }
+.fmap-band.n2 { background: color-mix(in srgb, var(--p-rhythm) 60%, transparent); }
+.fmap-band.n3 { background: var(--bad); }
+@media (max-width: 600px) { .fmap-name { width: 64px; } .fmap-gridwrap { left: 70px; } }
+
+/* reference pages: long text in tables wraps */
+.part-reference td, .part-reference th { white-space: normal; }
+.part-reference td:last-child { white-space: nowrap; }
+@media (min-width: 700px) { .part-reference table { display: table; } }

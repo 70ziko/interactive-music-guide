@@ -43,3 +43,18 @@ export function Callout({ kind = 'tip', children }: { kind?: 'math' | 'tip' | 'w
 export function Formula({ children }: { children: ReactNode }) {
   return <div className="formula">{children}</div>;
 }
+
+/** A left-to-right signal chain: [{name, desc, code}] */
+export function Chain({ steps }: { steps: { name: string; desc: string; code?: string }[] }) {
+  return (
+    <ol className="chain">
+      {steps.map((s) => (
+        <li key={s.name}>
+          <strong>{s.name}</strong>
+          <span>{s.desc}</span>
+          {s.code && <code>{s.code}</code>}
+        </li>
+      ))}
+    </ol>
+  );
+}

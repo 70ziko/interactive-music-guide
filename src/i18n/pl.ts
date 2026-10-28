@@ -2,7 +2,7 @@ import type { Dict } from './en';
 
 export const pl: Dict = {
   siteTitle: 'Interaktywny przewodnik muzyczny',
-  siteTagline: 'Teoria muzyki, syntezatory i struktura utworu — do pisania house, bounce i hard house w Strudelu.',
+  siteTagline: 'Teoria muzyki, syntezatory i struktura utworu — do pisania elektronicznej muzyki tanecznej w Strudelu: house, techno, trance, EDM i nie tylko.',
   start: 'Zacznij lekcję 1',
   continue: 'Lekcje',
   home: 'Start',

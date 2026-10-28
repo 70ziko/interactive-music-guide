@@ -1,6 +1,6 @@
 # Interactive Music Guide
 
-Learn music theory, synths and song structure for **house, bounce and hard house** — with real, runnable [Strudel](https://strudel.cc) code on every page. English and Polish.
+Learn music theory, synths and song structure for **electronic dance music** — house, bounce, hard house, techno, trance, EDM — with real, runnable [Strudel](https://strudel.cc) code on every page. English and Polish.
 
 ## Run it
 
@@ -21,7 +21,7 @@ npm run typecheck
 | Part | Lessons |
 |---|---|
 | Sound & math | 01 Sound is math · 02 Pitch, octaves and ratios |
-| Rhythm | 03 Time: cycles, bars, steps · 04 House drum grammar · 05 Groove and variation |
+| Rhythm | 03 Time: cycles, bars, steps · 04 Dance drum grammar · 05 Groove and variation |
 | Harmony & melody | 06 Scales and keys · 07 Chords and progressions · 08 Melody and hooks · 09 Bass and the offbeat |
 | Synthesis & sound design | 10 Synth basics · 11 Effects · 12 Sound design recipes |
 | Arrangement & mix | 13 Song structure · 14 Tension and release · 15 Mixing basics |

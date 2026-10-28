@@ -1,6 +1,6 @@
 export const en = {
   siteTitle: 'Interactive Music Guide',
-  siteTagline: 'Music theory, synths and song structure — for writing house, bounce and hard house in Strudel.',
+  siteTagline: 'Music theory, synths and song structure — for writing electronic dance music in Strudel: house, techno, trance, EDM and more.',
   start: 'Start lesson 1',
   continue: 'Lessons',
   home: 'Home',

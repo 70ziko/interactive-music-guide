@@ -31,7 +31,7 @@ export const lessons: LessonMeta[] = [
   L('time', 'rhythm', 'Time: cycles, bars, steps', 'Czas: cykle, takty, kroki',
     'BPM vs Strudel cycles, the 16-step grid, mini-notation.',
     'BPM a cykle Strudla, siatka 16 kroków, mini-notacja.'),
-  L('drums', 'rhythm', 'House drum grammar', 'Gramatyka bębnów house',
+  L('drums', 'rhythm', 'Dance drum grammar', 'Gramatyka bębnów klubowych',
     'Four-on-the-floor, claps, offbeat hats, swing, Euclid.',
     'Four-on-the-floor, klaśnięcia, hi-haty na offbicie, swing, Euklides.'),
   L('groove', 'rhythm', 'Groove and variation', 'Groove i wariacje',

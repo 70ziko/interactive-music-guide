@@ -2,9 +2,9 @@ Rhythm is *when* sounds happen. Dance music runs on a strict grid, and Strudel d
 
 ## Beats, bars, BPM — and cycles
 
-- A **beat** is one pulse you would nod your head to. In house, every kick is one beat.
+- A **beat** is one pulse you would nod your head to. In four-on-the-floor genres (house, techno, trance, EDM), every kick is one beat.
 - A **bar** (measure) is 4 beats. Almost all dance music is in 4/4: four beats per bar.
-- **BPM** = beats per minute. House ≈ 120–128, bounce and hard house ≈ 140–150.
+- **BPM** = beats per minute. House and EDM ≈ 120–130, techno ≈ 120–150 (mostly 128–138), trance ≈ 135–140, bounce and hard house ≈ 140–150. The genre playbooks (lessons 16–23) have the details.
 - A **cycle** is Strudel's unit of time. Everything inside `s("…")` is squeezed into one cycle.
 
 Make **1 cycle = 1 bar** and Strudel speaks the same language as every DJ:
@@ -22,7 +22,7 @@ At 124 BPM:
 
 ## The 16-step grid
 
-Split each beat into 4 and a bar has **16 steps**. Drum machines (TR-909, TR-808) are built on this grid, and so is almost every house drum pattern. Count the steps as **1 e & a 2 e & a 3 e & a 4 e & a** — the "&" is the **offbeat**, halfway between two kicks.
+Split each beat into 4 and a bar has **16 steps**. Drum machines (TR-909, TR-808) are built on this grid, and so is almost every dance-music drum pattern. Count the steps as **1 e & a 2 e & a 3 e & a 4 e & a** — the "&" is the **offbeat**, halfway between two kicks.
 
 <StepGrid preset="four" presets={['empty', 'four', 'offbeat', 'house']} />
 
@@ -102,7 +102,7 @@ Writing everything in one string gets hard to read. Give each part its own line 
   ]}
   dont={[
     'Mix cycle lengths by accident: a 3-step pattern against a 4-step one drifts (fun on purpose, confusing by accident).',
-    'Change tempo inside a track. House DJs need a steady BPM to mix.',
+    'Change tempo inside a track. DJs need a steady BPM to mix.',
     'Write 30 events in one string. Split into labelled lines.',
   ]}
 />

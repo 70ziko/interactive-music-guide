@@ -75,7 +75,8 @@ code {
 }
 pre { overflow-x: auto; }
 table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 0.95rem; display: block; overflow-x: auto; }
-th, td { border-bottom: 1px solid var(--line); padding: 0.45em 0.7em; text-align: left; white-space: nowrap; }
+th, td { border-bottom: 1px solid var(--line); padding: 0.45em 0.7em; text-align: left; }
+td code { white-space: nowrap; } /* text wraps when a table is too wide; code stays on one line */
 th { color: var(--muted); font-weight: 600; }
 .muted { color: var(--muted); }
 button { font: inherit; color: inherit; }
@@ -398,7 +399,6 @@ p code, li code { overflow-wrap: anywhere; }
 
 /* reference pages: long text in tables wraps */
 .part-reference td, .part-reference th { white-space: normal; }
-.part-reference td:last-child { white-space: nowrap; }
 @media (min-width: 700px) { .part-reference table { display: table; } }
 
 /* =========================================================

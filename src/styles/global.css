@@ -74,6 +74,11 @@ code {
   border-radius: 5px;
 }
 pre { overflow-x: auto; }
+/* JetBrains Mono joins ~> -> <~ etc. into arrow glyphs; show the characters as typed */
+code, pre, kbd, samp, .strudel-host, .strudel-placeholder, .mini-table td, .gaps {
+  font-variant-ligatures: none;
+  font-feature-settings: "liga" 0, "calt" 0;
+}
 table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 0.95rem; display: block; overflow-x: auto; }
 th, td { border-bottom: 1px solid var(--line); padding: 0.45em 0.7em; text-align: left; }
 td code { white-space: nowrap; } /* text wraps when a table is too wide; code stays on one line */

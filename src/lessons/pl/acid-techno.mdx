@@ -1,0 +1,117 @@
+Acid techno bierze mlaszczącą linię basu z chicagowskiego acid house'u i wrzuca ją w **twardsze, szybsze techno**. Definiuje go jedna maszyna: Roland **TB-303**.
+
+## Skąd się wzięło
+
+Acid techno wyrosło z acid house'u w **Europie i USA pod koniec lat 80. i na początku 90.**, ze słynną **londyńską** sceną undergroundową wokół ekip takich jak Liberators. „Acid” to ostre, mlaszczące brzmienie 303, które uzyskuje się, **podkręcając rezonans** i **skręcając odcięcie**, a potem nimi ruszając. W porównaniu z acid house'em to samo brzmienie trafia tu na twardsze techno. Tempa są zwykle szybkie — mniej więcej **130–150 BPM**.
+
+## Odcisk palca
+
+| Element | Zasada |
+|---|---|
+| Tempo | ~130–150 |
+| Stopa | twarda stopa 909, często przesterowana, four on the floor |
+| Haty | hat otwarty na offbicie, pędzące szesnastki |
+| **Linia 303** | szesnastkowa linia basu, 1–2 takty, wysoki rezonans, ruszające się odcięcie i akcenty |
+| Dodatki | czasem druga 303, klapy na 2 i 4, poza tym bardzo mało |
+| Aranżacja | 303 **jest** aranżacją: utwór rozwija się przez kręcenie jej gałkami |
+
+## Anatomia linii 303
+
+Wzór 303 ma cztery składniki. Strudel robi trzy wprost, a czwarty przybliża:
+
+| Składnik | Co robi | Strudel |
+|---|---|---|
+| Nuty | głównie pryma, oktawa, kilka nut skali | `note("a1 a2 c2 …")` |
+| Pauzy / łuki | przerwy tworzą groove | `~` i `@2` |
+| **Akcent** | niektóre nuty głośniejsze i jaśniejsze | `gain` i `lpenv` jako wzory |
+| Slide | poślizg między nutami | brak poślizgu w standardowych syntezatorach (`slide` działa tylko na dźwięki ZZFX Strudla) — zamiast tego skoki o oktawę i krótkie decaye |
+
+<Strudel title="zwykła linia → z akcentami (na zmianę co 2 takty)" code={`
+  setcpm(136/4)
+  note("a1 a1 a2 a1 c2 a1 [a1 a2] e2 a1 a1 g2 a1 c2 a2 a1 e2")
+    .s("sawtooth").ftype("ladder")
+    .lpf(500).lpq(16)
+    // takty 1–2: bez akcentów · takty 3–4: akcenty na krokach 3, 7, 11, 14
+    .lpenv("<1!2 [1 1 5 1 1 1 5 1 1 1 5 1 1 5 1 1]!2>")
+    .gain("<0.6!2 [.55 .55 .8 .55 .55 .55 .8 .55 .55 .55 .8 .55 .55 .8 .55 .55]!2>")
+    .lpdecay(0.1).decay(0.15).sustain(0.2)
+    .distort(0.7)
+    ._pianoroll()
+`} />
+
+## Kręcenie gałkami
+
+Brzmienie 303 ożywa, gdy **odcięcie i rezonans się ruszają**. Na żywo kręcisz nimi ręką — w Strudlu użyj `slider()` (przeciągaj gałki, które się pojawią) albo wolnych sygnałów.
+
+<Strudel title="kręć odcięciem i rezonansem na żywo" code={`
+  setcpm(138/4)
+  acid: note("a1 [a1 a2] c2 a1 [~ g2] a1 e2 [a1 c3]")
+    .s("sawtooth").ftype("ladder")
+    .lpf(slider(600, 150, 3000))
+    .lpq(slider(14, 1, 25))
+    .lpenv(slider(3, 0, 6)).lpdecay(0.1)
+    .decay(0.15).sustain(0.2).distort(slider(0.8, 0, 3)).gain(0.55)
+  kick: s("bd*4").bank("RolandTR909").distort(1).gain(0.9)
+  hats: s("[~ oh]*4, hh*16").bank("RolandTR909").gain(0.35)
+`} />
+
+<TryThis>
+Wciśnij Graj. Trzymaj gałkę odcięcia nisko (~300) i powoli podnoś rezonans. Potem przez ~8 taktów przesuń odcięcie w górę. Ten jeden gest to większość acid techno.
+</TryThis>
+
+## Przester i stopa
+
+Przesterowanie 303 robi ją głośniejszą i ostrzejszą — ale przesterowana 303 wypełnia też dół i może **zagłuszyć stopę**. Trzymaj dół 303 w ryzach (`hpf` około 60–80 Hz) albo duckuj ją stopą.
+
+<Strudel title="przesterowana 303, która zostawia miejsce stopie" code={`
+  setcpm(140/4)
+  acid: note("a1 a1 a2 a1 c2 a1 [a1 a2] e2")
+    .s("sawtooth").ftype("ladder").lpf(sine.range(400, 2500).slow(8)).lpq(15)
+    .lpenv(3).lpdecay(0.1).decay(0.15).sustain(0.2)
+    .distort(2).hpf(70).gain(0.45).orbit(2)
+  kick: s("bd*4").bank("RolandTR909").distort(1.2).gain(0.95)
+    .duckorbit(2).duckdepth(0.6).duckattack(0.12)
+`} />
+
+## Szablon
+
+Utwór acid techno na 144 takty (≈ 4,1 min przy 140 BPM). 303 zmienia charakter w każdej sekcji przez odcięcie, rezonans i przester.
+
+<Strudel title="szablon utworu acid techno" code={`
+  setcpm(140/4)
+  const kick = s("bd*4").bank("RolandTR909").distort(1.2).gain(0.95)
+    .duckorbit(2).duckdepth(0.55).duckattack(0.12)
+  const hats = s("[~ oh]*4, hh*16").bank("RolandTR909").gain("[0.25 0.35 0.55 0.35]*4")
+  const clap = s("~ cp ~ cp").bank("RolandTR909").gain(0.55)
+  const line = note("a1 a1 a2 a1 c2 a1 [a1 a2] e2 a1 a1 g2 a1 c2 a2 a1 e2")
+    .s("sawtooth").ftype("ladder")
+    .lpenv(3).lpdecay(0.1).decay(0.15).sustain(0.2).hpf(70).orbit(2)
+  const roll = s("sd*<4 4 8 8 16 16 32 32>").bank("RolandTR909")
+    .gain(saw.range(0.3, 0.9).slow(8))
+
+  arrange(
+    [16, stack(kick, hats)],                                                   // intro
+    [32, stack(kick, hats, line.lpf(saw.range(250, 900).slow(32)).lpq(10).gain(0.45))],  // acid się wkrada
+    [32, stack(kick, hats, clap, line.lpf(sine.range(500, 2500).slow(16)).lpq(16).distort(1).gain(0.45))], // pełne mlaskanie
+    [8,  stack(line.lpf(saw.range(300, 3500).slow(8)).lpq(20).distort(2).gain(0.4), roll)], // przerwa: sam acid + rolka
+    [32, stack(kick, hats, clap, line.lpf(sine.range(800, 3500).slow(8)).lpq(18).distort(2.5).gain(0.42))], // szczyt
+    [24, stack(kick, hats, line.lpf(saw.range(1500, 250).slow(24)).lpq(10).gain(0.45))]  // outro: acid się zamyka
+  )
+`} />
+
+<ArrangementTimeline template="techno" />
+
+<DoDont
+  do={[
+    'Niech linia 303 będzie centrum utworu; wszystko inne ją wspiera.',
+    'Pisz 1–2-taktowe linie szesnastek z pauzami, skokami o oktawę i kilkoma akcentami.',
+    'Kręć odcięciem i rezonansem powoli przez 8–32 takty — to jest aranżacja.',
+    'Przesterowaną 303 przepuść przez górnoprzepustowy albo duckuj, żeby stopa dalej uderzała.',
+  ]}
+  dont={[
+    'Dodawać akordów ani osobnej linii basu — 303 jest jednym i drugim.',
+    'Trzymać filtra w miejscu; zamrożona 303 brzmi jak pętla, a nie acid.',
+    'Wkręcać rezonansu na maksa bez sprawdzenia poziomu — szczyty robią się bardzo głośne.',
+    'Używać więcej niż dwóch linii acid naraz; robi się papka.',
+  ]}
+/>

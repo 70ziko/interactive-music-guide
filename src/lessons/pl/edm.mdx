@@ -1,0 +1,139 @@
+„EDM” znaczy dwie rzeczy. Szeroko to **ogólna nazwa** elektronicznej muzyki tanecznej — house, techno, trance i reszta. W latach 2010. stało się też nazwą jednego konkretnego brzmienia: **opartej na dropach, stadionowej muzyki z głównych scen**, która przejęła amerykańskie festiwale. Ta strona jest o tym drugim znaczeniu — festiwalowe EDM, big room i electro house.
+
+## Skąd się wzięło
+
+Termin wypromował amerykański przemysł muzyczny pod koniec lat 2000. i w latach 2010., gdy artyści tacy jak David Guetta, Avicii, Swedish House Mafia i Skrillex wypełniali hale. Brzmienie głównej sceny definiują dwa style:
+
+- **Electro house** — wyraźna linia basu albo stopa, **125–135 BPM, zwykle 128**.
+- **Big room house** (koniec lat 2000.–2010., Szwecja, Norwegia, Holandia; Martin Garrix, Hardwell, Dimitri Vegas & Like Mike) — **126–132 BPM**, **długie narastania, po których przychodzi drop w stylu electro**, proste, minimalne melodie, często supersaw, i oszczędne bębny w dropie.
+
+## Odcisk palca
+
+| Element | Zasada |
+|---|---|
+| Tempo | ~128 (big room 126–132) |
+| Struktura | jak w popie: intro → zwrotka/breakdown → narastanie → **drop** → przerwa → narastanie → drop 2 → outro |
+| Narastanie | 8–16 taktów: przyspieszająca rolka werbla, riser, rosnąca wysokość i filtr, często 1 uderzenie ciszy |
+| Drop | ogromna stopa, prosty lead (supersaw albo perkusyjny), oszczędne bębny, mocny sidechain |
+| Harmonia | popowe progresje na 4 akordy, jasny moll albo dur |
+| Miks | bardzo głośno, szeroko, jasno; wszystko pompuje ze stopą |
+
+W porównaniu z house'em i techno EDM jest zbudowane wokół **jednego momentu** — dropu — a wszystko inne istnieje po to, żeby go przygotować.
+
+## 1. Festiwalowa progresja
+
+Wiele festiwalowych utworów zapętla cztery akordy z popowego kanonu. W A-moll klasyką jest **i – VI – III – VII** (Am F C G); to te same cztery akordy co słynne durowe **vi – IV – I – V**.
+
+<Strudel title="festiwalowe akordy z mocnym pompowaniem sidechain" code={`
+  setcpm(128/4)
+  chords: n("<[0,2,4,7] [5,7,9,12] [2,4,6,9] [6,8,10,13]>").scale("A3:minor")
+    .s("supersaw").unison(7).detune(0.3).lpf(4000)
+    .sustain(1).gain(0.35).room(0.3).orbit(2)
+  kick: s("bd*4").bank("RolandTR909").gain(0.95)
+    .duckorbit(2).duckdepth(0.95).duckattack(0.3)
+`} />
+
+<Callout kind="tip">
+Ekstremalne pompowanie (`duckdepth` blisko 1, `duckattack` ~0,3 s) to znak rozpoznawczy stylu: akordy znikają przy każdej stopie i wracają falą pomiędzy.
+</Callout>
+
+## 2. Narastanie
+
+Narastanie w EDM łączy wszystkie narzędzia napięcia z lekcji 14 — i robi je oczywistymi.
+
+<Strudel title="8-taktowe narastanie EDM w ciche uderzenie" code={`
+  setcpm(128/4)
+  stack(
+    s("sd*<4 4 8 8 16 16 32 32>").bank("RolandTR909")
+      .gain(saw.range(0.3, 1).slow(8)).speed(saw.range(1, 1.8).slow(8)),
+    s("white*16").decay(0.07).sustain(0)
+      .hpf(saw.range(300, 12000).slow(8)).gain(saw.range(0.05, 0.4).slow(8)),
+    n("<[0,2,4,7] [5,7,9,12] [2,4,6,9] [6,8,10,13]>").scale("A3:minor")
+      .s("supersaw").lpf(saw.range(500, 6000).slow(8)).sustain(1).gain(0.3)
+  ).mask("<1!7 [1 1 1 0]>")
+`} />
+
+## 3. Drop: dwa smaki
+
+**Drop big room:** prawie nic — ogromna stopa, krótki perkusyjny albo supersawowy lead, kilka hatów. Siła tkwi w kontraście z narastaniem.
+
+<Strudel title="drop big room (minimalny lead)" code={`
+  setcpm(128/4)
+  kick: s("bd*4").bank("RolandTR909").distort(0.6).gain(0.95)
+    .duckorbit(2).duckdepth(0.8).duckattack(0.2)
+  lead: note("[a3 ~ a3 ~] [~ a3 ~ ~] [c4 ~ a3 ~] [~ g3 ~ e3]")
+    .add(note("0,12")).s("supersaw").unison(7).detune(0.35)
+    .lpf(5000).decay(0.15).sustain(0.2).gain(0.4).orbit(2)
+  hats: s("[~ oh]*4").bank("RolandTR909").gain(0.4)
+`} />
+
+**Drop melodyjny / progresywny:** akordy z narastania wracają na pełną szerokość z leadem supersaw na wierzchu — bardziej emocjonalnie niż agresywnie.
+
+<Strudel title="drop melodyjny (akordy + lead)" code={`
+  setcpm(128/4)
+  kick: s("bd*4").bank("RolandTR909").gain(0.95)
+    .duckorbit(2).duckdepth(0.9).duckattack(0.25)
+  chords: n("<[0,2,4,7] [5,7,9,12] [2,4,6,9] [6,8,10,13]>").scale("A3:minor")
+    .s("supersaw").lpf(3500).sustain(1).gain(0.3).orbit(2)
+  lead: n("<[4 ~ 4 7 ~ 4 ~ 2] [5 ~ 5 4 ~ 2 ~ 0] [4 ~ 4 6 ~ 4 ~ 2] [6 ~ 5 4 ~ 2 1 ~]>")
+    .scale("A4:minor").s("supersaw").unison(5).detune(0.25)
+    .lpf(6000).decay(0.2).sustain(0.5).gain(0.35).room(0.3).orbit(2)
+  clap: s("~ cp ~ cp").bank("RolandTR909").gain(0.65).room(0.2)
+`} />
+
+## Szablon
+
+Festiwalowy utwór na 112 taktów (≈ 3,5 min przy 128 BPM) z dwoma dropami.
+
+<Strudel title="szablon utworu EDM" code={`
+  setcpm(128/4)
+  const prog = "<[0,2,4,7] [5,7,9,12] [2,4,6,9] [6,8,10,13]>"
+  const kick   = s("bd*4").bank("RolandTR909").distort(0.5).gain(0.95)
+    .duckorbit(2).duckdepth(0.85).duckattack(0.25)
+  const hats   = s("[~ oh]*4, hh*16").bank("RolandTR909").gain("[0.2 0.3 0.45 0.3]*4")
+  const clap   = s("~ cp ~ cp").bank("RolandTR909").gain(0.65).room(0.2)
+  const bass   = n("<0 5 2 6>").scale("A1:minor").struct("[~ x]*4")
+    .s("sawtooth").lpf(600).decay(0.15).sustain(0.3).gain(0.7)
+  const chords = n(prog).scale("A3:minor").s("supersaw").unison(7).detune(0.3)
+    .lpf(3500).sustain(1).gain(0.3).room(0.3).orbit(2)
+  const piano  = n(prog).scale("A3:minor").struct("[x ~ ~ x] [~ ~ x ~] [x ~ ~ ~] [~ ~ ~ ~]")
+    .s("piano").gain(0.7).room(0.4)
+  const lead   = n("<[4 ~ 4 7 ~ 4 ~ 2] [5 ~ 5 4 ~ 2 ~ 0] [4 ~ 4 6 ~ 4 ~ 2] [6 ~ 5 4 ~ 2 1 ~]>")
+    .scale("A4:minor").s("supersaw").unison(5).detune(0.25)
+    .lpf(6000).decay(0.2).sustain(0.5).gain(0.35).orbit(2)
+  const build  = stack(
+    s("sd*<4 4 8 8 16 16 32 32>").bank("RolandTR909")
+      .gain(saw.range(0.3, 1).slow(8)).speed(saw.range(1, 1.8).slow(8)),
+    s("white*16").decay(0.07).sustain(0)
+      .hpf(saw.range(300, 12000).slow(8)).gain(saw.range(0.05, 0.4).slow(8)),
+    chords.lpf(saw.range(500, 5000).slow(8))
+  ).mask("<1!7 [1 1 1 0]>")
+
+  arrange(
+    [16, stack(kick, hats, chords.lpf(800))],                 // intro (przefiltrowana zapowiedź)
+    [16, stack(piano, chords.gain(0.15))],                    // zwrotka / breakdown
+    [8,  build],                                              // narastanie
+    [16, stack(kick, hats, clap, bass, chords, lead)],        // drop
+    [16, stack(piano, lead.lpf(1500).gain(0.25))],            // przerwa
+    [8,  build],                                              // narastanie 2
+    [16, stack(kick, hats, clap, bass, chords, lead, lead.transpose(12).gain(0.2))], // drop 2 + warstwa oktawowa
+    [16, stack(kick, hats)]                                   // outro
+  )
+`} />
+
+<ArrangementTimeline template="edm" />
+
+<DoDont
+  do={[
+    'Najpierw zaprojektuj drop, potem napisz narastanie, które do niego prowadzi.',
+    'Używaj pętli na 4 akordy i trzymaj ją przez zwrotkę, narastanie i drop.',
+    'Rób narastanie oczywistym: rolka + riser + rosnący filtr + jedno ciche uderzenie.',
+    'Daj drugiemu dropowi jeden nowy element (warstwa oktawowa, dodatkowa perkusja), żeby był większy.',
+  ]}
+  dont={[
+    'Przeładowywać dropu — dropy big room są mocne, bo są oszczędne.',
+    'Pomijać pompowania sidechain; jest częścią brzmienia.',
+    'Robić zwrotki tak głośnej jak drop — cały sens to kontrast.',
+    'Używać wolnej ewolucji w stylu techno; EDM zmienia się wyraźnymi, dużymi krokami.',
+  ]}
+/>

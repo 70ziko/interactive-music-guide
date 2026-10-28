@@ -1,0 +1,117 @@
+Acid techno takes the squelching bassline of Chicago acid house and drops it into **harder, faster techno**. One machine defines it: the Roland **TB-303**.
+
+## Where it comes from
+
+Acid techno grew out of acid house in **Europe and the US in the late 1980s to early 1990s**, with a famous **London** underground scene around crews like the Liberators. The "acid" is the harsh, squelching sound of the 303, made by turning the **resonance up** and the **cutoff down**, then moving them. Compared with acid house, it applies that sound to harder-edged techno. Tempos are usually fast — roughly **130–150 BPM**.
+
+## The fingerprint
+
+| Element | Rule |
+|---|---|
+| Tempo | ~130–150 |
+| Kick | hard 909 kick, often distorted, four on the floor |
+| Hats | offbeat open hat, driving 16ths |
+| **303 line** | 16th-note bassline, 1–2 bars, resonance high, cutoff and accents moving |
+| Extra | sometimes a second 303, claps on 2 & 4, very little else |
+| Arrangement | the 303 **is** the arrangement: the track evolves by riding its knobs |
+
+## Anatomy of a 303 line
+
+A 303 pattern has four ingredients. Strudel can do three directly and approximate the fourth:
+
+| Ingredient | What it does | Strudel |
+|---|---|---|
+| Notes | mostly root, octave, a few scale notes | `note("a1 a2 c2 …")` |
+| Rests / ties | gaps make the groove | `~` and `@2` |
+| **Accent** | some notes louder and brighter | patterned `gain` + `lpenv` |
+| Slide | glide between notes | no glide on the standard synths (`slide` only affects Strudel's ZZFX sounds) — use octave jumps and short decays instead |
+
+<Strudel title="plain line → with accents (alternating 2 bars)" code={`
+  setcpm(136/4)
+  note("a1 a1 a2 a1 c2 a1 [a1 a2] e2 a1 a1 g2 a1 c2 a2 a1 e2")
+    .s("sawtooth").ftype("ladder")
+    .lpf(500).lpq(16)
+    // bars 1–2: no accents · bars 3–4: accents on steps 3, 7, 11, 14
+    .lpenv("<1!2 [1 1 5 1 1 1 5 1 1 1 5 1 1 5 1 1]!2>")
+    .gain("<0.6!2 [.55 .55 .8 .55 .55 .55 .8 .55 .55 .55 .8 .55 .55 .8 .55 .55]!2>")
+    .lpdecay(0.1).decay(0.15).sustain(0.2)
+    .distort(0.7)
+    ._pianoroll()
+`} />
+
+## Riding the knobs
+
+The 303 sound comes alive when **cutoff and resonance move**. In a live set you ride them by hand — in Strudel use `slider()` (drag the knobs that appear) or slow signals.
+
+<Strudel title="ride cutoff and resonance live" code={`
+  setcpm(138/4)
+  acid: note("a1 [a1 a2] c2 a1 [~ g2] a1 e2 [a1 c3]")
+    .s("sawtooth").ftype("ladder")
+    .lpf(slider(600, 150, 3000))
+    .lpq(slider(14, 1, 25))
+    .lpenv(slider(3, 0, 6)).lpdecay(0.1)
+    .decay(0.15).sustain(0.2).distort(slider(0.8, 0, 3)).gain(0.55)
+  kick: s("bd*4").bank("RolandTR909").distort(1).gain(0.9)
+  hats: s("[~ oh]*4, hh*16").bank("RolandTR909").gain(0.35)
+`} />
+
+<TryThis>
+Press Play. Keep the cutoff knob low (~300) and slowly raise the resonance. Then sweep the cutoff up over ~8 bars. That one gesture is most of acid techno.
+</TryThis>
+
+## Distortion and the kick
+
+Distorting the 303 makes it louder and harsher — but a distorted 303 also fills the low end and can **mask the kick**. Keep the 303's low end in check (`hpf` around 60–80 Hz) or duck it with the kick.
+
+<Strudel title="distorted 303 that leaves room for the kick" code={`
+  setcpm(140/4)
+  acid: note("a1 a1 a2 a1 c2 a1 [a1 a2] e2")
+    .s("sawtooth").ftype("ladder").lpf(sine.range(400, 2500).slow(8)).lpq(15)
+    .lpenv(3).lpdecay(0.1).decay(0.15).sustain(0.2)
+    .distort(2).hpf(70).gain(0.45).orbit(2)
+  kick: s("bd*4").bank("RolandTR909").distort(1.2).gain(0.95)
+    .duckorbit(2).duckdepth(0.6).duckattack(0.12)
+`} />
+
+## The template
+
+A 144-bar acid techno track (≈ 4.1 min at 140 BPM). The 303 changes character every section through cutoff, resonance and distortion.
+
+<Strudel title="acid techno track template" code={`
+  setcpm(140/4)
+  const kick = s("bd*4").bank("RolandTR909").distort(1.2).gain(0.95)
+    .duckorbit(2).duckdepth(0.55).duckattack(0.12)
+  const hats = s("[~ oh]*4, hh*16").bank("RolandTR909").gain("[0.25 0.35 0.55 0.35]*4")
+  const clap = s("~ cp ~ cp").bank("RolandTR909").gain(0.55)
+  const line = note("a1 a1 a2 a1 c2 a1 [a1 a2] e2 a1 a1 g2 a1 c2 a2 a1 e2")
+    .s("sawtooth").ftype("ladder")
+    .lpenv(3).lpdecay(0.1).decay(0.15).sustain(0.2).hpf(70).orbit(2)
+  const roll = s("sd*<4 4 8 8 16 16 32 32>").bank("RolandTR909")
+    .gain(saw.range(0.3, 0.9).slow(8))
+
+  arrange(
+    [16, stack(kick, hats)],                                                   // intro
+    [32, stack(kick, hats, line.lpf(saw.range(250, 900).slow(32)).lpq(10).gain(0.45))],  // acid creeps in
+    [32, stack(kick, hats, clap, line.lpf(sine.range(500, 2500).slow(16)).lpq(16).distort(1).gain(0.45))], // full squelch
+    [8,  stack(line.lpf(saw.range(300, 3500).slow(8)).lpq(20).distort(2).gain(0.4), roll)], // break: acid alone, roll
+    [32, stack(kick, hats, clap, line.lpf(sine.range(800, 3500).slow(8)).lpq(18).distort(2.5).gain(0.42))], // peak
+    [24, stack(kick, hats, line.lpf(saw.range(1500, 250).slow(24)).lpq(10).gain(0.45))]  // outro: acid closes
+  )
+`} />
+
+<ArrangementTimeline template="techno" />
+
+<DoDont
+  do={[
+    'Make the 303 line the centre of the track; everything else supports it.',
+    'Write 1–2 bar lines of 16ths with rests, octave jumps and a few accents.',
+    'Ride cutoff and resonance slowly over 8–32 bars — that is the arrangement.',
+    'High-pass or duck a distorted 303 so the kick still punches.',
+  ]}
+  dont={[
+    'Add chords or a separate bassline — the 303 is both.',
+    'Keep the filter static; a frozen 303 sounds like a loop, not acid.',
+    'Push resonance to the max without checking level — peaks get very loud.',
+    'Use more than two acid lines at once; they turn to mush.',
+  ]}
+/>

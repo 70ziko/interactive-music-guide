@@ -25,7 +25,7 @@ npm run typecheck
 | Harmony & melody | 06 Scales and keys · 07 Chords and progressions · 08 Melody and hooks · 09 Bass and the offbeat |
 | Synthesis & sound design | 10 Synth basics · 11 Effects · 12 Sound design recipes |
 | Arrangement & mix | 13 Song structure · 14 Tension and release · 15 Mixing basics |
-| Genres & practice | 16 House · 17 Bounce / donk · 18 Hard house · 19 From idea to finished track |
+| Genres & practice | 16 House · 17 Bounce / donk · 18 Hard house · 19 Techno · 20 Acid techno · 21 Groovy techno · 22 EDM / big room · 23 Trance · 24 From idea to finished track |
 | Reference | Cheat sheet · Glossary EN ↔ PL |
 
 Each lesson: concept → interactive widget → Strudel blocks → "Try this" → Do / Don't.

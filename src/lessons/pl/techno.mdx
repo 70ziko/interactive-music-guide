@@ -1,0 +1,147 @@
+Techno to chłodniejsze, bardziej maszynowe rodzeństwo house'u: mniej akordów, więcej rytmu i pętle, które zmieniają się tak wolno, że bardziej się je czuje niż słyszy.
+
+## Skąd się wzięło
+
+Techno wyszło z **Detroit w połowie lat 80.** Pierwszą falę przypisuje się „Belleville Three” — **Juanowi Atkinsowi, Derrickowi Mayowi i Kevinowi Saundersonowi** (tak, temu od basu reese z lekcji 12). Szybko podchwyciła je Europa, zwłaszcza Niemcy (Frankfurt, Berlin). Utwory są robione pod **ciągłe sety DJ-skie** i zwykle mieszczą się między **120 a 150 BPM**. Bit jest w 4/4, powtarzalne four on the floor, często z **TR-909 albo TR-808** (lub emulacji). W porównaniu z house'em techno stawia **rytm na pierwszym miejscu**: harmonia jest uproszczona do **powtarzalnych sekwencji nut**.
+
+## Odcisk palca
+
+| Element | Zasada |
+|---|---|
+| Tempo | 120–150 (z grubsza: sporo klubowego techno to okolice 128–138) |
+| Stopa | four on the floor, często dłuższa i ciemniejsza niż w house |
+| Haty | hat otwarty na offbicie, zamknięte szesnastki, często z ride'em |
+| Klap / werbel | oszczędnie — czasem na 2 i 4, czasem sam rim albo nic |
+| Bas | „rumble” (stopa + ciemny pogłos) albo krótka toczona nuta na offbicie |
+| Harmonia | jeden akord albo żaden; dubowe stabsy; atonalne sekwencje |
+| Hook | krótka hipnotyczna pętla (1 takt albo nieparzysta długość) |
+| Aranżacja | długo (często 6+ min), stopniowo: warstwy wchodzą i wychodzą, wolne ruchy filtra, krótkie przerwy |
+
+**Główna różnica wobec house'u:** w house co 8–16 taktów pojawia się nowy *pomysł*. W techno *ten sam* pomysł trwa, a zmienia się tylko jego **kształt** — filtr, rezonans, decay, delay, gęstniejący hat.
+
+## 1. Stopa i rumble
+
+„Rumble” to niski, rozmazany ogon pod stopą: stopa wysłana do **ciemnego pogłosu**, przefiltrowanego tak, że zostaje tylko dół. Wypełnia przestrzeń między stopami energią subu zamiast linii basu.
+
+<Strudel title="stopa → stopa + rumble (na zmianę co 2 takty)" code={`
+  setcpm(132/4)
+  kick: s("bd*4").bank("RolandTR909").gain(0.95)
+  rumble: s("bd*4").bank("RolandTR909")
+    .room(1).roomsize(6).roomlp(300).roomfade(1.5)  // ciemny ogon pogłosu
+    .lpf(200).gain("<0 0 0.9 0.9>").orbit(2)
+`} />
+
+<Callout kind="tip">
+`roomlp` filtruje **pogłos** (a nie suchą stopę). Niskie wartości (200–500 Hz) zostawiają tylko dudnienie. Rumble na własnym orbicie trzyma pogłos z dala od reszty (lekcja 11).
+</Callout>
+
+## 2. Haty, ride i perkusja
+
+Energia techno siedzi w górze pasma: szesnastkowe haty z akcentami, hat otwarty na offbicie, ride na ósemkach i jedna–dwie linie perkusji we wzorach euklidesowych grające *pod prąd* stopie.
+
+<Strudel title="góra pasma" code={`
+  setcpm(132/4)
+  stack(
+    s("bd*4"),
+    s("[~ oh]*4").gain(0.45),
+    s("hh*16").gain("[0.25 0.35 0.55 0.35]*4"),
+    s("rd*8").gain(0.25),
+    s("rim(5,16,2)").gain(0.4).pan(0.65),
+    s("<~ ~ ~ cp>").gain(0.5).room(0.4)
+  ).bank("RolandTR909")._punchcard()
+`} />
+
+## 3. Hipnotyczna pętla
+
+Hook w techno to zwykle **krótka sekwencja, która się powtarza**, często o długości, która **nie** dzieli taktu równo. `{…}%16` w mini-notacji gra sekwencję dowolnej długości po 16 kroków na takt — więc 7-nutowa pętla wypada inaczej w każdym takcie i zgrywa się z powrotem dopiero po 7 taktach. Działa hipnotycznie, bo jest jednocześnie powtarzalna i ciągle się przesuwa.
+
+<Strudel title="7-nutowa pętla na 16 krokach (polimetr)" code={`
+  setcpm(132/4)
+  stack(
+    s("bd*4").bank("RolandTR909"),
+    n("{0 ~ 3 0 ~ 7 5}%16").scale("A1:minor")
+      .s("sawtooth").lpf(sine.range(300, 1400).slow(16)).lpq(8)
+      .decay(0.12).sustain(0).gain(0.6)
+  )._pianoroll()
+`} />
+
+## 4. Dubowy stab
+
+Jeden mollowy akord, krótki, przez **delay** i wolno ruszający się filtr — brzmienie dub techno i świetna warstwa „atmosfery” w każdym utworze techno.
+
+<Strudel title="dubowy stab akordu" code={`
+  setcpm(124/4)
+  chord("Am7").voicing().struct("[~ ~ x ~] [~ ~ ~ ~]")
+    .s("sawtooth").lpf(perlin.range(500, 1600).slow(8)).lpq(3)
+    .decay(0.12).sustain(0).gain(0.5)
+    .delay(0.6).delaysync(3/16).delayfeedback(0.6).room(0.4)
+`} />
+
+## 5. Zmieniaj kształt, nie pomysł
+
+Kluczowa technika: zostaw wzór, poruszaj jednym parametrem powoli przez 16–32 takty. W Strudlu to **ciągłe sygnały z długim `.slow()`** — albo `slider()` na żywo, gdy grasz.
+
+| Parametr | Wolny ruch | Efekt |
+|---|---|---|
+| `lpf` | `sine.range(300, 3000).slow(32)` | otwiera i zamyka pętlę |
+| `decay` | `saw.range(0.05, 0.4).slow(16)` | krótkie kliki → dłuższe nuty |
+| `delayfeedback` | `"<0.2 0.4 0.6 0.4>"` | echa się nawarstwiają |
+| `degradeBy` na hatach | `"<0.5 0.3 0.1 0>"` | haty gęstnieją przez 4 takty |
+
+## Szablon
+
+Utwór techno na 176 taktów (≈ 5,3 min przy 132 BPM), zrobiony pod miksowanie.
+
+<Strudel title="szablon utworu techno" code={`
+  setcpm(132/4)
+  const kick   = s("bd*4").bank("RolandTR909").gain(0.95)
+  const rumble = s("bd*4").bank("RolandTR909")
+    .room(1).roomsize(6).roomlp(300).roomfade(1.5).lpf(200).gain(0.8).orbit(2)
+  const hats   = s("[~ oh]*4, hh*16").bank("RolandTR909")
+    .gain("[0.25 0.35 0.5 0.35]*4").degradeBy(0.05)
+  const ride   = s("rd*8").bank("RolandTR909").gain(0.22)
+  const perc   = s("rim(5,16,2)").bank("RolandTR909").gain(0.35).pan(0.65)
+  const clap   = s("~ cp ~ cp").bank("RolandTR909").gain(0.45).room(0.3).orbit(3)
+  const loop   = n("{0 ~ 3 0 ~ 7 5}%16").scale("A1:minor")
+    .s("sawtooth").lpf(sine.range(300, 1600).slow(32)).lpq(8)
+    .decay(0.12).sustain(0).gain(0.55)
+  const dub    = chord("Am7").voicing().struct("[~ ~ x ~] [~ ~ ~ ~]")
+    .s("sawtooth").lpf(1200).decay(0.12).sustain(0).gain(0.35)
+    .delay(0.6).delaysync(3/16).delayfeedback(0.55).orbit(4)
+
+  arrange(
+    [32, stack(kick, hats.degradeBy("<0.5 0.4 0.3 0.2 0.1 0 0 0>"))], // intro
+    [32, stack(kick, rumble, hats, perc)],                            // budowanie
+    [32, stack(kick, rumble, hats, perc, ride, clap, loop)],          // szczyt
+    [16, stack(loop, dub)],                                           // przerwa
+    [32, stack(kick, rumble, hats, perc, ride, clap, loop.lpq(14), dub)], // szczyt 2
+    [32, stack(kick, hats, perc)]                                     // outro
+  )
+`} />
+
+<ArrangementTimeline template="techno" />
+
+## House vs techno w skrócie
+
+| | House | Techno |
+|---|---|---|
+| Tempo | 115–130 | 120–150 (głównie 128–138) |
+| Harmonia | prowadzą akordy (m7, pianino, organy) | mało albo wcale; pętle i stabsy |
+| Bas | melodyjny, na offbicie albo synkopowany | rumble albo toczona jedna nuta |
+| Zmiany | nowe partie co 8–16 taktów | wolne zmiany parametrów |
+| Nastrój | ciepły, soulowy | hipnotyczny, maszynowy, mroczny |
+
+<DoDont
+  do={[
+    'Zbuduj utwór ze stopy, rumble i góry pasma, zanim dodasz jakąkolwiek melodię.',
+    'Używaj jednej krótkiej pętli i zmieniaj jej filtr, decay albo delay przez 16–32 takty.',
+    'Używaj pętli o nieparzystej długości ({…}%16) dla hipnotycznego ruchu.',
+    'Rób długie intro i outro (16–32 takty), dające się zmiksować.',
+  ]}
+  dont={[
+    'Pisać progresji akordów — normą jest jeden akord (albo żaden).',
+    'Zapychać utworu breakdownami; jedna krótka przerwa wystarczy.',
+    'Pozwalać, żeby pogłos rumble wyciekał na haty i klapy — daj mu własny orbit.',
+    'Zmieniać za dużo naraz. Techno nagradza cierpliwość.',
+  ]}
+/>

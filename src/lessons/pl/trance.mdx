@@ -1,0 +1,181 @@
+Trance to najbardziej **melodyjny** z klubowych gatunków: toczący się bas, arpeggio w szesnastkach, bramkowany pad i długi breakdown, w którym cały utwór się zatrzymuje, żeby zaśpiewała jedna melodia — zanim wróci jako „hymn”.
+
+## Skąd się wzięło
+
+Trance wyrósł ze **sceny techno i EBM we Frankfurcie, w Niemczech, pod koniec lat 80. i na początku lat 90.** i szybko rozszedł się po Europie (Wielka Brytania, Belgia, Holandia). Utwory mają zwykle **125–150 BPM**, metrum 4/4 i są zbudowane z **fraz po 16 i 32 uderzenia**. Instrumenty wchodzą i wychodzą co 4, 8, 16 albo 32 takty, a jeden główny motyw powtarza się przez większość utworu.
+
+Trzy rzeczy odróżniają go od house'u i techno:
+
+- **Stopa jest schowana**, żeby zrobić miejsce linii basu.
+- **Rolki werbla** zapowiadają każde przejście i kulminację.
+- **Szybkie arpeggia**, głównie **tonacje molowe** i **supersaw** — fala, którą rozsławił Roland JP-8000.
+
+**Hard trance** dodał **bramkowany pad** i schemat, który zna każdy producent trance'u: **breakdown → narastanie → hymn**.
+
+## Rodzina
+
+| Styl | Co go wyróżnia |
+|---|---|
+| Progressive trance | gładszy, bardziej listowy; wolno zmieniające się warstwy |
+| Uplifting trance | ~135–140 BPM, radośniejszy (akordy ciążące ku durowi), długie breakdowny, duże dropy, mocny sidechain |
+| Psytrance / Goa | korzenie w Goa (Indie); stały, dudniący bas; nowe warstwy co 4–8 taktów; full-on ~140–148 |
+| Hard / tech trance | szybszy i twardszy; tech trance miesza się z techno |
+| Vocal trance | popowa forma piosenki na wierzchu; „szybujący” wokal |
+
+## Odcisk palca
+
+| Element | Zasada |
+|---|---|
+| Tempo | 125–150 (uplifting ~138, psy ~145) |
+| Stopa | four on the floor, trochę cichsza niż w house — miejsce dostaje bas |
+| Bas | toczące się szesnastki **między** stopami (`~ x x x` na uderzenie) |
+| Harmonia | tonacja molowa, pętle na 4 akordy, akord trzymany cały takt |
+| Arp | arpeggio w szesnastkach po dźwiękach akordu, często z delayem w tempie |
+| Pad | akordy supersaw cięte 16-krokową **bramką trance** |
+| Lead | hook na supersawie z dużą ilością pogłosu i delayu |
+| Aranżacja | długa; intro → groove → **długi breakdown** → narastanie → **hymn** → outro |
+
+## 1. Toczący się bas
+
+Linia basu w trance to **trzy szesnastki po każdej stopie** — stopa zajmuje pierwszą szesnastkę, bas wypełnia pozostałe trzy. Brzmi to jak jeden ciągły, toczący się ruch. Krótka obwiednia filtra sprawia, że każda nuta „szarpie”, a pierwsza nuta basu po stopie jest trochę cichsza, żeby stopa wciąż się przebijała.
+
+<Strudel title="toczący się bas: stopa + 3 szesnastki basu" code={`
+  setcpm(138/4)
+  kick: s("bd*4").bank("RolandTR909").gain(0.85)
+  bass: n("<0 -2 -1 -3>").scale("A1:minor").struct("[~ x x x]*4")
+    .s("sawtooth").lpf(350).lpenv(3).lpdecay(0.07)
+    .decay(0.1).sustain(0).gain("[0 0.5 0.7 0.7]*4")
+  hats: s("[~ oh]*4").bank("RolandTR909").gain(0.35)
+`} />
+
+<Callout kind="tip">
+`.decay(0.1).sustain(0)` trzyma każdą nutę krócej niż szesnastka (≈ 109 ms przy 138 BPM), więc nuty nigdy na siebie nie nachodzą i toczenie zostaje zwarte. Dłuższe nuty rozmazują się w buczenie.
+</Callout>
+
+## 2. Arp
+
+Wzór w szesnastkach chodzi w górę i w dół po dźwiękach akordu. Ponieważ jest dodany do progresji **przed** `.scale()` (lekcja 8), sam podąża za akordami. Delay na ósemkę z kropką (`3/16` taktu) wypełnia przerwy echami, które wypadają na nieparzystych szesnastkach.
+
+Progresja jest zapisana jako `"<0 -2 -1 -3>"`: to te same Am – F – G – Em co `"<0 5 6 4>"`, ale każdy akord leży **poniżej** A, a nie powyżej. Partie przesuwają się małymi krokami, więc arp zostaje w jednym zakresie, zamiast skakać o oktawę przy każdym akordzie.
+
+<Strudel title="arp w szesnastkach podążający za akordami" code={`
+  setcpm(138/4)
+  arp: n("[0 2 4 2 7 4 2 4]*2").add(n("<0 -2 -1 -3>")).scale("A4:minor")
+    .s("supersaw").unison(3).detune(0.2)
+    .lpf(sine.range(1200, 4500).slow(16)).decay(0.12).sustain(0)
+    .delay(0.35).delaysync(3/16).delayfeedback(0.4).gain(0.35)
+  kick: s("bd*4").bank("RolandTR909").gain(0.85)
+`} />
+
+## 3. Bramka trance
+
+**Bramka trance** (trance gate) tnie trzymany akord w 16-krokowym rytmie. W DAW-ie to wtyczka bramki albo LFO na głośności; w Strudlu jest prościej — zagraj akord jako krótkie szesnastki i wybierz kroki, które grają, przez `struct()`. Bardzo krótkie wybrzmienie (release) daje ostre cięcia.
+
+<Strudel title="bramkowany pad supersaw (bramka 16-krokowa)" code={`
+  setcpm(138/4)
+  gate: n("[0,2,4,7]").add(n("<0 -2 -1 -3>")).scale("A3:minor")
+    .struct("x x ~ x x ~ x ~ x x ~ x x ~ x x")
+    .s("supersaw").unison(5).detune(0.3).lpf(3000)
+    .attack(0.005).sustain(1).release(0.03).gain(0.3)
+  kick: s("bd*4").bank("RolandTR909").gain(0.85)
+`} />
+
+<TryThis>
+Zmień wzór bramki — każde `~` to dziura. Spróbuj `"x*16"` (bez bramki), potem `"[x ~]*8"` (równe ósemki). Akordy zostają te same; klimat zmienia tylko rytm cięć.
+</TryThis>
+
+## 4. Breakdown → narastanie → hymn
+
+To serce trance'u. **Breakdown** zabiera stopę i bas i zostawia sam hook nad padem, z dużym pogłosem — często na 32 takty. **Narastanie** wprowadza rolkę werbla i otwiera filtr. Potem **hymn**: ten sam hook, teraz nad wszystkim.
+
+<Strudel title="sam hook (brzmienie breakdownu)" code={`
+  setcpm(138/4)
+  pad: n("[0,2,4,7]").add(n("<0 -2 -1 -3>")).scale("A3:minor")
+    .s("supersaw").attack(1).release(2).sustain(1).lpf(1800).gain(0.2).room(0.6)
+  lead: n("<[4 ~ 4 ~ 2 ~ 4 ~ 7 ~ ~ 6 ~ 4 ~ ~] [5 ~ 5 ~ 4 ~ 5 ~ 7 ~ ~ 9 ~ 7 ~ ~] [6 ~ 6 ~ 4 ~ 6 ~ 8 ~ ~ 9 ~ 8 ~ ~] [4 ~ 4 ~ 2 ~ 4 ~ 6 ~ ~ 4 ~ 1 ~ ~]>")
+    .scale("A4:minor").s("supersaw").unison(7).detune(0.3).lpf(5000)
+    .attack(0.005).decay(0.3).sustain(0.4).release(0.2)
+    .room(0.7).roomsize(6).delay(0.3).delaysync(3/16).gain(0.35)
+`} />
+
+<Callout kind="info">
+Uplifting trance mocno opiera się na **sidechainie** („ducking the kick”), więc duże pady i leady pompują wokół stopy. W szablonie poniżej wszystko, co melodyjne, siedzi na orbicie 2, a stopa ją przycisza — to samo narzędzie co w lekcji 15.
+</Callout>
+
+## 5. Smak psytrance'u
+
+Psytrance zostawia toczący się bas, ale gra go na **jednej nucie** przez długie odcinki, szybciej (~145), z ciemniejszym, mlaszczącym leadem i nowymi warstwami co 4–8 taktów.
+
+<Strudel title="psytrance: toczenie na jednej nucie + mlaszczący lead" code={`
+  setcpm(145/4)
+  kick: s("bd*4").bank("RolandTR909").gain(0.95)
+  bass: note("e1").struct("[~ x x x]*4").s("sawtooth")
+    .lpf(300).lpenv(3).lpdecay(0.05).decay(0.08).sustain(0).gain(0.75)
+  lead: n("0 ~ 1 0 ~ 3 ~ 1 0 ~ 7 ~ 6 ~ 3 1").scale("E3:phrygian")
+    .s("sawtooth").lpf(sine.range(400, 2500).slow(8)).lpq(12)
+    .decay(0.1).sustain(0).delay(0.3).delaysync(3/16).gain(0.35)
+  hats: s("hh*16").bank("RolandTR909").gain("[0.15 0.3]*8")
+`} />
+
+## Szablon
+
+Utwór na 136 taktów (≈ 4 min przy 138 BPM). Na 7-minutową wersję klubową podwój intro, groove i outro.
+
+<Strudel title="szablon utworu trance" code={`
+  setcpm(138/4)
+  const prog = "<0 -2 -1 -3>"
+  const kick0 = s("bd*4").bank("RolandTR909").gain(0.85)   // zwykła stopa: na orbicie 2 nie ma jeszcze czego przyciszać
+  const kick  = kick0.duckorbit(2).duckdepth(0.6).duckattack(0.2)
+  const hats  = s("[~ oh]*4, hh*16").bank("RolandTR909").gain("[0.15 0.25 0.4 0.25]*4")
+  const clap  = s("~ cp ~ cp").bank("RolandTR909").gain(0.55).room(0.3)
+  const bass  = n(prog).scale("A1:minor").struct("[~ x x x]*4")
+    .s("sawtooth").lpf(350).lpenv(3).lpdecay(0.07)
+    .decay(0.1).sustain(0).gain("[0 0.5 0.7 0.7]*4")
+  const arp   = n("[0 2 4 2 7 4 2 4]*2").add(n(prog)).scale("A4:minor")
+    .s("supersaw").unison(3).detune(0.2).lpf(3500).decay(0.12).sustain(0)
+    .delay(0.3).delaysync(3/16).gain(0.25).orbit(2)
+  const gate  = n("[0,2,4,7]").add(n(prog)).scale("A3:minor")
+    .struct("x x ~ x x ~ x ~ x x ~ x x ~ x x")
+    .s("supersaw").unison(5).detune(0.3).lpf(3000)
+    .attack(0.005).sustain(1).release(0.03).gain(0.25).orbit(2)
+  const pad   = n("[0,2,4,7]").add(n(prog)).scale("A3:minor")
+    .s("supersaw").attack(1).release(2).sustain(1).lpf(1800).gain(0.2).room(0.6).orbit(2)
+  const lead  = n("<[4 ~ 4 ~ 2 ~ 4 ~ 7 ~ ~ 6 ~ 4 ~ ~] [5 ~ 5 ~ 4 ~ 5 ~ 7 ~ ~ 9 ~ 7 ~ ~] [6 ~ 6 ~ 4 ~ 6 ~ 8 ~ ~ 9 ~ 8 ~ ~] [4 ~ 4 ~ 2 ~ 4 ~ 6 ~ ~ 4 ~ 1 ~ ~]>")
+    .scale("A4:minor").s("supersaw").unison(7).detune(0.3).lpf(5000)
+    .attack(0.005).decay(0.3).sustain(0.4).release(0.2)
+    .room(0.5).delay(0.3).delaysync(3/16).gain(0.32).orbit(2)
+  const build = stack(
+    s("sd*<4 4 8 8 16 16 32 32>").bank("RolandTR909")
+      .gain(saw.range(0.3, 1).slow(8)),
+    s("white*16").decay(0.07).sustain(0)
+      .hpf(saw.range(300, 12000).slow(8)).gain(saw.range(0.05, 0.35).slow(8)),
+    lead.lpf(saw.range(600, 5000).slow(8)), pad
+  ).mask("<1!7 [1 1 1 0]>")
+
+  arrange(
+    [16, stack(kick0, hats)],                                  // intro
+    [16, stack(kick, hats, clap, bass, arp.lpf(1200))],       // groove: bas + przefiltrowany arp
+    [16, stack(kick, hats, clap, bass, arp, gate)],           // groove: pełny arp + bramka
+    [32, stack(pad, lead.room(0.8), arp.gain(0.12))],         // breakdown: sam hook
+    [8,  build],                                              // narastanie
+    [32, stack(kick, hats, clap, bass, arp, gate, lead)],     // hymn
+    [16, stack(kick0, hats, bass)]                             // outro
+  )
+`} />
+
+<ArrangementTimeline template="trance" />
+
+<DoDont
+  do={[
+    'Najpierw napisz melodię breakdownu — cały utwór jest zbudowany po to, żeby ją dostarczyć.',
+    'Trzymaj nuty basu krótsze niż szesnastka, żeby toczenie było zwarte.',
+    'Wrzuć pady, arp i lead na jedną orbitę i przyciszaj ją stopą.',
+    'Dodawaj albo zabieraj jeden element co 8 lub 16 taktów; hook zostaw bez zmian.',
+  ]}
+  dont={[
+    'Robić stopy tak głośnej i dudniącej jak w techno — walczy z toczącym się basem.',
+    'Pisać krótkiego breakdownu; w trance 16–32 takty to norma.',
+    'Zmieniać hooka między breakdownem a hymnem — nagrodą jest usłyszeć go znowu, większego.',
+    'Układać padu, arpu i leadu w tej samej oktawie; daj każdemu własny zakres — pad nisko, arp w środku, lead na górze.',
+  ]}
+/>

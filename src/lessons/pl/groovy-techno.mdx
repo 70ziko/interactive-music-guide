@@ -1,0 +1,127 @@
+„Groovy techno” to luźna etykieta, a nie ściśle zdefiniowany gatunek. Używa się jej dla techno, które **buja i się toczy** zamiast walić: dużo perkusji, haty z shufflem, tomy i kongi, krótkie funkowe linie basu i posiekane wstawki wokalne. Leży między klasycznym techno a perkusyjnym house'em i zachodzi na to, co często nazywa się **hardgroove** — gęste plemienne bębny i kongi w okolicach 135–145 BPM.
+
+<Callout kind="warn">
+Skoro etykieta jest luźna, traktuj tę stronę jako **przewodnik po stylu**, a nie definicję. Posłuchaj kilku utworów oznaczonych „groovy techno” albo „hardgroove” i porównaj je z wzorami poniżej.
+</Callout>
+
+## Odcisk palca (z grubsza)
+
+| Element | Zasada |
+|---|---|
+| Tempo | ~128–140 (hardgroove do ~145) |
+| Stopa | four on the floor, punktowa, krótsza niż w mrocznym techno |
+| Haty | z shufflem (swing), dużo ghost notes |
+| **Perkusja** | główny bohater: tomy, kongi/bongosy, rimy, shakery we wzajemnie zazębionych wzorach |
+| Bas | krótki, synkopowany, funkowy — często jedna nuta z rytmem |
+| Dodatki | krótkie wstawki wokalne, stabsy, mało albo zero melodii |
+| Feeling | toczący się, sprężysty, „ludzki” — groove ponad mrok |
+
+## 1. Lekko zaswinguj wszystko
+
+Najszybszy sposób, żeby techno było „groovy”, to umiarkowany swing na hatach i perkusji (lekcja 4). Stopę zostaw prostą.
+
+<Strudel title="prosta vs zaswingowana góra (na zmianę co 2 takty)" code={`
+  setcpm(132/4)
+  stack(
+    s("bd*4"),
+    stack(
+      s("hh*16").gain("[0.25 0.4 0.3 0.45]*4"),
+      s("[~ oh]*4").gain(0.4)
+    ).swingBy("<0 0 0.25 0.25>", 8)
+  ).bank("RolandTR909")._punchcard()
+`} />
+
+## 2. Zazębiona perkusja
+
+Groove bierze się z kilku partii perkusji, które **wypełniają sobie nawzajem luki**. Rytmy euklidesowe z różnymi przesunięciami świetnie się do tego nadają: każda partia ma prostą zasadę, a razem się toczą.
+
+<Strudel title="tomy, rim i shaker zazębione" code={`
+  setcpm(132/4)
+  stack(
+    s("bd*4").bank("RolandTR909"),
+    s("lt(3,8)").bank("RolandTR909").gain(0.5).pan(0.35),
+    s("mt(3,8,2)").bank("RolandTR909").gain(0.45).pan(0.65),
+    s("ht(5,16,3)").bank("RolandTR909").gain(0.3),
+    s("rim(7,16,1)").bank("RolandTR909").gain(0.3).pan(0.55),
+    s("sh*16").bank("RolandTR808").gain("[0.15 0.25]*8")
+  ).swingBy(0.2, 8)._punchcard()
+`} />
+
+<TryThis>
+Wyciszaj po kolei każdą linię perkusji (dodaj `.gain(0)` albo ją usuń). Zauważ, że groove za każdym razem robi się „płaski” — toczenie bierze się z połączenia, a nie z jednej partii.
+</TryThis>
+
+## 3. Funkowy bas
+
+Jedna nuta, ciekawy rytm. Krótki decay, synkopowane szesnastki i od czasu do czasu skok o oktawę. Odpowiada stopie, zamiast za nią iść.
+
+<Strudel title="krótki synkopowany bas" code={`
+  setcpm(132/4)
+  stack(
+    s("bd*4").bank("RolandTR909"),
+    note("[~ a1 ~ a1] [~ ~ a2 ~] [~ a1 ~ ~] [a1 ~ ~ a1]")
+      .s("square").lpf(600).lpq(4).decay(0.08).sustain(0).gain(0.65)
+  ).swingBy(0.2, 8)._punchcard()
+`} />
+
+## 4. Wstawki „wokalne”
+
+Prawdziwe groovy techno często zapętla krótki sampel wokalny. Bez sampli `vowel()` na pile daje gadający, wokalopodobny stab, który można rytmicznie siekać.
+
+<Strudel title="siekane samogłoski" code={`
+  setcpm(132/4)
+  note("[~ a3 ~ ~] [~ ~ a3 ~] [~ ~ ~ ~] [a3 ~ ~ ~]")
+    .s("sawtooth").vowel("<a e i o>").decay(0.15).sustain(0)
+    .gain(0.4).room(0.3).delay(0.3).delaysync(1/8)
+`} />
+
+## Szablon
+
+Utwór groovy techno na 144 takty (≈ 4,4 min przy 132 BPM).
+
+<Strudel title="szablon utworu groovy techno" code={`
+  setcpm(132/4)
+  const kick  = s("bd*4").bank("RolandTR909").gain(0.95)
+  const hats  = stack(s("hh*16").gain("[0.25 0.4 0.3 0.45]*4"), s("[~ oh]*4").gain(0.4))
+    .bank("RolandTR909").swingBy(0.22, 8).degradeBy(0.05)
+  const toms  = stack(
+    s("lt(3,8)").gain(0.5).pan(0.35),
+    s("mt(3,8,2)").gain(0.45).pan(0.65),
+    s("ht(5,16,3)").gain(0.3)
+  ).bank("RolandTR909").swingBy(0.22, 8)
+  const perc  = stack(s("rim(7,16,1)").bank("RolandTR909").gain(0.3).pan(0.55),
+    s("sh*16").bank("RolandTR808").gain("[0.15 0.25]*8")).swingBy(0.22, 8)
+  const clap  = s("~ cp ~ cp").bank("RolandTR909").gain(0.55).room(0.3)
+  const bass  = note("[~ a1 ~ a1] [~ ~ a2 ~] [~ a1 ~ ~] [a1 ~ ~ a1]")
+    .s("square").lpf(perlin.range(400, 900).slow(8)).lpq(4)
+    .decay(0.08).sustain(0).gain(0.65).swingBy(0.22, 8)
+  const vox   = note("[~ a3 ~ ~] [~ ~ a3 ~] [~ ~ ~ ~] [a3 ~ ~ ~]")
+    .s("sawtooth").vowel("<a e i o>").decay(0.15).sustain(0)
+    .gain(0.35).room(0.3).delay(0.3).delaysync(1/8).orbit(2)
+
+  arrange(
+    [16, stack(kick, hats)],                                  // intro
+    [32, stack(kick, hats, perc, bass)],                      // groove
+    [32, stack(kick, hats, perc, toms, bass, clap)],          // pełna perkusja
+    [16, stack(toms, perc, vox)],                             // przerwa: perkusja + wokal
+    [32, stack(kick, hats, perc, toms, bass, clap, vox)],     // szczyt
+    [16, stack(kick, hats, perc)]                             // outro
+  )
+`} />
+
+<ArrangementTimeline template="techno" />
+
+<DoDont
+  do={[
+    'Traktuj perkusję jak instrument prowadzący: 3–5 zazębionych partii.',
+    'Swinguj haty i perkusję umiarkowanie (0.15–0.3); stopę zostaw prostą.',
+    'Trzymaj bas krótki i rytmiczny — jedna nuta z dobrym rytmem bije melodię.',
+    'Rozłóż partie perkusji w panoramie, żeby każda miała miejsce.',
+  ]}
+  dont={[
+    'Używać długiego, mrocznego rumble — zabija sprężystość. Zostaw go na ciemniejsze techno.',
+    'Kłaść całej perkusji na tych samych krokach; partie muszą wypełniać sobie luki.',
+    'Dodawać dużych progresji akordów; jeden stab albo wstawka wokalna wystarczy.',
+    'Przeswingowywać; powyżej ~0.35 zaczyna brzmieć jak inny gatunek.',
+  ]}
+/>

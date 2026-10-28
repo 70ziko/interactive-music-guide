@@ -1,0 +1,181 @@
+Trance is the most **melodic** of the club genres: a rolling bassline, a 16th-note arpeggio, a gated pad, and a long breakdown where the whole track stops to let one melody sing — before it comes back as the "anthem".
+
+## Where it comes from
+
+Trance grew out of the **techno and EBM scene in Frankfurt, Germany, in the late 1980s and early 1990s**, and spread quickly across Europe (UK, Belgium, the Netherlands). Tracks usually sit between **125 and 150 BPM**, in 4/4, built from **16- and 32-beat phrases**. Instruments come in and out every 4, 8, 16 or 32 bars, and one central hook repeats through most of the track.
+
+Three things set it apart from house and techno:
+
+- **The kick is de-emphasised** to give space to the bassline.
+- **Snare rolls** announce every transition and climax.
+- **Rapid arpeggios**, mostly **minor keys**, and the **supersaw** — the waveform made famous by the Roland JP-8000.
+
+**Hard trance** added the **gated pad** and the template every trance producer knows: **breakdown → build → anthem**.
+
+## The family
+
+| Style | What defines it |
+|---|---|
+| Progressive trance | smoother, chart-oriented; slow-moving layers |
+| Uplifting trance | ~135–140 BPM, happier (major-leaning chords), long breakdowns, big drops, heavy sidechain |
+| Psytrance / Goa | Goa (India) roots; a constant pounding bass; new layers every 4–8 bars; full-on ~140–148 |
+| Hard / tech trance | faster and harder; tech trance mixes in techno |
+| Vocal trance | pop song form on top; "soaring" vocals |
+
+## The fingerprint
+
+| Element | Rule |
+|---|---|
+| Tempo | 125–150 (uplifting ~138, psy ~145) |
+| Kick | four on the floor, a bit quieter than in house — the bass gets the space |
+| Bass | rolling 16ths **between** the kicks (`~ x x x` per beat) |
+| Harmony | minor key, 4-chord loops, chords held for a whole bar |
+| Arp | 16th-note arpeggio through the chord, often with a synced delay |
+| Pad | supersaw chords chopped by a 16-step **trance gate** |
+| Lead | supersaw hook with lots of reverb and delay |
+| Arrangement | long; intro → groove → **long breakdown** → build → **anthem** → outro |
+
+## 1. The rolling bass
+
+The trance bassline is **three 16ths after every kick** — the kick takes the first 16th, the bass fills the other three. It sounds like one continuous rolling motion. A short filter envelope makes each note "pluck", and the first bass note after the kick is a bit quieter so the kick still punches through.
+
+<Strudel title="rolling bass: kick + 3 bass 16ths" code={`
+  setcpm(138/4)
+  kick: s("bd*4").bank("RolandTR909").gain(0.85)
+  bass: n("<0 -2 -1 -3>").scale("A1:minor").struct("[~ x x x]*4")
+    .s("sawtooth").lpf(350).lpenv(3).lpdecay(0.07)
+    .decay(0.1).sustain(0).gain("[0 0.5 0.7 0.7]*4")
+  hats: s("[~ oh]*4").bank("RolandTR909").gain(0.35)
+`} />
+
+<Callout kind="tip">
+`.decay(0.1).sustain(0)` keeps every note shorter than a 16th (≈ 109 ms at 138 BPM), so the notes never overlap and the roll stays tight. Longer notes smear into a drone.
+</Callout>
+
+## 2. The arp
+
+A 16th-note pattern walks up and down the chord tones. Because it is added to the progression **before** `.scale()` (lesson 8), it follows the chords automatically. A dotted-8th delay (`3/16` of a bar) fills the gaps with echoes that land on the off-16ths.
+
+The progression is written as `"<0 -2 -1 -3>"`: the same Am – F – G – Em as `"<0 5 6 4>"`, but each chord sits **below** A instead of above it. The parts move by small steps, so the arp stays in one range instead of jumping up an octave on every chord.
+
+<Strudel title="16th-note arp following the chords" code={`
+  setcpm(138/4)
+  arp: n("[0 2 4 2 7 4 2 4]*2").add(n("<0 -2 -1 -3>")).scale("A4:minor")
+    .s("supersaw").unison(3).detune(0.2)
+    .lpf(sine.range(1200, 4500).slow(16)).decay(0.12).sustain(0)
+    .delay(0.35).delaysync(3/16).delayfeedback(0.4).gain(0.35)
+  kick: s("bd*4").bank("RolandTR909").gain(0.85)
+`} />
+
+## 3. The trance gate
+
+A **trance gate** chops a held chord on a 16-step rhythm. In a DAW it is a gate plugin or an LFO on the volume; in Strudel it is simpler — play the chord as short 16th notes and choose which steps play with `struct()`. A very short release makes the cuts sharp.
+
+<Strudel title="gated supersaw pad (16-step gate)" code={`
+  setcpm(138/4)
+  gate: n("[0,2,4,7]").add(n("<0 -2 -1 -3>")).scale("A3:minor")
+    .struct("x x ~ x x ~ x ~ x x ~ x x ~ x x")
+    .s("supersaw").unison(5).detune(0.3).lpf(3000)
+    .attack(0.005).sustain(1).release(0.03).gain(0.3)
+  kick: s("bd*4").bank("RolandTR909").gain(0.85)
+`} />
+
+<TryThis>
+Change the gate pattern — every `~` is a hole. Try `"x*16"` (no gate at all), then `"[x ~]*8"` (straight 8ths). The chords stay the same; only the rhythm of the cuts changes the feel.
+</TryThis>
+
+## 4. Breakdown → build → anthem
+
+This is the heart of trance. The **breakdown** removes the kick and bass and leaves the hook alone over a pad, with big reverb — often for 32 bars. The **build** brings in a snare roll and opens the filter. Then the **anthem**: the same hook, now over everything.
+
+<Strudel title="the hook alone (breakdown sound)" code={`
+  setcpm(138/4)
+  pad: n("[0,2,4,7]").add(n("<0 -2 -1 -3>")).scale("A3:minor")
+    .s("supersaw").attack(1).release(2).sustain(1).lpf(1800).gain(0.2).room(0.6)
+  lead: n("<[4 ~ 4 ~ 2 ~ 4 ~ 7 ~ ~ 6 ~ 4 ~ ~] [5 ~ 5 ~ 4 ~ 5 ~ 7 ~ ~ 9 ~ 7 ~ ~] [6 ~ 6 ~ 4 ~ 6 ~ 8 ~ ~ 9 ~ 8 ~ ~] [4 ~ 4 ~ 2 ~ 4 ~ 6 ~ ~ 4 ~ 1 ~ ~]>")
+    .scale("A4:minor").s("supersaw").unison(7).detune(0.3).lpf(5000)
+    .attack(0.005).decay(0.3).sustain(0.4).release(0.2)
+    .room(0.7).roomsize(6).delay(0.3).delaysync(3/16).gain(0.35)
+`} />
+
+<Callout kind="info">
+Uplifting trance leans on **sidechain** ("ducking the kick") so the big pads and leads pump around the kick. In the template below everything melodic sits on orbit 2 and the kick ducks it — the same tool as in lesson 15.
+</Callout>
+
+## 5. A taste of psytrance
+
+Psytrance keeps the rolling bass but plays it on **one note** for long stretches, faster (~145), with a darker, squelchy lead and new layers every 4–8 bars.
+
+<Strudel title="psytrance: one-note roll + squelchy lead" code={`
+  setcpm(145/4)
+  kick: s("bd*4").bank("RolandTR909").gain(0.95)
+  bass: note("e1").struct("[~ x x x]*4").s("sawtooth")
+    .lpf(300).lpenv(3).lpdecay(0.05).decay(0.08).sustain(0).gain(0.75)
+  lead: n("0 ~ 1 0 ~ 3 ~ 1 0 ~ 7 ~ 6 ~ 3 1").scale("E3:phrygian")
+    .s("sawtooth").lpf(sine.range(400, 2500).slow(8)).lpq(12)
+    .decay(0.1).sustain(0).delay(0.3).delaysync(3/16).gain(0.35)
+  hats: s("hh*16").bank("RolandTR909").gain("[0.15 0.3]*8")
+`} />
+
+## The template
+
+A 136-bar track (≈ 4 min at 138 BPM). For a 7-minute club version, double the intro, groove and outro.
+
+<Strudel title="trance track template" code={`
+  setcpm(138/4)
+  const prog = "<0 -2 -1 -3>"
+  const kick0 = s("bd*4").bank("RolandTR909").gain(0.85)   // plain kick: nothing on orbit 2 to duck yet
+  const kick  = kick0.duckorbit(2).duckdepth(0.6).duckattack(0.2)
+  const hats  = s("[~ oh]*4, hh*16").bank("RolandTR909").gain("[0.15 0.25 0.4 0.25]*4")
+  const clap  = s("~ cp ~ cp").bank("RolandTR909").gain(0.55).room(0.3)
+  const bass  = n(prog).scale("A1:minor").struct("[~ x x x]*4")
+    .s("sawtooth").lpf(350).lpenv(3).lpdecay(0.07)
+    .decay(0.1).sustain(0).gain("[0 0.5 0.7 0.7]*4")
+  const arp   = n("[0 2 4 2 7 4 2 4]*2").add(n(prog)).scale("A4:minor")
+    .s("supersaw").unison(3).detune(0.2).lpf(3500).decay(0.12).sustain(0)
+    .delay(0.3).delaysync(3/16).gain(0.25).orbit(2)
+  const gate  = n("[0,2,4,7]").add(n(prog)).scale("A3:minor")
+    .struct("x x ~ x x ~ x ~ x x ~ x x ~ x x")
+    .s("supersaw").unison(5).detune(0.3).lpf(3000)
+    .attack(0.005).sustain(1).release(0.03).gain(0.25).orbit(2)
+  const pad   = n("[0,2,4,7]").add(n(prog)).scale("A3:minor")
+    .s("supersaw").attack(1).release(2).sustain(1).lpf(1800).gain(0.2).room(0.6).orbit(2)
+  const lead  = n("<[4 ~ 4 ~ 2 ~ 4 ~ 7 ~ ~ 6 ~ 4 ~ ~] [5 ~ 5 ~ 4 ~ 5 ~ 7 ~ ~ 9 ~ 7 ~ ~] [6 ~ 6 ~ 4 ~ 6 ~ 8 ~ ~ 9 ~ 8 ~ ~] [4 ~ 4 ~ 2 ~ 4 ~ 6 ~ ~ 4 ~ 1 ~ ~]>")
+    .scale("A4:minor").s("supersaw").unison(7).detune(0.3).lpf(5000)
+    .attack(0.005).decay(0.3).sustain(0.4).release(0.2)
+    .room(0.5).delay(0.3).delaysync(3/16).gain(0.32).orbit(2)
+  const build = stack(
+    s("sd*<4 4 8 8 16 16 32 32>").bank("RolandTR909")
+      .gain(saw.range(0.3, 1).slow(8)),
+    s("white*16").decay(0.07).sustain(0)
+      .hpf(saw.range(300, 12000).slow(8)).gain(saw.range(0.05, 0.35).slow(8)),
+    lead.lpf(saw.range(600, 5000).slow(8)), pad
+  ).mask("<1!7 [1 1 1 0]>")
+
+  arrange(
+    [16, stack(kick0, hats)],                                  // intro
+    [16, stack(kick, hats, clap, bass, arp.lpf(1200))],       // groove: bass + filtered arp
+    [16, stack(kick, hats, clap, bass, arp, gate)],           // groove: full arp + gate
+    [32, stack(pad, lead.room(0.8), arp.gain(0.12))],         // breakdown: the hook alone
+    [8,  build],                                              // build-up
+    [32, stack(kick, hats, clap, bass, arp, gate, lead)],     // anthem
+    [16, stack(kick0, hats, bass)]                             // outro
+  )
+`} />
+
+<ArrangementTimeline template="trance" />
+
+<DoDont
+  do={[
+    'Write the breakdown melody first — the whole track is built to deliver it.',
+    'Keep the bass notes shorter than a 16th so the roll stays tight.',
+    'Put pads, arp and lead on one orbit and duck it with the kick.',
+    'Add or remove one element every 8 or 16 bars; keep the hook constant.',
+  ]}
+  dont={[
+    'Make the kick as loud and boomy as in techno — it fights the rolling bass.',
+    'Write a short breakdown; in trance 16–32 bars is normal.',
+    'Change the hook between breakdown and anthem — the payoff is hearing it again, bigger.',
+    'Stack the pad, arp and lead in the same octave; give each its own range — pad low, arp in the middle, lead on top.',
+  ]}
+/>

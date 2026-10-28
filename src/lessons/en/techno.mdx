@@ -1,0 +1,147 @@
+Techno is house's cooler, more machine-like sibling: fewer chords, more rhythm, and loops that change so slowly you feel them more than hear them.
+
+## Where it comes from
+
+Techno came out of **Detroit in the mid-1980s**. The first wave is credited to the "Belleville Three" — **Juan Atkins, Derrick May and Kevin Saunderson** (yes, the Reese bass guy from lesson 12). It was quickly picked up in Europe, especially Germany (Frankfurt, Berlin). Tracks are made for **continuous DJ sets** and usually sit between **120 and 150 BPM**. The beat is 4/4, a repetitive four on the floor, often from a **TR-909 or TR-808** (or emulations). Compared to house, techno puts **rhythm first**: harmony is simplified into **repetitive sequences of notes**.
+
+## The fingerprint
+
+| Element | Rule |
+|---|---|
+| Tempo | 120–150 (rough guide: much club techno sits around 128–138) |
+| Kick | four on the floor, often longer and darker than in house |
+| Hats | open hat on the offbeat, 16th closed hats, often with a ride cymbal |
+| Clap / snare | sparse — sometimes on 2 and 4, sometimes just a rim or nothing |
+| Bass | a "rumble" (kick + dark reverb), or a short rolling note on the offbeat |
+| Harmony | one chord or none; dub stabs; atonal sequences |
+| Hook | a short hypnotic loop (1 bar or an odd length) |
+| Arrangement | long (often 6+ min), gradual: layers in and out, slow filter moves, short breaks |
+
+**The big difference from house:** in house a new *idea* arrives every 8–16 bars. In techno the *same* idea keeps going and only its **shape** changes — filter, resonance, decay, delay, a hat that thickens.
+
+## 1. The kick and the rumble
+
+The "rumble" is a low, smeared tail under the kick: the kick sent into a **dark reverb**, filtered so only the low end stays. It fills the space between kicks with sub energy instead of a bassline.
+
+<Strudel title="kick → kick + rumble (alternating 2 bars)" code={`
+  setcpm(132/4)
+  kick: s("bd*4").bank("RolandTR909").gain(0.95)
+  rumble: s("bd*4").bank("RolandTR909")
+    .room(1).roomsize(6).roomlp(300).roomfade(1.5)  // dark reverb tail
+    .lpf(200).gain("<0 0 0.9 0.9>").orbit(2)
+`} />
+
+<Callout kind="tip">
+`roomlp` filters the **reverb** (not the dry kick). Low values (200–500 Hz) keep only the boom. Putting the rumble on its own orbit keeps the reverb off everything else (lesson 11).
+</Callout>
+
+## 2. Hats, ride and percussion
+
+Techno's energy lives in the top end: 16th hats with accents, an open hat on the offbeat, a ride cymbal on 8ths, and one or two percussion lines in Euclidean patterns sitting *against* the kick.
+
+<Strudel title="top end" code={`
+  setcpm(132/4)
+  stack(
+    s("bd*4"),
+    s("[~ oh]*4").gain(0.45),
+    s("hh*16").gain("[0.25 0.35 0.55 0.35]*4"),
+    s("rd*8").gain(0.25),
+    s("rim(5,16,2)").gain(0.4).pan(0.65),
+    s("<~ ~ ~ cp>").gain(0.5).room(0.4)
+  ).bank("RolandTR909")._punchcard()
+`} />
+
+## 3. The hypnotic loop
+
+The techno hook is usually a **short sequence that repeats**, often in a length that does **not** divide the bar evenly. Mini-notation's `{…}%16` plays a sequence of any length at 16 steps per bar — so a 7-note loop lands differently every bar and only realigns after 7 bars. It feels hypnotic because it is both repetitive and always shifting.
+
+<Strudel title="7-note loop over 16 steps (polymeter)" code={`
+  setcpm(132/4)
+  stack(
+    s("bd*4").bank("RolandTR909"),
+    n("{0 ~ 3 0 ~ 7 5}%16").scale("A1:minor")
+      .s("sawtooth").lpf(sine.range(300, 1400).slow(16)).lpq(8)
+      .decay(0.12).sustain(0).gain(0.6)
+  )._pianoroll()
+`} />
+
+## 4. The dub stab
+
+A single minor chord, short, through a **delay** and a slowly moving filter — the sound of dub techno, and a great "atmosphere" layer in any techno track.
+
+<Strudel title="dub chord stab" code={`
+  setcpm(124/4)
+  chord("Am7").voicing().struct("[~ ~ x ~] [~ ~ ~ ~]")
+    .s("sawtooth").lpf(perlin.range(500, 1600).slow(8)).lpq(3)
+    .decay(0.12).sustain(0).gain(0.5)
+    .delay(0.6).delaysync(3/16).delayfeedback(0.6).room(0.4)
+`} />
+
+## 5. Change the shape, not the idea
+
+The core technique: keep the pattern, move one parameter slowly over 16–32 bars. In Strudel that means **continuous signals with long `.slow()`** — or live `slider()`s when performing.
+
+| Parameter | Slow move | Effect |
+|---|---|---|
+| `lpf` | `sine.range(300, 3000).slow(32)` | opens and closes the loop |
+| `decay` | `saw.range(0.05, 0.4).slow(16)` | short clicks → longer notes |
+| `delayfeedback` | `"<0.2 0.4 0.6 0.4>"` | echoes build up |
+| `degradeBy` on hats | `"<0.5 0.3 0.1 0>"` | hats thicken over 4 bars |
+
+## The template
+
+A 176-bar techno track (≈ 5.3 min at 132 BPM), built to be mixed.
+
+<Strudel title="techno track template" code={`
+  setcpm(132/4)
+  const kick   = s("bd*4").bank("RolandTR909").gain(0.95)
+  const rumble = s("bd*4").bank("RolandTR909")
+    .room(1).roomsize(6).roomlp(300).roomfade(1.5).lpf(200).gain(0.8).orbit(2)
+  const hats   = s("[~ oh]*4, hh*16").bank("RolandTR909")
+    .gain("[0.25 0.35 0.5 0.35]*4").degradeBy(0.05)
+  const ride   = s("rd*8").bank("RolandTR909").gain(0.22)
+  const perc   = s("rim(5,16,2)").bank("RolandTR909").gain(0.35).pan(0.65)
+  const clap   = s("~ cp ~ cp").bank("RolandTR909").gain(0.45).room(0.3).orbit(3)
+  const loop   = n("{0 ~ 3 0 ~ 7 5}%16").scale("A1:minor")
+    .s("sawtooth").lpf(sine.range(300, 1600).slow(32)).lpq(8)
+    .decay(0.12).sustain(0).gain(0.55)
+  const dub    = chord("Am7").voicing().struct("[~ ~ x ~] [~ ~ ~ ~]")
+    .s("sawtooth").lpf(1200).decay(0.12).sustain(0).gain(0.35)
+    .delay(0.6).delaysync(3/16).delayfeedback(0.55).orbit(4)
+
+  arrange(
+    [32, stack(kick, hats.degradeBy("<0.5 0.4 0.3 0.2 0.1 0 0 0>"))], // intro
+    [32, stack(kick, rumble, hats, perc)],                            // build
+    [32, stack(kick, rumble, hats, perc, ride, clap, loop)],          // peak
+    [16, stack(loop, dub)],                                           // break
+    [32, stack(kick, rumble, hats, perc, ride, clap, loop.lpq(14), dub)], // peak 2
+    [32, stack(kick, hats, perc)]                                     // outro
+  )
+`} />
+
+<ArrangementTimeline template="techno" />
+
+## House vs techno at a glance
+
+| | House | Techno |
+|---|---|---|
+| Tempo | 115–130 | 120–150 (mostly 128–138) |
+| Harmony | chords lead (m7, piano, organ) | little or none; loops and stabs |
+| Bass | melodic, offbeat or syncopated | rumble or one-note roll |
+| Change | new parts every 8–16 bars | slow parameter changes |
+| Mood | warm, soulful | hypnotic, mechanical, dark |
+
+<DoDont
+  do={[
+    'Build the track from a kick, a rumble and the top end before adding any melody.',
+    'Use one short loop and change its filter, decay or delay over 16–32 bars.',
+    'Use odd-length loops ({…}%16) for hypnotic movement.',
+    'Make intro and outro long (16–32 bars) and mixable.',
+  ]}
+  dont={[
+    'Write chord progressions — one chord (or none) is the norm.',
+    'Fill the track with breakdowns; one short break is enough.',
+    'Let the rumble reverb leak onto hats or claps — give it its own orbit.',
+    'Change too many things at once. Techno rewards patience.',
+  ]}
+/>

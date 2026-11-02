@@ -302,6 +302,7 @@ button { font: inherit; color: inherit; }
 .key.lit.black { background: color-mix(in srgb, var(--part, var(--accent)) 70%, #1b1a22); }
 .key.root.white, .key.root.black { background: var(--part, var(--accent)); }
 .key.pressed { outline: 3px solid var(--text); outline-offset: -3px; }
+.key { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
 .key .deg { font: 600 12px var(--font-mono); margin-bottom: 6px; }
 .key .cname { font: 10px var(--font-mono); opacity: 0.6; margin-bottom: 4px; }
 .gaps { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; font-family: var(--font-mono); font-size: 0.8rem; }

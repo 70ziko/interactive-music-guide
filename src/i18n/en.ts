@@ -74,7 +74,7 @@ export const en = {
   w_root: 'Root',
   w_scale: 'Scale',
   w_chord: 'Chord',
-  w_clickKey: 'Click a key to hear it',
+  w_clickKey: 'Click or tap a key to hear it; touch several keys at once for a chord',
   w_step: 'step',
   w_clear: 'Clear',
   w_preset: 'Preset',

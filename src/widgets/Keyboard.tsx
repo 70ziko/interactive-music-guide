@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useRef, useState, type PointerEvent } from 'react';
 import { useLang } from '../i18n/LangContext';
-import { midiName, midiToFreq, NOTE_NAMES, pluck } from '../audio/tone';
+import { audio, midiName, midiToFreq, NOTE_NAMES, pluck } from '../audio/tone';
 import { Controls, Seg, Widget } from './ui';
 
 export const SCALES: Record<string, { steps: number[]; en: string; pl: string; strudel: string }> = {
@@ -45,6 +45,9 @@ export default function Keyboard({ mode = 'free', root: r0 = 9, scale: s0 = 'min
   const [scale, setScale] = useState<string>(s0);
   const [chord, setChord] = useState<string>(c0);
   const [last, setLast] = useState<number | null>(null);
+  // Keys held right now, one per finger (or the mouse), so a chord lights up every key.
+  const fingers = useRef(new Map<number, number>()); // pointerId -> midi
+  const [held, setHeld] = useState<number[]>([]);
 
   const rootMidi = LOW + root; // in the first octave
   const steps = mode === 'scale' ? SCALES[scale].steps : mode === 'chord' ? CHORDS[chord].steps : [];
@@ -67,6 +70,20 @@ export default function Keyboard({ mode = 'free', root: r0 = 9, scale: s0 = 'min
     setLast(m);
     pluck([midiToFreq(m)], { wave: 'triangle' });
   };
+  // Pointer events fire once per finger; click does not fire for multi-finger touches,
+  // so chords on a touch screen need pointerdown.
+  const down = (m: number) => (e: PointerEvent<HTMLButtonElement>) => {
+    if (e.pointerType === 'mouse' && e.button !== 0) return;
+    e.preventDefault(); // no focus/selection side effects, no emulated mouse events
+    fingers.current.set(e.pointerId, m);
+    setHeld([...fingers.current.values()]);
+    press(m);
+  };
+  const up = (e: PointerEvent<HTMLButtonElement>) => {
+    audio(); // resumes the audio context on browsers that only unlock it on touch end
+    if (fingers.current.delete(e.pointerId)) setHeld([...fingers.current.values()]);
+  };
+
   const playAll = () => {
     const ms = [...lit.keys()].sort((a, b) => a - b);
     if (mode === 'chord') {
@@ -112,9 +129,15 @@ export default function Keyboard({ mode = 'free', root: r0 = 9, scale: s0 = 'min
             return (
               <button
                 key={m}
-                className={`key ${black ? 'black' : 'white'} ${deg !== undefined ? 'lit' : ''} ${deg === 0 ? 'root' : ''} ${last === m ? 'pressed' : ''}`}
+                className={`key ${black ? 'black' : 'white'} ${deg !== undefined ? 'lit' : ''} ${deg === 0 ? 'root' : ''} ${held.includes(m) || (held.length === 0 && last === m) ? 'pressed' : ''}`}
                 style={{ left: `${left}%`, width: `${black ? ww * 0.6 : ww}%` }}
-                onClick={() => press(m)}
+                onPointerDown={down(m)}
+                onPointerUp={up}
+                onPointerCancel={up}
+                onPointerLeave={up}
+                onContextMenu={(e) => e.preventDefault()}
+                // keyboard (Enter/Space) still works: those clicks have detail 0
+                onClick={(e) => e.detail === 0 && press(m)}
                 aria-label={midiName(m)}
               >
                 {deg !== undefined && <span className="deg">{mode === 'chord' ? ['R', '3', '5', '7', '9'][deg] ?? '' : deg + 1}</span>}

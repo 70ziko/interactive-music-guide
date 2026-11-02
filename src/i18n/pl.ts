@@ -71,7 +71,7 @@ export const pl: Dict = {
   w_root: 'Tonika',
   w_scale: 'Skala',
   w_chord: 'Akord',
-  w_clickKey: 'Kliknij klawisz, żeby go usłyszeć',
+  w_clickKey: 'Kliknij lub dotknij klawisza, żeby go usłyszeć; kilka klawiszy naraz zagra akord',
   w_step: 'krok',
   w_clear: 'Wyczyść',
   w_preset: 'Gotowiec',
